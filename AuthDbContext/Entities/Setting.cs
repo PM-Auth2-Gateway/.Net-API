@@ -15,7 +15,7 @@ namespace PMAuth.AuthDbContext.Entities
         public int SocialId { get; set; }
         public Social Social { get; set; }
 
-        public int ClientId { get; set; }
+        public string ClientId { get; set; }
         public string SecretKey { get; set; }
         public string Scope { get; set; }
 
