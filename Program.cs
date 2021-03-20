@@ -20,7 +20,7 @@ namespace PMAuth
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureServices(collection => collection.AddHostedService<MigrationService>())
+                //.ConfigureServices(collection => collection.AddHostedService<MigrationService>())
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

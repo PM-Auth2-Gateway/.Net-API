@@ -9,6 +9,7 @@ using PMAuth.AuthDbContext;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace PMAuth
 {
@@ -41,7 +42,7 @@ namespace PMAuth
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -58,6 +59,10 @@ namespace PMAuth
                 endpoints.MapHealthChecks("/health");
                 endpoints.MapControllers();
             });
+
+            using var scope = app.ApplicationServices.CreateScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<BackOfficeContext>();
+            await context.Database.MigrateAsync();
         }
     }
 }
