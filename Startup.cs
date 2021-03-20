@@ -35,7 +35,7 @@ namespace PMAuth
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 if (File.Exists(xmlPath))
                 {
-                    c.IncludeXmlComments(xmlPath);
+                    c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
                 }
             });
 
