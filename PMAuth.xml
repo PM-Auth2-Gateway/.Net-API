@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PMAuth</name>
+    </assembly>
+    <members>
+        <member name="T:PMAuth.Controllers.SocialsController">
+            <summary>
+            Return all socials by app_id
+            </summary>
+        </member>
+        <member name="M:PMAuth.Controllers.SocialsController.#ctor(PMAuth.AuthDbContext.BackOfficeContext)">
+            <summary>
+            SocialsController constructor
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:PMAuth.Controllers.SocialsController.Get(System.Int32)">
+            <summary>
+            Get all socials by app_id
+            </summary>
+            <param name="App_id">App_id header</param>
+            <returns>Socials</returns>
+        </member>
+        <member name="T:PMAuth.Services.MigrationService">
+            <summary>
+            Migration service.
+            </summary>
+        </member>
+        <member name="M:PMAuth.Services.MigrationService.#ctor(System.IServiceProvider)">
+            <summary>
+            MigrationService constructor.
+            </summary>
+            <param name="serviceProvider">IServiceProvider</param>
+        </member>
+        <member name="M:PMAuth.Services.MigrationService.StartAsync(System.Threading.CancellationToken)">
+            <summary>
+            Start migration service Async
+            </summary>
+            <param name="cancellationToken">CancellationToken</param>
+            <returns>Task</returns>
+        </member>
+        <member name="M:PMAuth.Services.MigrationService.StopAsync(System.Threading.CancellationToken)">
+            <summary>
+            Stop migration service Async
+            </summary>
+            <param name="cancellationToken">CancellationToken</param>
+            <returns>Task</returns>
+        </member>
+    </members>
+</doc>
