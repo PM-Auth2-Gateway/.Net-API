@@ -1,10 +1,18 @@
 ﻿    using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-    using PMAuth.Middleware;
+using PMAuth.Middleware;
+
+using PMAuth.AuthDbContext;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
+
 
     namespace PMAuth
 {
@@ -25,11 +33,22 @@ using Microsoft.OpenApi.Models;
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PMAuth", Version = "v1" });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                if (File.Exists(xmlPath))
+                {
+                    c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+                }
             });
+
+            services.AddDbContext<BackOfficeContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("BackOfficeContext"))
+                , ServiceLifetime.Transient);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -46,6 +65,10 @@ using Microsoft.OpenApi.Models;
                 endpoints.MapHealthChecks("/health");
                 endpoints.MapControllers();
             });
+
+            using var scope = app.ApplicationServices.CreateScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<BackOfficeContext>();
+            await context.Database.MigrateAsync();
         }
     }
 }
