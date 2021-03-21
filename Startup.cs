@@ -12,6 +12,9 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+    using PMAuth.Models.OAuthGoogle;
+    using PMAuth.Services.Abstract;
+    using PMAuth.Services.GoogleOAuth2;
 
 
     namespace PMAuth
@@ -58,6 +61,11 @@ using System.Threading.Tasks;
             services.AddDbContext<BackOfficeContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("BackOfficeContext"))
                 , ServiceLifetime.Transient);
+
+            services.AddHttpClient();
+
+            services.AddTransient<IAccessTokenReceivingService<GoogleTokensModel>, GoogleAccessTokenReceivingService>();
+            
         }
 
         /// <summary>

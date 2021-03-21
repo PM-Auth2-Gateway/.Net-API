@@ -141,6 +141,11 @@
             Auth Uri
             </summary>
         </member>
+        <member name="T:PMAuth.Controllers.ProfileController">
+            <summary>
+            Get user profile by authorization code 
+            </summary>
+        </member>
         <member name="T:PMAuth.Controllers.SocialsController">
             <summary>
             Controller that operate socials.
@@ -198,6 +203,21 @@
             <remarks>
             Ny i zachem ti syda zawel???
             </remarks>
+        </member>
+        <member name="T:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel">
+            <summary>
+            Authorization code model 
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.AuthorizationCode">
+            <summary>
+            Authorization code itself
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.RedirectUri">
+            <summary>
+            RedirectUri, for now it is hardcoded, so you can type anything here
+            </summary>
         </member>
         <member name="T:PMAuth.Models.SocialLinkModel">
             <summary>
