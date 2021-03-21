@@ -4,6 +4,138 @@
         <name>PMAuth</name>
     </assembly>
     <members>
+        <member name="T:PMAuth.AuthDbContext.BackOfficeContext">
+            <summary>
+            BackOfficeContext
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.BackOfficeContext.Admins">
+            <summary>
+            Admins DbSet
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.BackOfficeContext.Apps">
+            <summary>
+            Apps DbSet
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.BackOfficeContext.Socials">
+            <summary>
+            Socials DbSet
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.BackOfficeContext.Settings">
+            <summary>
+            Settings DbSet
+            </summary>
+        </member>
+        <member name="M:PMAuth.AuthDbContext.BackOfficeContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{PMAuth.AuthDbContext.BackOfficeContext})">
+            <summary>
+            BackOfficeContext constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="T:PMAuth.AuthDbContext.Entities.Admin">
+            <summary>
+            Admin entity
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Admin.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Admin.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="T:PMAuth.AuthDbContext.Entities.App">
+            <summary>
+            App entity
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.App.Id">
+            <summary>
+            App id
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.App.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.App.AdminId">
+            <summary>
+            Admin Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.App.Admin">
+            <summary>
+            Admin entity
+            </summary>
+        </member>
+        <member name="T:PMAuth.AuthDbContext.Entities.Setting">
+            <summary>
+            Setting entity
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.Id">
+            <summary>
+            Setting id (identity)
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.AppId">
+            <summary>
+            App Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.App">
+            <summary>
+            App entity
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.SocialId">
+            <summary>
+            Social Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.Social">
+            <summary>
+            Social entity
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.ClientId">
+            <summary>
+            Client Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.SecretKey">
+            <summary>
+            Secret Key
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.Scope">
+            <summary>
+            Scope
+            </summary>
+        </member>
+        <member name="T:PMAuth.AuthDbContext.Entities.Social">
+            <summary>
+            Social entity
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Social.Id">
+            <summary>
+            Social id.
+            </summary>
+            <remarks>Primary key.</remarks>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Social.Name">
+            <summary>
+            Social name.
+            </summary>
+        </member>
         <member name="T:PMAuth.Controllers.SocialsController">
             <summary>
             Return all socials by app_id
@@ -13,14 +145,71 @@
             <summary>
             SocialsController constructor
             </summary>
-            <param name="context"></param>
+            <param name="context">BackOfficeContext</param>
         </member>
         <member name="M:PMAuth.Controllers.SocialsController.Get(System.Int32)">
             <summary>
             Get all socials by app_id
             </summary>
             <param name="App_id">App_id header</param>
-            <returns>Socials</returns>
+            <returns>
+            <see cref="F:System.Net.HttpStatusCode.OK"/> SocialsModel
+            <see cref="F:System.Net.HttpStatusCode.BadRequest"/> for unexisting app_id.
+            </returns>
+            <remarks>
+            Get SocialModel from app_id header
+            </remarks>
+        </member>
+        <member name="T:PMAuth.Controllers.WeatherForecastController">
+            <summary>
+            Eto nam ne nado, prosto testoviy endpoint
+            </summary>
+        </member>
+        <member name="M:PMAuth.Controllers.WeatherForecastController.#ctor(Microsoft.Extensions.Logging.ILogger{PMAuth.Controllers.WeatherForecastController})">
+            <summary>
+            WeatherForecastController constructor
+            </summary>
+            <param name="logger"></param>
+        </member>
+        <member name="M:PMAuth.Controllers.WeatherForecastController.Get">
+            <summary>
+            Daje ne otkrivai
+            </summary>
+            <returns>IEnumerable WeatherForecast</returns>
+            <remarks>
+            Ny i zachem ti syda zawel???
+            </remarks>
+        </member>
+        <member name="T:PMAuth.Models.SocialsModel">
+            <summary>
+            A social model.
+            </summary>
+            <remarks>
+            Model has list of socials.
+            </remarks>
+        </member>
+        <member name="P:PMAuth.Models.SocialsModel.Socials">
+            <summary>
+            List of socials.
+            </summary>
+        </member>
+        <member name="T:PMAuth.Program">
+            <summary>
+            Program class
+            </summary>
+        </member>
+        <member name="M:PMAuth.Program.Main(System.String[])">
+            <summary>
+            Entry point (main)
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:PMAuth.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            CreateHostBuilder
+            </summary>
+            <param name="args">string[] args</param>
+            <returns>IHostBuilder</returns>
         </member>
         <member name="T:PMAuth.Services.MigrationService">
             <summary>
@@ -46,6 +235,60 @@
             </summary>
             <param name="cancellationToken">CancellationToken</param>
             <returns>Task</returns>
+        </member>
+        <member name="T:PMAuth.Startup">
+            <summary>
+            Startup
+            </summary>
+        </member>
+        <member name="M:PMAuth.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Startup constructor
+            </summary>
+            <param name="configuration">IConfiguration</param>
+        </member>
+        <member name="P:PMAuth.Startup.Configuration">
+            <summary>
+            Configuration
+            </summary>
+        </member>
+        <member name="M:PMAuth.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services">IServiceCollection</param>
+        </member>
+        <member name="M:PMAuth.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app">IApplicationBuilder</param>
+            <param name="env">IWebHostEnvironment</param>
+        </member>
+        <member name="T:PMAuth.WeatherForecast">
+            <summary>
+            Vse ewe ne ponimau za4em ti eto smotriw ...
+            </summary>
+        </member>
+        <member name="P:PMAuth.WeatherForecast.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:PMAuth.WeatherForecast.TemperatureC">
+            <summary>
+            TemperatureC
+            </summary>
+        </member>
+        <member name="P:PMAuth.WeatherForecast.TemperatureF">
+            <summary>
+            TemperatureF
+            </summary>
+        </member>
+        <member name="P:PMAuth.WeatherForecast.Summary">
+            <summary>
+            Summary
+            </summary>
         </member>
     </members>
 </doc>

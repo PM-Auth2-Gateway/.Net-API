@@ -13,16 +13,29 @@ using System.Threading.Tasks;
 
 namespace PMAuth
 {
+    /// <summary>
+    /// Startup
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// Startup constructor
+        /// </summary>
+        /// <param name="configuration">IConfiguration</param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// Configuration
+        /// </summary>
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services">IServiceCollection</param>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks();
@@ -44,7 +57,11 @@ namespace PMAuth
                 , ServiceLifetime.Transient);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">IApplicationBuilder</param>
+        /// <param name="env">IWebHostEnvironment</param>
         public async void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

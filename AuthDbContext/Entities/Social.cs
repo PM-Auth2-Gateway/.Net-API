@@ -5,9 +5,20 @@ using System.Threading.Tasks;
 
 namespace PMAuth.AuthDbContext.Entities
 {
+    /// <summary>
+    /// Social entity
+    /// </summary>
     public class Social
     {
+        /// <summary>
+        /// Social id.
+        /// </summary>
+        /// <remarks>Primary key.</remarks>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Social name.
+        /// </summary>
         public string Name { get; set; }
     }
 }
