@@ -56,9 +56,7 @@ namespace PMAuth.Controllers
         {
             //todo Authorize
             var admin = "admin";
-            var adminId = _backOfficeContext.Admins.First(a => a.Name == admin).Id;
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
-            await _backOfficeContext.SaveChangesAsync();
             return Ok(resApp);
         }
         [HttpDelete]
