@@ -20,5 +20,10 @@ namespace PMAuth.AuthDbContext.Entities
         /// Social name.
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Auth Uri
+        /// </summary>
+        public string AuthUri { get; set; }
     }
 }

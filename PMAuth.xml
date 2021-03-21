@@ -136,6 +136,11 @@
             Social name.
             </summary>
         </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Social.AuthUri">
+            <summary>
+            Auth Uri
+            </summary>
+        </member>
         <member name="T:PMAuth.Controllers.SocialsController">
             <summary>
             Return all socials by app_id
