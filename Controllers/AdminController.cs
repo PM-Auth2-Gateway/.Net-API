@@ -139,6 +139,7 @@ namespace PMAuth.Controllers
                 Scope = social.Scope,
                 AppId = appId
             };
+            _backOfficeContext.Settings.Add(setting);
             await _backOfficeContext.SaveChangesAsync();
             return Ok(setting);
         }
