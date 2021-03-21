@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PMAuth.AuthDbContext;
 using PMAuth.AuthDbContext.Entities;
+using PMAuth.Models;
 
 namespace PMAuth.Controllers
 {
@@ -23,6 +24,14 @@ namespace PMAuth.Controllers
         [Route("token")]
         public async Task<ActionResult<string>> GetToken([FromHeader] string authCode)
         {
+            var admin= _backOfficeContext.Admins.First(a => a.Name == "admin");
+            if (admin == null)
+            {
+                admin = new Admin() {Name = "admin"};
+                _backOfficeContext.Admins.Add(admin);
+            }
+
+            await _backOfficeContext.SaveChangesAsync();
             return Ok();
         }
 
@@ -118,16 +127,18 @@ namespace PMAuth.Controllers
         }
         
         [HttpPost]
-        [Route("socials/{socialId}")]
-        public async Task<ActionResult<Setting>> PostSocialSetting([FromHeader] string Authentication, [FromQuery]int socialId,[FromHeader] int appId,
-            [FromBody] string ClientId, [FromBody] string SecretKey,[FromBody] string Scope)
+        [Route("socials")]
+        public async Task<ActionResult<Setting>> PostSocialSetting([FromHeader] string Authentication,[FromHeader] int appId, [FromBody] SocialCreateModel social)
         {
             //todo Authorize
             var admin = "admin";
-            var setting = _backOfficeContext.Settings.First(s => (s.AppId == appId) && (s.SocialId == socialId));
-            setting.ClientId = ClientId;
-            setting.SecretKey = SecretKey;
-            setting.Scope = Scope;
+            var setting = new Setting()
+            {
+                ClientId = social.ClientId,
+                SecretKey = social.SecretKey,
+                Scope = social.Scope,
+                AppId = appId
+            };
             await _backOfficeContext.SaveChangesAsync();
             return Ok(setting);
         }
