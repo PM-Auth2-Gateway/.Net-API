@@ -143,7 +143,7 @@
         </member>
         <member name="T:PMAuth.Controllers.SocialsController">
             <summary>
-            Return all socials by app_id
+            Controller that operate socials.
             </summary>
         </member>
         <member name="M:PMAuth.Controllers.SocialsController.#ctor(PMAuth.AuthDbContext.BackOfficeContext)">
@@ -152,7 +152,7 @@
             </summary>
             <param name="context">BackOfficeContext</param>
         </member>
-        <member name="M:PMAuth.Controllers.SocialsController.Get(System.Int32)">
+        <member name="M:PMAuth.Controllers.SocialsController.GetAllSocials(System.Int32)">
             <summary>
             Get all socials by app_id
             </summary>
@@ -163,6 +163,20 @@
             </returns>
             <remarks>
             Get SocialModel from app_id header
+            </remarks>
+        </member>
+        <member name="M:PMAuth.Controllers.SocialsController.GetLinkParameters(System.Int32,PMAuth.Models.SocialModel)">
+            <summary>
+            Get parameters for social auth link.
+            </summary>
+            <param name="App_id">App_id header</param>
+            <param name="socialModel">Social Model</param>
+            <returns>
+            <see cref="F:System.Net.HttpStatusCode.OK"/> SocialLinkModel
+            <see cref="F:System.Net.HttpStatusCode.BadRequest"/> for unexisting app_id or social_id.
+            </returns>
+            <remarks>
+            Get SocialLinkModel from app_id header and social_id value.
             </remarks>
         </member>
         <member name="T:PMAuth.Controllers.WeatherForecastController">
@@ -184,6 +198,51 @@
             <remarks>
             Ny i zachem ti syda zawel???
             </remarks>
+        </member>
+        <member name="T:PMAuth.Models.SocialLinkModel">
+            <summary>
+            Social Link parameters
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialLinkModel.AuthUri">
+            <summary>
+            Auth Uri.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialLinkModel.Prompt">
+            <summary>
+            Prompt.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialLinkModel.ResponseType">
+            <summary>
+            Response Type.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialLinkModel.ClientId">
+            <summary>
+            Client Id.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialLinkModel.Scope">
+            <summary>
+            Scope.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialLinkModel.AccessType">
+            <summary>
+            Access Type.
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.SocialModel">
+            <summary>
+            Requested social model
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialModel.SocialId">
+            <summary>
+            Social Id.
+            </summary>
         </member>
         <member name="T:PMAuth.Models.SocialsModel">
             <summary>

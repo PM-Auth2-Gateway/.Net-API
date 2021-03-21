@@ -11,7 +11,7 @@ using PMAuth.Models;
 namespace PMAuth.Controllers
 {
     /// <summary>
-    /// Return all socials by app_id
+    /// Controller that operate socials.
     /// </summary>
     [ApiController]
     [Route("[controller]")]
@@ -42,7 +42,7 @@ namespace PMAuth.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(SocialsModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        public ActionResult<SocialsModel> Get([FromHeader] int App_id)
+        public ActionResult<SocialsModel> GetAllSocials([FromHeader] int App_id)
         {
             Setting setting = context.Settings.FirstOrDefault(x => x.AppId == App_id);
 
@@ -53,6 +53,44 @@ namespace PMAuth.Controllers
             if (socials == null) return BadRequest();
 
             return new SocialsModel() { Socials = socials };
+
+        }
+
+
+        /// <summary>
+        /// Get parameters for social auth link.
+        /// </summary>
+        /// <param name="App_id">App_id header</param>
+        /// <param name="socialModel">Social Model</param>
+        /// <returns>
+        /// <see cref="HttpStatusCode.OK"/> SocialLinkModel
+        /// <see cref="HttpStatusCode.BadRequest"/> for unexisting app_id or social_id.
+        /// </returns>
+        /// <remarks>
+        /// Get SocialLinkModel from app_id header and social_id value.
+        /// </remarks>
+        [HttpPost("auth-link")]
+        [ProducesResponseType(typeof(SocialLinkModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        public ActionResult<SocialLinkModel> GetLinkParameters([FromHeader] int App_id, [FromBody] SocialModel socialModel)
+        {
+            Setting setting = context.Settings.FirstOrDefault(x => x.AppId == App_id && x.SocialId == socialModel.SocialId);
+
+            if (setting == null) return BadRequest();
+
+            Social social = context.Socials.FirstOrDefault(x => x.Id == setting.SocialId);
+
+            if (social == null) return BadRequest();
+
+            return new SocialLinkModel()
+            {
+                AuthUri = social.AuthUri,
+                Prompt = "consent",
+                ResponseType = "code",
+                ClientId = setting.ClientId,
+                Scope = setting.Scope,
+                AccessType = "offline"
+            };
 
         }
     }
