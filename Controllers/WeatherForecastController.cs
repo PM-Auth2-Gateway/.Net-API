@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace PMAuth.Controllers
 {
+    /// <summary>
+    /// Eto nam ne nado, prosto testoviy endpoint
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
@@ -18,11 +21,22 @@ namespace PMAuth.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
+        /// <summary>
+        /// WeatherForecastController constructor
+        /// </summary>
+        /// <param name="logger"></param>
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Daje ne otkrivai
+        /// </summary>
+        /// <returns>IEnumerable WeatherForecast</returns>
+        /// <remarks>
+        /// Ny i zachem ti syda zawel???
+        /// </remarks>
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
