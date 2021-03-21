@@ -24,14 +24,14 @@ namespace PMAuth.Controllers
         [Route("token")]
         public async Task<ActionResult<string>> GetToken([FromHeader] string authCode)
         {
-            var admin= _backOfficeContext.Admins.First(a => a.Name == "admin");
+            var admin= _backOfficeContext.Admins.FirstOrDefault(a => a.Name == "admin");
             if (admin == null)
             {
                 admin = new Admin() {Name = "admin"};
                 _backOfficeContext.Admins.Add(admin);
+                await _backOfficeContext.SaveChangesAsync();
             }
 
-            await _backOfficeContext.SaveChangesAsync();
             return Ok();
         }
 
@@ -48,20 +48,20 @@ namespace PMAuth.Controllers
 
         [HttpPost]
         [Route("applications")]
-        public async Task<ActionResult<App>> PostApp([FromHeader] string Authentication, [FromBody] string name)
+        public async Task<ActionResult<App>> PostApp([FromHeader] string Authentication, [FromHeader] string name)
         {
             //todo Authorize
             var admin = "admin";
             var adminId = _backOfficeContext.Admins.First(a => a.Name == admin).Id;
             var app = new App() {Name = name, AdminId = adminId};
-            var resApp = _backOfficeContext.Apps.Add(app);
+            var resApp = _backOfficeContext.Apps.Add(app).Entity;
             await _backOfficeContext.SaveChangesAsync();
             return Ok(resApp);
         }
 
         [HttpGet]
         [Route("applications/{appId}")]
-        public async Task<ActionResult<App>> GetAppInfo([FromHeader] string Authentication, [FromQuery] int appId)
+        public async Task<ActionResult<App>> GetAppInfo([FromHeader] string Authentication, [FromRoute] int appId)
         {
             //todo Authorize
             var admin = "admin";
@@ -70,7 +70,7 @@ namespace PMAuth.Controllers
         }
         [HttpDelete]
         [Route("applications/{appId}")]
-        public async Task<ActionResult<App>> DeleteApp([FromHeader] string Authentication, [FromQuery] int appId)
+        public async Task<ActionResult<App>> DeleteApp([FromHeader] string Authentication, [FromRoute] int appId)
         {
             //todo Authorize
             var admin = "admin";
@@ -89,7 +89,7 @@ namespace PMAuth.Controllers
         }
         [HttpPut]
         [Route("applications/{appId}")]
-        public async Task<ActionResult<App>> PutApp([FromHeader] string Authentication, [FromQuery] int appId, [FromBody] string name)
+        public async Task<ActionResult<App>> PutApp([FromHeader] string Authentication, [FromRoute] int appId, [FromHeader] string name)
         {
             //todo Authorize
             var admin = "admin";
@@ -117,18 +117,18 @@ namespace PMAuth.Controllers
         }
         [HttpGet]
         [Route("socials/{socialId}")]
-        public async Task<ActionResult<Setting>> GetSocialSetting([FromHeader] string Authentication, [FromQuery]int socialId,[FromHeader] int appId)
+        public async Task<ActionResult<Setting>> GetSocialSetting([FromHeader] string Authentication, [FromRoute] int socialId,[FromHeader] int appId)
         {
             //todo Authorize
             var admin = "admin";
-            var setting = _backOfficeContext.Settings.First(s => (s.AppId == appId) && (s.SocialId == socialId));
+            var setting = _backOfficeContext.Settings.FirstOrDefault(s => (s.AppId == appId) && (s.SocialId == socialId));
 
             return Ok(setting);
         }
         
         [HttpPost]
         [Route("socials")]
-        public async Task<ActionResult<Setting>> PostSocialSetting([FromHeader] string Authentication,[FromHeader] int appId, [FromBody] SocialCreateModel social)
+        public async Task<ActionResult<Setting>> PostSocialSetting([FromHeader] int socialId,[FromHeader] string Authentication,[FromHeader] int appId, [FromBody] SocialCreateModel social)
         {
             //todo Authorize
             var admin = "admin";
@@ -137,7 +137,8 @@ namespace PMAuth.Controllers
                 ClientId = social.ClientId,
                 SecretKey = social.SecretKey,
                 Scope = social.Scope,
-                AppId = appId
+                AppId = appId,
+                SocialId = socialId
             };
             _backOfficeContext.Settings.Add(setting);
             await _backOfficeContext.SaveChangesAsync();
