@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -53,7 +55,7 @@ namespace PMAuth.Controllers
         [HttpGet("test")]
         public IActionResult Test()
         {
-            _logger.LogWarning("Request path: " + Request.Path + ", pathBase: "
+            _logger.LogWarning("Request path: " + Request.Path.Value + ", pathBase: "
                 + Request.PathBase + ", host: value => " + Request.Host.Value + 
                 ", host.host => " + Request.Host.Host + ", scheme: " + Request.Scheme + ", localIpAdress"
                 + Request.HttpContext.Connection.LocalIpAddress);
@@ -62,6 +64,14 @@ namespace PMAuth.Controllers
                 + Request.PathBase + ", host: value => " + Request.Host.Value +
                 ", host.host => " + Request.Host.Host + ", scheme: " + Request.Scheme + ", localIpAdress"
                 + Request.HttpContext.Connection.LocalIpAddress);
+
+            var url = Request.GetTypedHeaders().Referer;
+            _logger.LogWarning("Refer: absolute => " + url.AbsoluteUri + ", path => " + url.AbsolutePath +
+                ", fragment : " + url.Fragment + ", segment: " + url.Segments.FirstOrDefault() + ", host: " + url.Host + 
+                ", local: " + url.LocalPath + ", user info: " + url.UserInfo + ", authority: " + url.Authority + 
+                HttpContext.Request.Path + " " + HttpContext.Request.Path.Value + ", encodedUrl: " 
+                + HttpContext.Request.GetEncodedUrl() + ", displayUrl: " + HttpContext.Request.GetDisplayUrl());
+
             return Redirect("pmacademy://");
         }
     }
