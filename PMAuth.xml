@@ -212,6 +212,46 @@
             Ny i zachem ti syda zawel???
             </remarks>
         </member>
+        <member name="P:PMAuth.Models.SettingModel.Id">
+            <summary>
+            Setting id (identity)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.AppId">
+            <summary>
+            App Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.AppName">
+            <summary>
+            App name
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.SocialId">
+            <summary>
+            Social Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.SocialName">
+            <summary>
+            Social name
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.ClientId">
+            <summary>
+            Client Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.SecretKey">
+            <summary>
+            Secret Key
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.Scope">
+            <summary>
+            Scope
+               </summary>
+        </member>
         <member name="T:PMAuth.Exceptions.Models.AuthorizationCodeExchangeExceptionModel">
             <summary>
             Error model. It will be put in response if something went wrong while getting user profile from social network
