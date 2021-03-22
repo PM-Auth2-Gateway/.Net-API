@@ -141,6 +141,19 @@
             Auth Uri
             </summary>
         </member>
+        <member name="T:PMAuth.Controllers.ProfileController">
+            <summary>
+            Get user profile by authorization code 
+            </summary>
+        </member>
+        <member name="M:PMAuth.Controllers.ProfileController.GetUserProfileAsync(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+            <summary>
+            Get user profile
+            </summary>
+            <param name="appId">Application id (this id admin receives in the backoffice)</param>
+            <param name="authCodeModel">Authorization code model </param>
+            <returns>UserProfile or AuthorizationCodeExchangeExceptionModel</returns>
+        </member>
         <member name="T:PMAuth.Controllers.SocialsController">
             <summary>
             Controller that operate socials.
@@ -237,6 +250,136 @@
         <member name="P:PMAuth.Models.SettingModel.Scope">
             <summary>
             Scope
+               </summary>
+        </member>
+        <member name="T:PMAuth.Exceptions.Models.AuthorizationCodeExchangeExceptionModel">
+            <summary>
+            Error model. It will be put in response if something went wrong while getting user profile from social network
+            </summary>
+        </member>
+        <member name="P:PMAuth.Exceptions.Models.AuthorizationCodeExchangeExceptionModel.ErrorDescription">
+            <summary>
+            Detailed description of an error
+            </summary>
+        </member>
+        <member name="P:PMAuth.Exceptions.Models.AuthorizationCodeExchangeExceptionModel.Error">
+            <summary>
+            Error message
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthGoogle.GoogleTokensModel">
+            <summary>
+            Model for retrieving access and refresh tokens from Google 
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthGoogle.GoogleTokensModel.IdToken">
+            <summary>
+            JWT token which contains all user info according to used scope
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthGoogle.GoogleTokensModel.TokenType">
+            <summary>
+            Token type, always Bearer
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthGoogle.GoogleTokensModel.Scope">
+            <summary>
+            Used scope
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthGoogle.GoogleTokensModel.RefreshToken">
+            <summary>
+            Refresh token
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel">
+            <summary>
+            Authorization code model 
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.SocialId">
+            <summary>
+            Id of the social network through which authorization is made
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.AuthorizationCode">
+            <summary>
+            Authorization code itself
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.RedirectUri">
+            <summary>
+            RedirectUri, for now it is hardcoded, so you can type anything here
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthUniversal.TokenModel">
+            <summary>
+            Base token model. Can be used for multiple social networks
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.TokenModel.AccessToken">
+            <summary>
+            Access token which allows us to make calls to social network API
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.TokenModel.ExpiresIn">
+            <summary>
+            Expiration time of token in seconds
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthUniversal.UserProfile">
+            <summary>
+            Unified model of user profile
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.Id">
+            <summary>
+            Users unique ID in social network used for authorization
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.AccessToken">
+            <summary>
+            Access token received from the social network
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.RefreshToken">
+            <summary>
+            Refresh token received from the social network (may be absent)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.ExpiresIn">
+            <summary>
+            Token expiration time in seconds received from the social network
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.FirstName">
+            <summary>
+            User's first name received from the social network (may be absent)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.LastName">
+            <summary>
+            User's last name received from the social network (may be absent)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.Email">
+            <summary>
+            User's email received from the social network (may be absent)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.IsVerifiedEmail">
+            <summary>
+            Is user's email verified received from the social network (may be absent)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.Photo">
+            <summary>
+            User's profile photo link received from the social network (may be absent)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.Locale">
+            <summary>
+            User's profile locale received from the social network (may be absent)
             </summary>
         </member>
         <member name="T:PMAuth.Models.SocialLinkModel">
@@ -314,6 +457,57 @@
             </summary>
             <param name="args">string[] args</param>
             <returns>IHostBuilder</returns>
+        </member>
+        <member name="M:PMAuth.Services.Abstract.IAccessTokenReceivingService.ExchangeAuthorizationCodeForTokens(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+            <summary>
+            Method for exchanging authorization code for access token
+            </summary>
+            <param name="appId">application ID</param>
+            <param name="authenticationCodeModel">Model with authorization code</param>
+            <returns>Model with access token and other info</returns>
+            <exception cref="T:PMAuth.Exceptions.AuthorizationCodeExchangeException">
+            The request failed due to an underlying issue such as network connectivity,
+            DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
+            </exception>
+        </member>
+        <member name="M:PMAuth.Services.Abstract.IProfileManager.GetUserProfileAsync(PMAuth.Models.OAuthUniversal.TokenModel)">
+            <summary>
+            
+            </summary>
+            <param name="tokensModel"></param>
+            <returns></returns>
+        </member>
+        <member name="T:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext">
+            <summary>
+            Context for setting code flow for processing exchange of authorization code on user profile
+            Consists of two strategies.
+            1. Strategy of exchanging authorization code for access token (IAccessTokenReceivingService)
+                1.1 All exceptions that occurs during the process of code exchange should be wrapped into AuthorizationCodeExchangeException
+            2. Strategy of getting user profile from the social network and returning it in unified model (UserProfile)
+                2.1 If on this stage you need to make calls to the social network API, exception during these calls should be also
+                wrapped into AuthorizationCodeExchangeException.
+                2.2 If there may be some exceptions regarding models mapping (like JsonException), contact your teammates and
+                introduce a new type of exception to avoid leaky abstraction
+            </summary>
+        </member>
+        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.SetStrategies(PMAuth.Services.Abstract.IAccessTokenReceivingService,PMAuth.Services.Abstract.IProfileManager)">
+            <summary>
+            Set code flow for chosen social network
+            </summary>
+            <param name="accessTokenReceivingStrategy">service which exchanges authorization token on access token</param>
+            <param name="profileManagerStrategy">service which gets user profile from social network and return unified user profile</param>
+        </member>
+        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.Execute(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+            <summary>
+            Get user profile by authorization code
+            </summary>
+            <param name="appId">application ID</param>
+            <param name="authorizationCodeModel">Model with authorization code</param>
+            <returns>Unified user profile</returns>
+            <exception cref="T:PMAuth.Exceptions.AuthorizationCodeExchangeException">
+            The request failed due to an underlying issue such as network connectivity,
+            DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
+            </exception>
         </member>
         <member name="T:PMAuth.Services.MigrationService">
             <summary>

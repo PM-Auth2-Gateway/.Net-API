@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -48,6 +50,53 @@ namespace PMAuth.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            _logger.LogWarning("Request path: " + Request.Path.Value + ", pathBase: "
+                + Request.PathBase + ", host: value => " + Request.Host.Value + 
+                ", host.host => " + Request.Host.Host + ", scheme: " + Request.Scheme + ", localIpAdress"
+                + Request.HttpContext.Connection.LocalIpAddress);
+
+            _logger.LogInformation("Request path: " + Request.Path + ", pathBase: "
+                + Request.PathBase + ", host: value => " + Request.Host.Value +
+                ", host.host => " + Request.Host.Host + ", scheme: " + Request.Scheme + ", localIpAdress"
+                + Request.HttpContext.Connection.LocalIpAddress);
+
+            if (HttpContext.Request != null)
+            {
+                _logger.LogWarning("path " + HttpContext.Request.Path);
+                _logger.LogWarning(", encodedUrl: "
+                + HttpContext.Request.GetEncodedUrl() + ", displayUrl: " + HttpContext.Request.GetDisplayUrl());
+
+                if (HttpContext.Request.Path != null)
+                {
+                    _logger.LogWarning("path value " + HttpContext.Request.Path.Value);
+                }
+            }
+
+            //var url = Request.GetTypedHeaders().Referer;
+            //if (url == null)
+            //{
+            //    _logger.LogWarning("url is null!!!!!!!!!!!!!!!!!!!");
+            //    return BadRequest();
+            //}
+            //if( url.Segments != null && url.Segments.Length != 0)
+            //{
+            //    _logger.LogWarning(", segment: " + url.Segments.FirstOrDefault());
+            //}
+
+            
+            
+
+            //_logger.LogWarning("Refer: absolute => " + url.AbsoluteUri + ", path => " + url.AbsolutePath +
+            //    ", fragment : " + url.Fragment +  ", host: " + url.Host + 
+            //    ", local: " + url.LocalPath + ", user info: " + url.UserInfo + ", authority: " + url.Authority  
+            //     );
+
+            return Redirect("pmacademy://");
         }
     }
 }
