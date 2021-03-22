@@ -23,7 +23,8 @@ namespace PMAuth.Models.OAuthUniversal
         /// RedirectUri, for now it is hardcoded, so you can type anything here
         /// </summary>
         [Required] 
-        public string RedirectUri { get; } = "https%3A%2F%2Fdevelopers.google.com%2Foauthplayground"; 
+        public string RedirectUri { get; } = "https://developers.google.com/oauthplayground"; 
+        //public string RedirectUri { get; } = "https%3A%2F%2Fdevelopers.google.com%2Foauthplayground"; 
         // TODO should be received from request. For now it is hardcoded
     }
 }

@@ -7,12 +7,12 @@ namespace PMAuth.Services.OAuthUniversal
 {
     public class UserProfileReceivingServiceContext : IUserProfileReceivingServiceContext
     {
-        private IAccessTokenReceivingService<TokenModel> _accessTokenReceivingStrategy;
-        private IProfileManager<TokenModel> _profileManagerStrategy;
+        private IAccessTokenReceivingService _accessTokenReceivingStrategy;
+        private IProfileManager _profileManagerStrategy;
 
         public void SetStrategies(
-            IAccessTokenReceivingService<TokenModel> accessTokenReceivingStrategy,
-            IProfileManager<TokenModel> profileManagerStrategy)
+            IAccessTokenReceivingService accessTokenReceivingStrategy,
+            IProfileManager profileManagerStrategy)
         {
             _accessTokenReceivingStrategy = accessTokenReceivingStrategy;
             _profileManagerStrategy = profileManagerStrategy;

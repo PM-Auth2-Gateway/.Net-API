@@ -8,7 +8,7 @@ using PMAuth.Services.Abstract;
 
 namespace PMAuth.Services.GoogleOAuth
 {
-    public class GoogleProfileManager : IProfileManager<TokenModel>
+    public class GoogleProfileManager : IProfileManager
     {
         public async Task<UserProfile> GetUserProfileAsync(TokenModel rawTokenModel)
         {
@@ -58,15 +58,4 @@ namespace PMAuth.Services.GoogleOAuth
             return userProfile;
         }
     }
-
-
-    /*
-     public class GoogleProfileManager : IProfileManager<TokenModel>
-    {
-        public Task<UserProfile> GetUserProfileAsync(TokenModel rawTokenModel)
-        {
-            GoogleTokensModel tokensModel = (GoogleTokensModel) rawTokenModel;
-        }
-    }
-    */
 }

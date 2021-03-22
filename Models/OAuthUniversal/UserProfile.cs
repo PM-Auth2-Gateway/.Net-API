@@ -10,17 +10,11 @@
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        //public string Gender { get; set; }
-        //public string BirthDate { get; set; }
+        
+        /*public string Gender { get; set; }
+        public string BirthDate { get; set; }*/
         public string Photo { get; set; }
         public string Locale { get; set; }
         public bool? IsVerifiedEmail { get; set; }
-
-        /*public override string ToString()
-        {
-            return $"Id: {Id}\n" +
-                   $"First Name: {FirstName}\n" +
-                   $"Last Name: {LastName}\n";
-        }*/
     }
 }

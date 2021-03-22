@@ -12,8 +12,8 @@ namespace PMAuth.Services.Abstract
         /// <param name="accessTokenReceivingStrategy">service which exchanges authorization token on access token</param>
         /// <param name="profileManagerStrategy">service which gets user profile from social network and return unified user profile</param>
         void SetStrategies(
-            IAccessTokenReceivingService<TokenModel> accessTokenReceivingStrategy,
-            IProfileManager<TokenModel> profileManagerStrategy);
+            IAccessTokenReceivingService accessTokenReceivingStrategy,
+            IProfileManager profileManagerStrategy);
 
         
         /// <summary>

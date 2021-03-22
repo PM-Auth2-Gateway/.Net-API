@@ -5,7 +5,7 @@ using PMAuth.Models.OAuthUniversal;
 
 namespace PMAuth.Services.Abstract
 {
-    public interface IAccessTokenReceivingService<T> where T : TokenModel // T is a model that contains tokens
+    public interface IAccessTokenReceivingService // T is a model that contains tokens
     {
         /// <summary>
         /// Method for exchanging authorization code for access token
@@ -17,6 +17,6 @@ namespace PMAuth.Services.Abstract
         /// The request failed due to an underlying issue such as network connectivity,
         /// DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
         /// </exception>
-        Task<T> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authenticationCodeModel);
+        Task<TokenModel> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authenticationCodeModel);
     }
 }

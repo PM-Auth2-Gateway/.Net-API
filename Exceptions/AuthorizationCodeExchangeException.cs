@@ -21,6 +21,11 @@ namespace PMAuth.Exceptions
         {
         }
 
+        public AuthorizationCodeExchangeException(string message, AuthorizationCodeExchangeExceptionModel model) 
+            : base(message)
+        {
+            Description = model;
+        }
         public AuthorizationCodeExchangeException(string message, AuthorizationCodeExchangeExceptionModel model, Exception inner) 
             : base(message, inner)
         {

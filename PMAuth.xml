@@ -307,7 +307,7 @@
             <param name="args">string[] args</param>
             <returns>IHostBuilder</returns>
         </member>
-        <member name="M:PMAuth.Services.Abstract.IAccessTokenReceivingService`1.ExchangeAuthorizationCodeForTokens(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Services.Abstract.IAccessTokenReceivingService.ExchangeAuthorizationCodeForTokens(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
             <summary>
             Method for exchanging authorization code for access token
             </summary>
@@ -319,14 +319,14 @@
             DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
             </exception>
         </member>
-        <member name="M:PMAuth.Services.Abstract.IProfileManager`1.GetUserProfileAsync(`0)">
+        <member name="M:PMAuth.Services.Abstract.IProfileManager.GetUserProfileAsync(PMAuth.Models.OAuthUniversal.TokenModel)">
             <summary>
             
             </summary>
             <param name="tokensModel"></param>
             <returns></returns>
         </member>
-        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.SetStrategies(PMAuth.Services.Abstract.IAccessTokenReceivingService{PMAuth.Models.OAuthUniversal.TokenModel},PMAuth.Services.Abstract.IProfileManager{PMAuth.Models.OAuthUniversal.TokenModel})">
+        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.SetStrategies(PMAuth.Services.Abstract.IAccessTokenReceivingService,PMAuth.Services.Abstract.IProfileManager)">
             <summary>
             Set code flow for chosen social network
             </summary>
