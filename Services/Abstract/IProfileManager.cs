@@ -11,6 +11,6 @@ namespace PMAuth.Services.Abstract
         /// </summary>
         /// <param name="tokensModel"></param>
         /// <returns></returns>
-        Task<UserProfile> GetUserProfileAsync(TokenModel tokensModel);
+        UserProfile GetUserProfileAsync(TokenModel tokensModel);
     }
 }

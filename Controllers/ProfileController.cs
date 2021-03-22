@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
-using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Services.Abstract;
 using PMAuth.Services.GoogleOAuth;
@@ -35,11 +34,12 @@ namespace PMAuth.Controllers
         }
 #pragma warning restore 1591
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+       /// <summary>
+       /// Get user profile
+       /// </summary>
+       /// <param name="appId">Application id (this id admin receives in the backoffice)</param>
+       /// <param name="authCodeModel">Authorization code model </param>
+       /// <returns>UserProfile or AuthorizationCodeExchangeExceptionModel</returns>
         [HttpPost("info")]
         [ProducesResponseType(typeof(UserProfile), 200)]
         [ProducesResponseType(typeof(AuthorizationCodeExchangeExceptionModel), 400)]
@@ -55,6 +55,8 @@ namespace PMAuth.Controllers
             }
             else if (authCodeModel.SocialId == _context.Socials.FirstOrDefault(s => s.Name.Equals("Facebook"))?.Id) // facebook
             {
+                //maybe it should be moved inside receivingServiceContext
+                
                /* _userProfileReceivingServiceContext.SetStrategies(
                     new FacebookAccessTokenReceivingService(_httpClientFactory, _context), 
                     new FacebookProfileManager()); */
@@ -64,7 +66,6 @@ namespace PMAuth.Controllers
             {
                 UserProfile userProfile = await _userProfileReceivingServiceContext.Execute(appId, authCodeModel);
                 return Ok(userProfile);
-                //return await _userProfileReceivingServiceContext.Execute(appId, authCodeModel);
             }
             catch (AuthorizationCodeExchangeException exception)
             {

@@ -10,26 +10,24 @@ namespace PMAuth.Services.GoogleOAuth
 {
     public class GoogleProfileManager : IProfileManager
     {
-        public async Task<UserProfile> GetUserProfileAsync(TokenModel rawTokenModel)
+        public  UserProfile GetUserProfileAsync(TokenModel rawTokenModel)
         {
             GoogleTokensModel tokensModel = (GoogleTokensModel) rawTokenModel;
-            if (string.IsNullOrWhiteSpace(tokensModel.IdToken))
+            /*if (string.IsNullOrWhiteSpace(tokensModel.IdToken))
             {
                 return await GetProfileFromAPICall(tokensModel);
-            }
-            else
-            {
-                UserProfile profile = GetProfileFromIdToken(tokensModel);
-                return profile;
-            }
+            }*/
+            
+            UserProfile profile = GetProfileFromIdToken(tokensModel);
+            return profile;
         }
         
-        private async Task<UserProfile> GetProfileFromAPICall(GoogleTokensModel tokensModel)
+        /*private async Task<UserProfile> GetProfileFromAPICall(GoogleTokensModel tokensModel)
         {
             // here can be awaitable code, so GetUserProfileAsync should stay async for now
             //TODO add variant of getting user profile via Google OAuth API
             return null;
-        }
+        }*/
         
         private UserProfile GetProfileFromIdToken(GoogleTokensModel tokensModel)
         {

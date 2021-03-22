@@ -22,7 +22,7 @@ namespace PMAuth.Services.OAuthUniversal
         public async Task<UserProfile> Execute(int appId, AuthorizationCodeModel authorizationCodeModel)
         {
             TokenModel tokens = await _accessTokenReceivingStrategy.ExchangeAuthorizationCodeForTokens(appId, authorizationCodeModel);
-            UserProfile userProfile = await _profileManagerStrategy.GetUserProfileAsync(tokens);
+            UserProfile userProfile = _profileManagerStrategy.GetUserProfileAsync(tokens);
             return userProfile;
         }
     }

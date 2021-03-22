@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +9,6 @@ using Microsoft.IO;
 
 namespace PMAuth.Middleware
 {
-
     public class LogMiddleware
     {
         private readonly RequestDelegate _next;
