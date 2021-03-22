@@ -66,11 +66,33 @@ namespace PMAuth.Controllers
                 + Request.HttpContext.Connection.LocalIpAddress);
 
             var url = Request.GetTypedHeaders().Referer;
-            _logger.LogWarning("Refer: absolute => " + url.AbsoluteUri + ", path => " + url.AbsolutePath +
-                ", fragment : " + url.Fragment + ", segment: " + url.Segments.FirstOrDefault() + ", host: " + url.Host + 
-                ", local: " + url.LocalPath + ", user info: " + url.UserInfo + ", authority: " + url.Authority + 
-                HttpContext.Request.Path + " " + HttpContext.Request.Path.Value + ", encodedUrl: " 
+            if (url == null)
+            {
+                _logger.LogWarning("url is null!!!!!!!!!!!!!!!!!!!");
+                return BadRequest();
+            }
+            if( url.Segments != null && url.Segments.Length != 0)
+            {
+                _logger.LogWarning(", segment: " + url.Segments.FirstOrDefault());
+            }
+
+            if(HttpContext.Request != null )
+            {
+                _logger.LogWarning("path "+HttpContext.Request.Path);
+                _logger.LogWarning(", encodedUrl: "
                 + HttpContext.Request.GetEncodedUrl() + ", displayUrl: " + HttpContext.Request.GetDisplayUrl());
+
+                if (HttpContext.Request.Path != null)
+                {
+                    _logger.LogWarning("path value " + HttpContext.Request.Path.Value);
+                }
+            }
+            
+
+            _logger.LogWarning("Refer: absolute => " + url.AbsoluteUri + ", path => " + url.AbsolutePath +
+                ", fragment : " + url.Fragment +  ", host: " + url.Host + 
+                ", local: " + url.LocalPath + ", user info: " + url.UserInfo + ", authority: " + url.Authority  
+                 );
 
             return Redirect("pmacademy://");
         }
