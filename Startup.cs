@@ -14,7 +14,8 @@ using System.Reflection;
 using System.Threading.Tasks;
     using PMAuth.Models.OAuthGoogle;
     using PMAuth.Services.Abstract;
-    using PMAuth.Services.GoogleOAuth2;
+    using PMAuth.Services.GoogleOAuth;
+    using PMAuth.Services.OAuthUniversal;
 
 
     namespace PMAuth
@@ -64,8 +65,9 @@ using System.Threading.Tasks;
 
             services.AddHttpClient();
 
-            services.AddTransient<IAccessTokenReceivingService<GoogleTokensModel>, GoogleAccessTokenReceivingService>();
-            
+            services.AddTransient<IUserProfileReceivingServiceContext, UserProfileReceivingServiceContext>();
+            //services.AddTransient<IAccessTokenReceivingService<GoogleTokensModel>, GoogleAccessTokenReceivingService>();
+
         }
 
         /// <summary>

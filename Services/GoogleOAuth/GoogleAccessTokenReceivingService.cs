@@ -12,9 +12,9 @@ using PMAuth.Services.Abstract;
 
 #pragma warning disable 1591
 
-namespace PMAuth.Services.GoogleOAuth2
+namespace PMAuth.Services.GoogleOAuth
 {
-    public class GoogleAccessTokenReceivingService : IAccessTokenReceivingService<GoogleTokensModel>
+    public class GoogleAccessTokenReceivingService : IAccessTokenReceivingService<TokenModel>
     {
         private readonly BackOfficeContext _context;
         //private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
@@ -29,7 +29,7 @@ namespace PMAuth.Services.GoogleOAuth2
             //_logger = logger;
             _httpClient = httpClientFactory.CreateClient();
         }
-        public async Task<GoogleTokensModel> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
+        public async Task<TokenModel> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
         {
             string responseBody = await SendRequest(appId, authorizationCodeModel);
             if (string.IsNullOrWhiteSpace(responseBody))
@@ -58,8 +58,10 @@ namespace PMAuth.Services.GoogleOAuth2
             string tokenUri = "https://oauth2.googleapis.com/token";  //TODO should be added to database. for now it is hardcoded
             string code = authorizationCodeModel.AuthorizationCode;
             string redirectUri = authorizationCodeModel.RedirectUri;
-            string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId)?.ClientId;
-            string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId)?.SecretKey;
+            //string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId)?.ClientId;
+            string clientId = "532364683542-3hg1fdiptik9lhbj22o72rrnsb9eqtvi.apps.googleusercontent.com";
+            //string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId)?.SecretKey;
+            string clientSecret = "zwqbWaKdRhyyQf6scdJWTiod";
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             {

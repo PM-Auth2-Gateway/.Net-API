@@ -1,5 +1,6 @@
 ﻿namespace PMAuth.Models.OAuthUniversal
 {
+    //TODO add documentation (in a lot of places)
     public class UserProfile
     {
         public string Id { get; set; }

@@ -146,6 +146,13 @@
             Get user profile by authorization code 
             </summary>
         </member>
+        <member name="M:PMAuth.Controllers.ProfileController.GetUserProfileAsync(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
         <member name="T:PMAuth.Controllers.SocialsController">
             <summary>
             Controller that operate socials.
@@ -207,6 +214,11 @@
         <member name="T:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel">
             <summary>
             Authorization code model 
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.SocialId">
+            <summary>
+            Id of the social network through which authorization is made
             </summary>
         </member>
         <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.AuthorizationCode">
@@ -294,6 +306,44 @@
             </summary>
             <param name="args">string[] args</param>
             <returns>IHostBuilder</returns>
+        </member>
+        <member name="M:PMAuth.Services.Abstract.IAccessTokenReceivingService`1.ExchangeAuthorizationCodeForTokens(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+            <summary>
+            Method for exchanging authorization code for access token
+            </summary>
+            <param name="appId">application ID</param>
+            <param name="authenticationCodeModel">Model with authorization code</param>
+            <returns>Model with access token and other info</returns>
+            <exception cref="T:PMAuth.Exceptions.AuthorizationCodeExchangeException">
+            The request failed due to an underlying issue such as network connectivity,
+            DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
+            </exception>
+        </member>
+        <member name="M:PMAuth.Services.Abstract.IProfileManager`1.GetUserProfileAsync(`0)">
+            <summary>
+            
+            </summary>
+            <param name="tokensModel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.SetStrategies(PMAuth.Services.Abstract.IAccessTokenReceivingService{PMAuth.Models.OAuthUniversal.TokenModel},PMAuth.Services.Abstract.IProfileManager{PMAuth.Models.OAuthUniversal.TokenModel})">
+            <summary>
+            Set code flow for chosen social network
+            </summary>
+            <param name="accessTokenReceivingStrategy">service which exchanges authorization token on access token</param>
+            <param name="profileManagerStrategy">service which gets user profile from social network and return unified user profile</param>
+        </member>
+        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.Execute(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+            <summary>
+            Get user profile by authorization code
+            </summary>
+            <param name="appId">application ID</param>
+            <param name="authorizationCodeModel">Model with authorization code</param>
+            <returns>Unified user profile</returns>
+            <exception cref="T:PMAuth.Exceptions.AuthorizationCodeExchangeException">
+            The request failed due to an underlying issue such as network connectivity,
+            DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
+            </exception>
         </member>
         <member name="T:PMAuth.Services.MigrationService">
             <summary>

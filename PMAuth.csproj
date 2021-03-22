@@ -22,6 +22,7 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.9.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +30,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\RequestModels" />
   </ItemGroup>
 
 </Project>
