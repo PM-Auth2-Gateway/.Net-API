@@ -53,6 +53,15 @@ namespace PMAuth.Controllers
         [HttpGet("test")]
         public IActionResult Test()
         {
+            _logger.LogWarning("Request path: " + Request.Path + ", pathBase: "
+                + Request.PathBase + ", host: value => " + Request.Host.Value + 
+                ", host.host => " + Request.Host.Host + ", scheme: " + Request.Scheme + ", localIpAdress"
+                + Request.HttpContext.Connection.LocalIpAddress);
+
+            _logger.LogInformation("Request path: " + Request.Path + ", pathBase: "
+                + Request.PathBase + ", host: value => " + Request.Host.Value +
+                ", host.host => " + Request.Host.Host + ", scheme: " + Request.Scheme + ", localIpAdress"
+                + Request.HttpContext.Connection.LocalIpAddress);
             return Redirect("pmacademy://");
         }
     }
