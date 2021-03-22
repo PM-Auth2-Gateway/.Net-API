@@ -71,7 +71,7 @@ namespace PMAuth.Controllers
             var admin = "admin";
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
             if (resApp == null)
-                return Ok();
+                return BadRequest();
             return Ok(new AppModel(resApp.Id,resApp.Name));
         }
         [HttpDelete]
@@ -121,7 +121,14 @@ namespace PMAuth.Controllers
         [Route("socials/{socialId}")]
         public async Task<ActionResult<SettingModel>> GetSocialSetting([FromHeader] string Authentication, [FromRoute] int socialId,[FromHeader] int appId)
         {
+
             //todo Authorize
+            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
+            if (resApp == null)
+                return BadRequest();
+            var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
+            if (resSocial == null)
+                return BadRequest();
             var admin = "admin";
             var set = _backOfficeContext.Settings.FirstOrDefault(s => (s.AppId == appId) && (s.SocialId == socialId));
             return Ok(new SettingModel(set.Id, set.AppId, _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name, set.SocialId, _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name, set.ClientId, set.SecretKey, set.Scope));
@@ -131,6 +138,12 @@ namespace PMAuth.Controllers
         [Route("socials/{socialId}")]
         public async Task<ActionResult<SettingModel>> PostSocialSetting([FromRoute] int socialId,[FromHeader] string Authentication,[FromHeader] int appId, [FromBody] SocialCreateModel social)
         {
+            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
+            if (resApp == null)
+                return BadRequest();
+            var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
+            if (resSocial == null)
+                return BadRequest();
             //todo Authorize
             var admin = "admin";
             var setting = new Setting()
