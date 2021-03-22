@@ -61,6 +61,16 @@ namespace PMAuth.Controllers
                     new FacebookAccessTokenReceivingService(_httpClientFactory, _context), 
                     new FacebookProfileManager()); */
             }
+            else
+            {
+                AuthorizationCodeExchangeExceptionModel exceptionModel = new AuthorizationCodeExchangeExceptionModel
+                {
+                    Error = "Unregister social network.",
+                    ErrorDescription = "You are trying to use unregister social network. Social network with this ID" +
+                                       "doesnt exists."
+                };
+                BadRequest(exceptionModel);
+            }
 
             try
             {

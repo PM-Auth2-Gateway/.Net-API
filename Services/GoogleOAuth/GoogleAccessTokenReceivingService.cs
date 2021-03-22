@@ -134,6 +134,5 @@ namespace PMAuth.Services.GoogleOAuth
                 throw;
             }
         }
-        
     }
 }
