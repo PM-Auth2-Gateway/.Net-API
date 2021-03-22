@@ -69,7 +69,7 @@ namespace PMAuth.Controllers
                     ErrorDescription = "You are trying to use unregister social network. Social network with this ID" +
                                        "doesnt exists."
                 };
-                BadRequest(exceptionModel);
+                return BadRequest(exceptionModel);
             }
 
             try

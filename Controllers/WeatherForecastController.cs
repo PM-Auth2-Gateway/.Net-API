@@ -49,5 +49,11 @@ namespace PMAuth.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Redirect("pmacademy://");
+        }
     }
 }
