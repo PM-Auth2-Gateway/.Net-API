@@ -21,6 +21,6 @@ namespace PMAuth.Models
         /// Redirect Url 2
         /// </summary>
         [JsonPropertyName("device")]
-        public int Device { get; set; }
+        public string Device { get; set; }
     }
 }
