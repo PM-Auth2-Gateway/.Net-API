@@ -102,7 +102,8 @@ namespace PMAuth.Controllers
         [HttpGet("test-close")]
         public IActionResult TestClose()
         {
-            return new JavaScriptResult("<script>window.close()</script>"); 
+            return Content("<script>window.close()</script>");
+                //new JavaScriptResult("<script>window.close()</script>"); 
         }
 
         public class JavaScriptResult : ContentResult
