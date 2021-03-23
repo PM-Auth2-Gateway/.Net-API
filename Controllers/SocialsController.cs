@@ -85,13 +85,12 @@ namespace PMAuth.Controllers
             return new SocialLinkModel()
             {
                 AuthUri = social.AuthUri,
-                Prompt = "consent",
+                RedirectUri = "redirect_uri",
                 ResponseType = "code",
                 ClientId = setting.ClientId,
                 Scope = setting.Scope,
-                AccessType = "offline"
+                State = "session_id"
             };
-
         }
     }
 }
