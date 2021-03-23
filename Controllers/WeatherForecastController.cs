@@ -98,5 +98,11 @@ namespace PMAuth.Controllers
 
             return Redirect("pmacademy://");
         }
+
+        [HttpGet("test-close")]
+        public ActionResult<string> TestClose()
+        {
+            return "<script>window.close()</script>";
+        }
     }
 }
