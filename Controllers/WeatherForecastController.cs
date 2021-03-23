@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace PMAuth.Controllers
@@ -102,7 +104,12 @@ namespace PMAuth.Controllers
         [HttpGet("test-close")]
         public IActionResult TestClose()
         {
-            return Content("<script language='javascript' type='text/javascript'>window.close()</script>");
+
+            var resp = new HttpResponseMessage(HttpStatusCode.OK);
+            resp.Content = new StringContent("<script>window.close()</script>", System.Text.Encoding.UTF8, "application/javascript");
+            return (IActionResult)resp;
+            //new ContentResult();
+            //return Content();
                 //new JavaScriptResult("<script>window.close()</script>"); 
         }
 
