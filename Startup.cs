@@ -45,6 +45,8 @@ using System.Threading.Tasks;
         /// <param name="services">IServiceCollection</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+
             services.AddHealthChecks();
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -83,6 +85,11 @@ using System.Threading.Tasks;
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PMAuth v1"));
             }
+
+            app.UseCors(builder => builder.AllowAnyOrigin()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
+
             app.UseMiddleware<LogMiddleware>();
             app.UseRouting();
             app.UseAuthorization();
