@@ -20,5 +20,10 @@
         /// Auth Uri
         /// </summary>
         public string AuthUri { get; set; }
+
+        /// <summary>
+        /// Token Url
+        /// </summary>
+        public string TokenUrl { get; set; }
     }
 }
