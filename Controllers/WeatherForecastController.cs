@@ -102,24 +102,14 @@ namespace PMAuth.Controllers
         }
 
         [HttpGet("test-close")]
-        public HttpResponseMessage TestClose()
+        public IActionResult TestClose()
         {
 
-            var resp = new HttpResponseMessage(HttpStatusCode.OK);
-            resp.Content = new StringContent("<script>window.close()</script>", System.Text.Encoding.UTF8, "application/javascript");
-            return resp;
-            //new ContentResult();
-            //return Content();
-                //new JavaScriptResult("<script>window.close()</script>"); 
-        }
-
-        public class JavaScriptResult : ContentResult
-        {
-            public JavaScriptResult(string script)
+            return new ContentResult
             {
-                this.Content = script;
-                this.ContentType = "application/javascript";
-            }
+                ContentType = "text/html",
+                Content = "<script>window.close()</script>"
+            };
         }
     }
 }
