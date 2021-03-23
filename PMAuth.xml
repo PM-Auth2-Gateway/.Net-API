@@ -141,6 +141,11 @@
             Auth Uri
             </summary>
         </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Social.TokenUrl">
+            <summary>
+            Token Url
+            </summary>
+        </member>
         <member name="T:PMAuth.Controllers.ProfileController">
             <summary>
             Get user profile by authorization code 
@@ -211,46 +216,6 @@
             <remarks>
             Ny i zachem ti syda zawel???
             </remarks>
-        </member>
-        <member name="P:PMAuth.Models.SettingModel.Id">
-            <summary>
-            Setting id (identity)
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.SettingModel.AppId">
-            <summary>
-            App Id
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.SettingModel.AppName">
-            <summary>
-            App name
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.SettingModel.SocialId">
-            <summary>
-            Social Id
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.SettingModel.SocialName">
-            <summary>
-            Social name
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.SettingModel.ClientId">
-            <summary>
-            Client Id
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.SettingModel.SecretKey">
-            <summary>
-            Secret Key
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.SettingModel.Scope">
-            <summary>
-            Scope
-               </summary>
         </member>
         <member name="T:PMAuth.Exceptions.Models.AuthorizationCodeExchangeExceptionModel">
             <summary>
@@ -382,6 +347,46 @@
             User's profile locale received from the social network (may be absent)
             </summary>
         </member>
+        <member name="P:PMAuth.Models.SettingModel.Id">
+            <summary>
+            Setting id (identity)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.AppId">
+            <summary>
+            App Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.AppName">
+            <summary>
+            App name
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.SocialId">
+            <summary>
+            Social Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.SocialName">
+            <summary>
+            Social name
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.ClientId">
+            <summary>
+            Client Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.SecretKey">
+            <summary>
+            Secret Key
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SettingModel.Scope">
+            <summary>
+            Scope
+            </summary>
+        </member>
         <member name="T:PMAuth.Models.SocialLinkModel">
             <summary>
             Social Link parameters
@@ -392,9 +397,9 @@
             Auth Uri.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.Prompt">
+        <member name="P:PMAuth.Models.SocialLinkModel.RedirectUri">
             <summary>
-            Prompt.
+            Auth Uri.
             </summary>
         </member>
         <member name="P:PMAuth.Models.SocialLinkModel.ResponseType">
@@ -412,9 +417,9 @@
             Scope.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.AccessType">
+        <member name="P:PMAuth.Models.SocialLinkModel.State">
             <summary>
-            Access Type.
+            Scope.
             </summary>
         </member>
         <member name="T:PMAuth.Models.SocialModel">
@@ -425,6 +430,11 @@
         <member name="P:PMAuth.Models.SocialModel.SocialId">
             <summary>
             Social Id.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialModel.Device">
+            <summary>
+            Redirect Url 2
             </summary>
         </member>
         <member name="T:PMAuth.Models.SocialsModel">

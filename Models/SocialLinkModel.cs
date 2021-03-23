@@ -18,10 +18,10 @@ namespace PMAuth.Models
         public string AuthUri { get; set; }
 
         /// <summary>
-        /// Prompt.
+        /// Auth Uri.
         /// </summary>
-        [JsonPropertyName("prompt")]
-        public string Prompt { get; set; }
+        [JsonPropertyName("redirect_uri")]
+        public string RedirectUri { get; set; }
 
         /// <summary>
         /// Response Type.
@@ -42,10 +42,10 @@ namespace PMAuth.Models
         public string Scope { get; set; }
 
         /// <summary>
-        /// Access Type.
+        /// Scope.
         /// </summary>
-        [JsonPropertyName("access_type")]
-        public string AccessType { get; set; }
+        [JsonPropertyName("state")]
+        public string State { get; set; }
 
     }
 }
