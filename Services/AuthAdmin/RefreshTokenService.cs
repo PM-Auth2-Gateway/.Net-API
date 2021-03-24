@@ -8,7 +8,7 @@ namespace PMAuth.Services.AuthAdmin
 {
     public class RefreshTokenService
     {
-        private ConcurrentDictionary<string, string> refreshTokenDictionary = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<string, string> refreshTokenDictionary = new ConcurrentDictionary<string, string>();
 
         public string GetRefreshToken(string login)
         {
@@ -27,7 +27,10 @@ namespace PMAuth.Services.AuthAdmin
 
         internal void SaveRefreshToken(string username, string newRefreshToken)
         {
-            refreshTokenDictionary.TryAdd(username, newRefreshToken);
+            if(!refreshTokenDictionary.TryAdd(username, newRefreshToken))
+            {
+                refreshTokenDictionary[username] = newRefreshToken;
+            }
         }
     } 
 }
