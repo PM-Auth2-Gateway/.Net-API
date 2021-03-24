@@ -16,7 +16,7 @@ using PMAuth.Services.Abstract;
 using PMAuth.Services.OAuthUniversal;
 
 
-    namespace PMAuth
+namespace PMAuth
 {
     /// <summary>
     /// Startup
