@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using PMAuth.AuthDbContext;
 using PMAuth.AuthDbContext.Entities;
 using PMAuth.Models;
+using PMAuth.Services.AuthAdmin;
 
 namespace PMAuth.Controllers
 {
@@ -17,33 +21,59 @@ namespace PMAuth.Controllers
     public class AdminController : Controller
     {
         private readonly BackOfficeContext _backOfficeContext;
+        private readonly AuthService _authService;
+        private readonly RefreshTokenService _refreshTokenService;
 
-        public AdminController(BackOfficeContext backOfficeContext)
+        public AdminController(BackOfficeContext backOfficeContext,AuthService authService,RefreshTokenService refreshTokenService)
         {
             _backOfficeContext = backOfficeContext;
+            _authService = authService;
+            _refreshTokenService = refreshTokenService;
         }
 
-        [HttpGet]
-        [Route("token")]
-        public async Task<ActionResult<string>> GetToken([FromHeader] string authCode)
+        [HttpGet("token")]
+        public async Task<ActionResult<AuthModel>> GetToken([FromHeader] string sessionId)
         {
             //todo Authorize
-            var admin = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == "admin");
-            if (admin == null)
+            var identity = _authService.GetIdentity();
+            if (identity == null)
             {
-                admin = new Admin() {Name = "admin"};
-                _backOfficeContext.Admins.Add(admin);
-                await _backOfficeContext.SaveChangesAsync();
+                return BadRequest();
             }
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                notBefore: now,
+                issuer: AuthOptions.ISSUER,
+                claims: identity.Claims,
+                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var refreshToken = _authService.GenerateRefreshToken();
+            _refreshTokenService.SaveRefreshToken(identity.Name, refreshToken);
+            return new JsonResult(new AuthModel(identity.Name, encodedJwt, refreshToken));
+        }
+        [HttpPost("refreshToken")]
+        public ActionResult<AuthModel> Refresh(string token, string refreshToken)
+        {
+            var principal = _authService.GetPrincipalFromExpiredToken(token);
+            var username = principal.Identity.Name;
+            var savedRefreshToken = _refreshTokenService.GetRefreshToken(username); //retrieve the refresh token from a data store
+            if (savedRefreshToken != refreshToken)
+                throw new SecurityTokenException("Invalid refresh token");
 
-            return Ok();
+            var newJwtToken = _authService.GenerateToken(principal.Claims);
+            var newRefreshToken = _authService.GenerateRefreshToken();
+            _refreshTokenService.DeleteRefreshToken(username, refreshToken);
+            _refreshTokenService.SaveRefreshToken(username, newRefreshToken);
+
+            return new JsonResult(new AuthModel(username,newJwtToken,newRefreshToken));
         }
 
         [HttpGet]
         [Route("applications")]
-        public async Task<ActionResult<AppModel[]>> GetApps([FromHeader] string Authentication)
+        [Authorize]
+        public async Task<ActionResult<AppModel[]>> GetApps()
         {
-            //todo Authorize
             var admin = "admin";
             var adminId = _backOfficeContext.Admins.First(a => a.Name == admin).Id;
             var arrApp = _backOfficeContext.Apps.Where(a => a.AdminId == adminId).Select(s=>new AppModel(s.Id,s.Name)).ToArray();
@@ -52,9 +82,9 @@ namespace PMAuth.Controllers
 
         [HttpPost]
         [Route("applications")]
-        public async Task<ActionResult<AppModel>> PostApp([FromHeader] string Authentication, [FromBody] CreateAppModel createApp)
+        [Authorize]
+        public async Task<ActionResult<AppModel>> PostApp([FromBody] CreateAppModel createApp)
         {
-            //todo Authorize
             var admin = "admin";
             var adminId = _backOfficeContext.Admins.First(a => a.Name == admin).Id;
             var app = new App() {Name = createApp.Name, AdminId = adminId};
@@ -65,9 +95,9 @@ namespace PMAuth.Controllers
 
         [HttpGet]
         [Route("applications/{appId}")]
-        public async Task<ActionResult<AppModel>> GetAppInfo([FromHeader] string Authentication, [FromRoute] int appId)
+        [Authorize]
+        public async Task<ActionResult<AppModel>> GetAppInfo([FromRoute] int appId)
         {
-            //todo Authorize
             var admin = "admin";
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
             if (resApp == null)
@@ -76,9 +106,9 @@ namespace PMAuth.Controllers
         }
         [HttpDelete]
         [Route("applications/{appId}")]
-        public async Task<ActionResult> DeleteApp([FromHeader] string Authentication, [FromRoute] int appId)
+        [Authorize]
+        public async Task<ActionResult> DeleteApp([FromRoute] int appId)
         {
-            //todo Authorize
             var delApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
             if (delApp != null)
             {
@@ -93,9 +123,9 @@ namespace PMAuth.Controllers
         }
         [HttpPut]
         [Route("applications/{appId}")]
-        public async Task<ActionResult<AppModel>> PutApp([FromHeader] string Authentication, [FromRoute] int appId, [FromBody] CreateAppModel createApp)
+        [Authorize]
+        public async Task<ActionResult<AppModel>> PutApp([FromRoute] int appId, [FromBody] CreateAppModel createApp)
         {
-            //todo Authorize
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
             if (resApp != null)
             {
@@ -110,19 +140,18 @@ namespace PMAuth.Controllers
         }
         [HttpGet]
         [Route("socials")]
-        public async Task<ActionResult<SocialModelResponsecs[]>> GetSocials([FromHeader] string Authentication)
+        [Authorize]
+        public async Task<ActionResult<SocialModelResponsecs[]>> GetSocials()
         {
-            //todo Authorize
             var admin = "admin";
             var arrSoc = _backOfficeContext.Socials.Select(s=>new SocialModelResponsecs(s.Id,s.Name)).ToArray();
             return Ok(arrSoc);
         }
         [HttpGet]
         [Route("socials/{socialId}")]
-        public async Task<ActionResult<SettingModel>> GetSocialSetting([FromHeader] string Authentication, [FromRoute] int socialId,[FromHeader] int appId)
+        [Authorize]
+        public async Task<ActionResult<SettingModel>> GetSocialSetting([FromRoute] int socialId,[FromHeader] int appId)
         {
-
-            //todo Authorize
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
             if (resApp == null)
                 return BadRequest();
@@ -136,7 +165,8 @@ namespace PMAuth.Controllers
         
         [HttpPost]
         [Route("socials/{socialId}")]
-        public async Task<ActionResult<SettingModel>> PostSocialSetting([FromRoute] int socialId,[FromHeader] string Authentication,[FromHeader] int appId, [FromBody] SocialCreateModel social)
+        [Authorize]
+        public async Task<ActionResult<SettingModel>> PostSocialSetting([FromRoute] int socialId,[FromHeader] int appId, [FromBody] SocialCreateModel social)
         {
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
             if (resApp == null)
@@ -144,7 +174,6 @@ namespace PMAuth.Controllers
             var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
             if (resSocial == null)
                 return BadRequest();
-            //todo Authorize
             var admin = "admin";
             var setting = new Setting()
             {
