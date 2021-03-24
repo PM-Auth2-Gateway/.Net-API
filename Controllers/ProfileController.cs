@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
 using PMAuth.Exceptions.Models;
+using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.RequestModels;
-using PMAuth.Services.Abstract;
-using PMAuth.Services.FacebookOAuth;
-using PMAuth.Services.GoogleOAuth;
 
 namespace PMAuth.Controllers
 {
@@ -43,14 +41,13 @@ namespace PMAuth.Controllers
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
                 return BadRequest(new ErrorModel
-
                 {
                     Error = "Invalid session id",
                     ErrorDescription = "There is no profile related to provided session id"
                 });
             }
 
-            bool isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out TempDummyMc sessionInfo);
+            bool isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out CacheModel sessionInfo);
             if (isSuccess == false || sessionInfo == null)
             {
                 return BadRequest(new ErrorModel
@@ -59,6 +56,7 @@ namespace PMAuth.Controllers
                     ErrorDescription = "There is no profile related to provided session id"
                 });
             }
+            
             isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
             if (isSuccess && sessionInfo?.UserProfile == null)
             {
@@ -75,7 +73,7 @@ namespace PMAuth.Controllers
                     requestCounter++;
                 }
             }
-            //todo test timeout
+            
             
             if (sessionInfo?.UserProfile == null)
             {
@@ -86,7 +84,7 @@ namespace PMAuth.Controllers
                 });
             }
 
-            return Ok(_memoryCache.Get<TempDummyMc>(sessionIdModel.SessionId).UserProfile);
+            return Ok(_memoryCache.Get<CacheModel>(sessionIdModel.SessionId).UserProfile);
         }
     }
 }

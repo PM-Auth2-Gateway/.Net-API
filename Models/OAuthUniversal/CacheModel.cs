@@ -1,10 +1,4 @@
-﻿using PMAuth.Models.OAuthUniversal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace PMAuth.Models
+﻿namespace PMAuth.Models.OAuthUniversal
 {
     /// <summary>
     /// CasheModel for store info in cache
@@ -34,6 +28,11 @@ namespace PMAuth.Models
         /// <summary>
         /// Application Id
         /// </summary>
-        public string AppId { get; set; }
+        public int AppId { get; set; }
+        
+        /// <summary>
+        /// Redirect Url
+        /// </summary>
+        public string RedirectUri { get; set; }
     }
 }
