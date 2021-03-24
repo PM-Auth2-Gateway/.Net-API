@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Net.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
-using PMAuth.Extensions;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Services.Abstract;
@@ -103,8 +104,8 @@ namespace PMAuth.Controllers
                 
             }
 
-            TempDummyMc sessionInfo = _memoryCache.Peek<TempDummyMc>(authorizationCode.SessionId);
-            if (string.IsNullOrWhiteSpace(sessionInfo?.Device))
+            bool isSuccess = _memoryCache.TryGetValue(authorizationCode.SessionId, out TempDummyMc sessionInfo);
+            if (isSuccess == false || string.IsNullOrWhiteSpace(sessionInfo?.Device))
             {
                 return BadRequest("Unknown session ID");
             }

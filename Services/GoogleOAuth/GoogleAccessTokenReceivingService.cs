@@ -91,7 +91,6 @@ namespace PMAuth.Services.GoogleOAuth
                     .AddQuery("scope", string.Empty)
                     .AddQuery("grant_type", "authorization_code")
             };
-            
             HttpResponseMessage response;
             try
             {

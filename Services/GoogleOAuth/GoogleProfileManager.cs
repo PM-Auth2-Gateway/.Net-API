@@ -27,8 +27,11 @@ namespace PMAuth.Services.GoogleOAuth
             }*/
             
             UserProfile profile = GetProfileFromIdToken(tokensModel);
-            TempDummyMc model = _memoryCache.Peek<TempDummyMc>(sessionId);
-            model.UserProfile = profile;
+            bool isSuccess = _memoryCache.TryGetValue(sessionId, out TempDummyMc model);
+            if (isSuccess && model != null)
+            {
+                model.UserProfile = profile;
+            }
             // return profile;
         }
         

@@ -1,21 +1,19 @@
-﻿    using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.IO;
+using System.Reflection;
+
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using PMAuth.Middleware;
 
+using PMAuth.Middleware;
 using PMAuth.AuthDbContext;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
-    using PMAuth.Models.OAuthGoogle;
-    using PMAuth.Services.Abstract;
-    using PMAuth.Services.GoogleOAuth;
-    using PMAuth.Services.OAuthUniversal;
+using PMAuth.Services.Abstract;
+using PMAuth.Services.OAuthUniversal;
 
 
     namespace PMAuth
