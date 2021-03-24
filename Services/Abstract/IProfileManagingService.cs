@@ -4,13 +4,13 @@ using PMAuth.Models.OAuthUniversal;
 
 namespace PMAuth.Services.Abstract
 {
-    public interface IProfileManager
+    public interface IProfileManagingService
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="tokensModel"></param>
         /// <returns></returns>
-        UserProfile GetUserProfileAsync(TokenModel tokensModel);
+        Task GetUserProfileAsync(TokenModel tokensModel, string sessionId);
     }
 }

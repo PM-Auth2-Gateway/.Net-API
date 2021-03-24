@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PMAuth.AuthDbContext;
 using PMAuth.AuthDbContext.Entities;
@@ -24,7 +27,8 @@ namespace PMAuth.Controllers
         [Route("token")]
         public async Task<ActionResult<string>> GetToken([FromHeader] string authCode)
         {
-            var admin= _backOfficeContext.Admins.FirstOrDefault(a => a.Name == "admin");
+            //todo Authorize
+            var admin = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == "admin");
             if (admin == null)
             {
                 admin = new Admin() {Name = "admin"};
@@ -37,50 +41,50 @@ namespace PMAuth.Controllers
 
         [HttpGet]
         [Route("applications")]
-        public async Task<ActionResult<App[]>> GetApps([FromHeader] string Authentication)
+        public async Task<ActionResult<AppModel[]>> GetApps([FromHeader] string Authentication)
         {
             //todo Authorize
             var admin = "admin";
             var adminId = _backOfficeContext.Admins.First(a => a.Name == admin).Id;
-            var arrApp = _backOfficeContext.Apps.Where(a => a.AdminId == adminId).ToArray();
+            var arrApp = _backOfficeContext.Apps.Where(a => a.AdminId == adminId).Select(s=>new AppModel(s.Id,s.Name)).ToArray();
             return Ok(arrApp);
         }
 
         [HttpPost]
         [Route("applications")]
-        public async Task<ActionResult<App>> PostApp([FromHeader] string Authentication, [FromHeader] string name)
+        public async Task<ActionResult<AppModel>> PostApp([FromHeader] string Authentication, [FromBody] CreateAppModel createApp)
         {
             //todo Authorize
             var admin = "admin";
             var adminId = _backOfficeContext.Admins.First(a => a.Name == admin).Id;
-            var app = new App() {Name = name, AdminId = adminId};
+            var app = new App() {Name = createApp.Name, AdminId = adminId};
             var resApp = _backOfficeContext.Apps.Add(app).Entity;
             await _backOfficeContext.SaveChangesAsync();
-            return Ok(resApp);
+            return Ok(new AppModel(resApp.Id,resApp.Name));
         }
 
         [HttpGet]
         [Route("applications/{appId}")]
-        public async Task<ActionResult<App>> GetAppInfo([FromHeader] string Authentication, [FromRoute] int appId)
+        public async Task<ActionResult<AppModel>> GetAppInfo([FromHeader] string Authentication, [FromRoute] int appId)
         {
             //todo Authorize
             var admin = "admin";
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
-            return Ok(resApp);
+            if (resApp == null)
+                return BadRequest();
+            return Ok(new AppModel(resApp.Id,resApp.Name));
         }
         [HttpDelete]
         [Route("applications/{appId}")]
-        public async Task<ActionResult<App>> DeleteApp([FromHeader] string Authentication, [FromRoute] int appId)
+        public async Task<ActionResult> DeleteApp([FromHeader] string Authentication, [FromRoute] int appId)
         {
             //todo Authorize
-            var admin = "admin";
-            var adminId = _backOfficeContext.Admins.First(a => a.Name == admin).Id;
             var delApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
             if (delApp != null)
             {
-                var resApp = _backOfficeContext.Remove(delApp).Entity;
+                _backOfficeContext.Remove(delApp);
                 await _backOfficeContext.SaveChangesAsync();
-                return Ok(resApp);
+                return Ok();
             }
             else
             {
@@ -89,17 +93,15 @@ namespace PMAuth.Controllers
         }
         [HttpPut]
         [Route("applications/{appId}")]
-        public async Task<ActionResult<App>> PutApp([FromHeader] string Authentication, [FromRoute] int appId, [FromHeader] string name)
+        public async Task<ActionResult<AppModel>> PutApp([FromHeader] string Authentication, [FromRoute] int appId, [FromBody] CreateAppModel createApp)
         {
             //todo Authorize
-            var admin = "admin";
-            var adminId = _backOfficeContext.Admins.First(a => a.Name == admin).Id;
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
             if (resApp != null)
             {
-                resApp.Name = name;
+                resApp.Name = createApp.Name;
                 await _backOfficeContext.SaveChangesAsync();
-                return Ok(resApp);
+                return Ok(new AppModel(resApp.Id,resApp.Name));
             }
             else
             {
@@ -108,28 +110,40 @@ namespace PMAuth.Controllers
         }
         [HttpGet]
         [Route("socials")]
-        public async Task<ActionResult<Social[]>> GetSocials([FromHeader] string Authentication)
+        public async Task<ActionResult<SocialModelResponsecs[]>> GetSocials([FromHeader] string Authentication)
         {
             //todo Authorize
             var admin = "admin";
-            var arrSoc = _backOfficeContext.Socials.ToArray();
+            var arrSoc = _backOfficeContext.Socials.Select(s=>new SocialModelResponsecs(s.Id,s.Name)).ToArray();
             return Ok(arrSoc);
         }
         [HttpGet]
         [Route("socials/{socialId}")]
-        public async Task<ActionResult<Setting>> GetSocialSetting([FromHeader] string Authentication, [FromRoute] int socialId,[FromHeader] int appId)
+        public async Task<ActionResult<SettingModel>> GetSocialSetting([FromHeader] string Authentication, [FromRoute] int socialId,[FromHeader] int appId)
         {
-            //todo Authorize
-            var admin = "admin";
-            var setting = _backOfficeContext.Settings.FirstOrDefault(s => (s.AppId == appId) && (s.SocialId == socialId));
 
-            return Ok(setting);
+            //todo Authorize
+            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
+            if (resApp == null)
+                return BadRequest();
+            var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
+            if (resSocial == null)
+                return BadRequest();
+            var admin = "admin";
+            var set = _backOfficeContext.Settings.FirstOrDefault(s => (s.AppId == appId) && (s.SocialId == socialId));
+            return Ok(new SettingModel(set.Id, set.AppId, _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name, set.SocialId, _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name, set.ClientId, set.SecretKey, set.Scope));
         }
         
         [HttpPost]
-        [Route("socials")]
-        public async Task<ActionResult<Setting>> PostSocialSetting([FromHeader] int socialId,[FromHeader] string Authentication,[FromHeader] int appId, [FromBody] SocialCreateModel social)
+        [Route("socials/{socialId}")]
+        public async Task<ActionResult<SettingModel>> PostSocialSetting([FromRoute] int socialId,[FromHeader] string Authentication,[FromHeader] int appId, [FromBody] SocialCreateModel social)
         {
+            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => a.Id == appId);
+            if (resApp == null)
+                return BadRequest();
+            var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
+            if (resSocial == null)
+                return BadRequest();
             //todo Authorize
             var admin = "admin";
             var setting = new Setting()
@@ -138,11 +152,11 @@ namespace PMAuth.Controllers
                 SecretKey = social.SecretKey,
                 Scope = social.Scope,
                 AppId = appId,
-                SocialId = socialId
+                SocialId = socialId,
             };
-            _backOfficeContext.Settings.Add(setting);
+            var set= _backOfficeContext.Settings.Add(setting).Entity;
             await _backOfficeContext.SaveChangesAsync();
-            return Ok(setting);
+            return Ok(new SettingModel(set.Id,set.AppId, _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name,set.SocialId, _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name,set.ClientId,set.SecretKey,set.Scope));
         }
     }
 }

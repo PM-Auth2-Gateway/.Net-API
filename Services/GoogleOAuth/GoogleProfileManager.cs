@@ -1,6 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using PMAuth.Extensions;
 using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Services.Abstract;
@@ -8,9 +10,15 @@ using PMAuth.Services.Abstract;
 
 namespace PMAuth.Services.GoogleOAuth
 {
-    public class GoogleProfileManager : IProfileManager
+    public class GoogleProfileManager : IProfileManagingService
     {
-        public  UserProfile GetUserProfileAsync(TokenModel rawTokenModel)
+        private readonly IMemoryCache _memoryCache;
+
+        public GoogleProfileManager(IMemoryCache memoryCache)
+        {
+            _memoryCache = memoryCache;
+        }
+        public async Task GetUserProfileAsync(TokenModel rawTokenModel, string sessionId)
         {
             GoogleTokensModel tokensModel = (GoogleTokensModel) rawTokenModel;
             /*if (string.IsNullOrWhiteSpace(tokensModel.IdToken))
@@ -19,7 +27,9 @@ namespace PMAuth.Services.GoogleOAuth
             }*/
             
             UserProfile profile = GetProfileFromIdToken(tokensModel);
-            return profile;
+            TempDummyMc model = _memoryCache.Peek<TempDummyMc>(sessionId);
+            model.UserProfile = profile;
+            // return profile;
         }
         
         /*private async Task<UserProfile> GetProfileFromAPICall(GoogleTokensModel tokensModel)
@@ -37,9 +47,9 @@ namespace PMAuth.Services.GoogleOAuth
             UserProfile userProfile = new UserProfile
             {
                 Id = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value,
-                AccessToken = tokensModel.AccessToken,
-                RefreshToken = tokensModel.RefreshToken,
-                ExpiresIn = tokensModel.ExpiresIn,
+                //AccessToken = tokensModel.AccessToken,
+                //RefreshToken = tokensModel.RefreshToken,
+                //ExpiresIn = tokensModel.ExpiresIn,
                 Email = token.Claims.FirstOrDefault(c => c.Type == "email")?.Value,
                 FirstName = token.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value,
                 LastName = token.Claims.FirstOrDefault(c => c.Type == "family_name")?.Value,
