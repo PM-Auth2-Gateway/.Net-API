@@ -60,7 +60,7 @@ namespace PMAuth.Services.FacebookOAuth
             // if you need this code, think about moving it to another class
             string tokenUri = "https://graph.facebook.com/v10.0/oauth/access_token";  //TODO should be added to database. for now it is hardcoded
             string code = authorizationCodeModel.AuthorizationCode;
-            string redirectUri = "https://localhost:5001/auth/facebook";//authorizationCodeModel.RedirectUri;
+            string redirectUri = "https://localhost:44313/auth/facebook";//authorizationCodeModel.RedirectUri;
             /*string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId && 
                                                                s.SocialId == authorizationCodeModel.SocialId)
                                                                ?.ClientId;*/

@@ -11,7 +11,7 @@
         public int Id { get; set; }
 
         /// <summary>
-        /// App Id
+        /// Application Id
         /// </summary>
         public int AppId { get; set; }
         /// <summary>
@@ -33,11 +33,11 @@
         /// </summary>
         public string ClientId { get; set; }
         /// <summary>
-        /// Secret Key
+        /// Secret Key - secret field setting in application
         /// </summary>
         public string SecretKey { get; set; }
         /// <summary>
-        /// Scope
+        /// Scope - bunch of accessed information by user.
         /// </summary>
         public string Scope { get; set; }
 
