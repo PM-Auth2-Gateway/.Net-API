@@ -41,7 +41,6 @@ namespace PMAuth.Controllers
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
                 return BadRequest(new ErrorModel
-
                 {
                     Error = "Invalid session id",
                     ErrorDescription = "There is no profile related to provided session id"
@@ -57,6 +56,7 @@ namespace PMAuth.Controllers
                     ErrorDescription = "There is no profile related to provided session id"
                 });
             }
+            
             isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
             if (isSuccess && sessionInfo?.UserProfile == null)
             {
@@ -73,7 +73,7 @@ namespace PMAuth.Controllers
                     requestCounter++;
                 }
             }
-            //todo test timeout
+            
             
             if (sessionInfo?.UserProfile == null)
             {

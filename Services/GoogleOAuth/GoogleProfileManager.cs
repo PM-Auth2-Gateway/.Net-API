@@ -26,6 +26,11 @@ namespace PMAuth.Services.GoogleOAuth
             {
                 return await GetProfileFromAPICall(tokensModel);
             }*/
+
+            if (tokensModel == null)
+            {
+                return;
+            }
             
             UserProfile profile = GetProfileFromIdToken(tokensModel);
             bool isSuccess = _memoryCache.TryGetValue(sessionId, out CacheModel model);

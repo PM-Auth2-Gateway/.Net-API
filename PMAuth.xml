@@ -164,9 +164,18 @@
             Controller for handling redirect from social network services
             </summary>
         </member>
-        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCode(System.String,PMAuth.Exceptions.Models.ErrorModel,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeGoogle(System.String,PMAuth.Models.RequestModels.RedirectionErrorModelGoogle,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
             <summary>
-            
+            Handle redirect from Google
+            </summary>
+            <param name="name"></param>
+            <param name="error"></param>
+            <param name="authorizationCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeFacebook(System.String,PMAuth.Models.RequestModels.RedirectionErrorModelFacebook,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+            <summary>
+            Handle redirect from Facebook
             </summary>
             <param name="name"></param>
             <param name="error"></param>
@@ -252,36 +261,6 @@
             Error reason
             </summary>
         </member>
-        <member name="T:PMAuth.Models.CacheModel">
-            <summary>
-            CasheModel for store info in cache
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.CacheModel.SocialId">
-            <summary>
-            Social Id.
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.CacheModel.AccessToken">
-            <summary>
-            Access Token - allow user receiving information about him
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.CacheModel.UserProfile">
-            <summary>
-            User Profile where stored user info
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.CacheModel.Device">
-            <summary>
-            Device - field which inform what type of device will recieve a redirect
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.CacheModel.AppId">
-            <summary>
-            Application Id
-            </summary>
-        </member>
         <member name="T:PMAuth.Models.OAuthFacebook.FacebookTokensModel">
             <summary>
             Model for retrieving access and refresh tokens from Facebook 
@@ -330,6 +309,41 @@
         <member name="P:PMAuth.Models.OAuthGoogle.GoogleTokensModel.RefreshToken">
             <summary>
             Refresh token
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthUniversal.CacheModel">
+            <summary>
+            CasheModel for store info in cache
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.SocialId">
+            <summary>
+            Social Id.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.AccessToken">
+            <summary>
+            Access Token - allow user receiving information about him
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.UserProfile">
+            <summary>
+            User Profile where stored user info
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.Device">
+            <summary>
+            Device - field which inform what type of device will recieve a redirect
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.AppId">
+            <summary>
+            Application Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.RedirectUri">
+            <summary>
+            Redirect Url
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel">
@@ -410,6 +424,16 @@
         <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.AdditionalInformation">
             <summary>
             Key-value pairs ("paramName": "value") of additional information about user
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.RequestModels.RedirectionErrorModelGoogle.Error">
+            <summary>
+            Error
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.RequestModels.RedirectionErrorModelGoogle.ErrorDescription">
+            <summary>
+            Detailed description of an error
             </summary>
         </member>
         <member name="P:PMAuth.Models.SettingModel.Id">

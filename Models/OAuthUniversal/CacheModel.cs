@@ -29,5 +29,10 @@
         /// Application Id
         /// </summary>
         public int AppId { get; set; }
+        
+        /// <summary>
+        /// Redirect Url
+        /// </summary>
+        public string RedirectUri { get; set; }
     }
 }

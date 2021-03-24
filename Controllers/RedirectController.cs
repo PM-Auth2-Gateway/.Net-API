@@ -40,14 +40,6 @@ namespace PMAuth.Controllers
             _httpClientFactory = httpClientFactory;
             _context = context;
             _memoryCache = memoryCache;
-            //todo delete
-            // _memoryCache.Set("xxxxxxxxxxxxxxxxx", new TempDummyMc
-            // {
-            //     Device = "browser"
-            // }, new MemoryCacheEntryOptions
-            // {
-            //     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            // });
         }
 #pragma warning restore 1591
 
@@ -72,7 +64,7 @@ namespace PMAuth.Controllers
             }
 
             _userProfileReceivingServiceContext.SetStrategies(
-                new GoogleAccessTokenReceivingService(_httpClientFactory, _context),
+                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache),
                 new GoogleProfileManager(_memoryCache));
             
             return ContinueFlow(authorizationCode);
@@ -109,27 +101,23 @@ namespace PMAuth.Controllers
         
         private IActionResult ContinueFlow(AuthorizationCodeModel authorizationCode)
         {
+            CacheModel session = _memoryCache.Get<CacheModel>(authorizationCode.SessionId);
+            if (session == null)
+            {
+                return BadRequest("Authorization time has expired."); 
+            }
+            string device = session.Device.ToLower().Trim();
+            
             try
             {
-                CacheModel session = _memoryCache.Get<CacheModel>(authorizationCode.SessionId);
-                if (session == null)
-                {
-                    
-                }
-                Task.Run(() => _userProfileReceivingServiceContext.Execute(session.AppId, authorizationCode));
+                _userProfileReceivingServiceContext.Execute(session.AppId, authorizationCode);
             }
             catch (AuthorizationCodeExchangeException exception)
             {
                 
             }
-
-            bool isSuccess = _memoryCache.TryGetValue(authorizationCode.SessionId, out CacheModel sessionInfo);
-            if (isSuccess == false || string.IsNullOrWhiteSpace(sessionInfo?.Device))
-            {
-                return BadRequest("Unknown session ID");
-            }
-
-            if (sessionInfo.Device.ToLower().Trim().Equals("browser"))
+            
+            if (device.Equals("browser"))
             {
                 return new ContentResult 
                 {
@@ -139,9 +127,8 @@ namespace PMAuth.Controllers
             }
             else
             {
-                return Redirect(sessionInfo.Device);
+                return Redirect(device);
             }
-        }  
-        
+        }
     }
 }

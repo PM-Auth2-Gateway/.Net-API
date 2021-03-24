@@ -94,25 +94,27 @@ namespace PMAuth.Controllers
             {
                 return BadRequest();
             }
+            
+            string socialName = context.Socials.FirstOrDefault(x => x.Id == socialModel.SocialId).Name.ToLower();
+            string redirectUri = $"{Request.Scheme}://{Request.Host}/auth/{socialName}";
 
             var sessionId = Guid.NewGuid().ToString();
             cache.Set(sessionId, new CacheModel
             {
                 SocialId = socialModel.SocialId,
                 Device = socialModel.Device,
-                AppId = App_id
+                AppId = App_id,
+                RedirectUri = redirectUri
             },
             new MemoryCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
-
-            string socialName = context.Socials.FirstOrDefault(x => x.Id == socialModel.SocialId).Name.ToLower();
-
-            return new SocialLinkModel()
+            
+            return new SocialLinkModel
             {
                 AuthUri = social.AuthUri,
-                RedirectUri = $"{Request.Scheme}://{Request.Host}/auth/{socialName}",
+                RedirectUri = redirectUri,
                 ResponseType = "code",
                 ClientId = setting.ClientId,
                 Scope = setting.Scope,
