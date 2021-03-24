@@ -9,6 +9,7 @@ using PMAuth.Extensions;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Services.Abstract;
+using PMAuth.Services.FacebookOAuth;
 using PMAuth.Services.GoogleOAuth;
 
 namespace PMAuth.Controllers
@@ -78,10 +79,10 @@ namespace PMAuth.Controllers
             else if (name.ToLower().Trim().Equals("facebook")) // facebook
             {
                 //maybe it should be moved inside receivingServiceContext
-                
-                // _userProfileReceivingServiceContext.SetStrategies(
-                //     new FacebookAccessTokenReceivingService(_httpClientFactory, _context), 
-                //     new FacebookProfileManager()); 
+
+                _userProfileReceivingServiceContext.SetStrategies(
+                    new FacebookAccessTokenReceivingService(_httpClientFactory, _context),
+                    new FacebookProfileManager(_memoryCache));
             }
             else
             {

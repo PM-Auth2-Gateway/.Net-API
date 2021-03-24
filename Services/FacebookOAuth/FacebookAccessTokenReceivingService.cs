@@ -9,6 +9,7 @@ using PMAuth.Extensions;
 using PMAuth.Models.OAuthFacebook;
 using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
+using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Services.Abstract;
 
 #pragma warning disable 1591
@@ -59,15 +60,19 @@ namespace PMAuth.Services.FacebookOAuth
             // if you need this code, think about moving it to another class
             string tokenUri = "https://graph.facebook.com/v10.0/oauth/access_token";  //TODO should be added to database. for now it is hardcoded
             string code = authorizationCodeModel.AuthorizationCode;
-            string redirectUri = authorizationCodeModel.RedirectUri;
-            //string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId)?.ClientId;
+            string redirectUri = "https://localhost:5001/auth/facebook";//authorizationCodeModel.RedirectUri;
+            /*string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId && 
+                                                               s.SocialId == authorizationCodeModel.SocialId)
+                                                               ?.ClientId;*/
             string clientId = "929331344507670";
-            //string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId)?.SecretKey;
+            /*string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId &&
+                                                                s.SocialId == authorizationCodeModel.SocialId)
+                                                                ?.SecretKey;*/
             string clientSecret = "164d0e742d123c6547c641d9393b865c";
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             {
-                var errorExplanation = new AuthorizationCodeExchangeExceptionModel
+                var errorExplanation = new ErrorModel
                 {
                     Error = "Secrets are unavailable",
                     ErrorDescription = "There is no client id or client secret key registered in our widget."
@@ -85,7 +90,6 @@ namespace PMAuth.Services.FacebookOAuth
                     .AddQuery("client_id", clientId)
                     .AddQuery("client_secret", clientSecret)
                     .AddQuery("scope", string.Empty)
-                    .AddQuery("grant_type", "authorization_code")
             };
             
             HttpResponseMessage response;
@@ -118,7 +122,7 @@ namespace PMAuth.Services.FacebookOAuth
             string responseBody = await response.Content.ReadAsStringAsync();
             try
             {
-                var errorExplanation = JsonSerializer.Deserialize<AuthorizationCodeExchangeExceptionModel>(responseBody);
+                var errorExplanation = JsonSerializer.Deserialize<ErrorModel>(responseBody);
                 return new AuthorizationCodeExchangeException("Response StatusCode from the Facebook " +
                                                               "is unsuccessful when trying to exchange code " +
                                                               "for tokens", errorExplanation, exception);
