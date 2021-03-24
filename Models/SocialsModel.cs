@@ -16,7 +16,7 @@ namespace PMAuth.Models
     public class SocialsModel
     {
         /// <summary>
-        /// List of socials.
+        /// List of socials which is registered by user in some application.
         /// </summary>
         public List<Social> Socials { get; set; }
     }

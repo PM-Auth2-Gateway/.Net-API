@@ -6,11 +6,11 @@
     public class Admin
     {
         /// <summary>
-        /// Id
+        /// Admin Id
         /// </summary>
         public int Id { get; set; }
         /// <summary>
-        /// Name
+        /// Admin Name
         /// </summary>
         public string Name { get; set; }
     }

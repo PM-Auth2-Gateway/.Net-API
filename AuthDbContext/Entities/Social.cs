@@ -17,12 +17,12 @@
         public string Name { get; set; }
 
         /// <summary>
-        /// Auth Uri
+        /// Auth Uri - base link of some service which offer authentication.
         /// </summary>
         public string AuthUri { get; set; }
 
         /// <summary>
-        /// Token Url
+        /// Token Url - adress which operate with tokens
         /// </summary>
         public string TokenUrl { get; set; }
     }
