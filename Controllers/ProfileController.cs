@@ -59,7 +59,7 @@ namespace PMAuth.Controllers
             if (isSuccess && sessionInfo?.UserProfile == null)
             {
                 int requestCounter = 0;
-                while (requestCounter < 20)
+                while (requestCounter < 50)
                 {
                     isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
                     if (isSuccess && sessionInfo?.UserProfile != null)
@@ -67,16 +67,17 @@ namespace PMAuth.Controllers
                         break;
                     }
 
-                    await Task.Delay(500);
+                    await Task.Delay(200);
                     requestCounter++;
                 }
             }
+            //todo test timeout
             
             if (sessionInfo?.UserProfile == null)
             {
                 return BadRequest(new ErrorModel
                 {
-                    Error = "Invalid session id",
+                    Error = "Social service servers are currently unavailable",
                     ErrorDescription = "There is no profile related to provided session id"
                 });
             }

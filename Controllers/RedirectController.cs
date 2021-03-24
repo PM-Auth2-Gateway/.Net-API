@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 
 using Microsoft.AspNetCore.Mvc;
@@ -44,8 +45,7 @@ namespace PMAuth.Controllers
                 Device = "browser"
             }, new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(1),
-                SlidingExpiration =TimeSpan.FromMinutes(1)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 #pragma warning restore 1591
@@ -94,7 +94,7 @@ namespace PMAuth.Controllers
                 };
                 return BadRequest(exceptionModel);
             }
-
+            
             try
             {
                 _userProfileReceivingServiceContext.Execute(1, authorizationCode);
