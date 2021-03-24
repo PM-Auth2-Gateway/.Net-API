@@ -44,13 +44,17 @@ namespace PMAuth.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public ActionResult<SocialsModel> GetAllSocials([FromHeader] int App_id)
         {
-            Setting setting = context.Settings.FirstOrDefault(x => x.AppId == App_id);
+            var socialIds = context.Settings.Where(x => x.AppId == App_id).Select(x => x.SocialId).Distinct().ToList();
 
-            if (setting == null) return BadRequest();
+            if (socialIds == null) return BadRequest();
 
-            var socials = context.Socials.Where(x => x.Id == setting.SocialId).ToList();
-
-            if (socials == null) return BadRequest();
+            List<Social> socials = new List<Social>();
+            foreach(int socialId in socialIds)
+            {
+                socials.Add(context.Socials.FirstOrDefault(social => social.Id == socialId));
+            }
+            
+            if (socials.Count == 0) return BadRequest();
 
             return new SocialsModel() { Socials = socials };
 
@@ -85,13 +89,12 @@ namespace PMAuth.Controllers
             return new SocialLinkModel()
             {
                 AuthUri = social.AuthUri,
-                Prompt = "consent",
+                RedirectUri = "redirect_uri",
                 ResponseType = "code",
                 ClientId = setting.ClientId,
                 Scope = setting.Scope,
-                AccessType = "offline"
+                State = "session_id"
             };
-
         }
     }
 }

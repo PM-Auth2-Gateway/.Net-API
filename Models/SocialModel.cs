@@ -16,5 +16,11 @@ namespace PMAuth.Models
         /// </summary>
         [JsonPropertyName("social_id")]
         public int SocialId { get; set; }
+
+        /// <summary>
+        /// Redirect Url 2
+        /// </summary>
+        [JsonPropertyName("device")]
+        public string Device { get; set; }
     }
 }
