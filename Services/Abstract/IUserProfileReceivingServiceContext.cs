@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using PMAuth.Exceptions;
 using PMAuth.Models.OAuthUniversal;
+using PMAuth.Models.OAuthUniversal.RedirectPart;
 
 namespace PMAuth.Services.Abstract
 {
@@ -24,8 +25,7 @@ namespace PMAuth.Services.Abstract
         /// <param name="profileManagerStrategy">service which gets user profile from social network and return unified user profile</param>
         void SetStrategies(
             IAccessTokenReceivingService accessTokenReceivingStrategy,
-            IProfileManager profileManagerStrategy);
-
+            IProfileManagingService profileManagerStrategy);
         
         /// <summary>
         /// Get user profile by authorization code
@@ -37,6 +37,6 @@ namespace PMAuth.Services.Abstract
         /// The request failed due to an underlying issue such as network connectivity,
         /// DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
         /// </exception>
-        Task<UserProfile> Execute(int appId, AuthorizationCodeModel authorizationCodeModel);
+        Task Execute(int appId, AuthorizationCodeModel authorizationCodeModel);
     }
 }

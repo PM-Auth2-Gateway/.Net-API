@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using PMAuth.Exceptions;
 using PMAuth.Models.OAuthUniversal;
+using PMAuth.Models.OAuthUniversal.RedirectPart;
+
 #pragma warning disable 1591
 
 namespace PMAuth.Services.Abstract
