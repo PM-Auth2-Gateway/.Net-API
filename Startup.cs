@@ -64,7 +64,8 @@ using System.Threading.Tasks;
                 , ServiceLifetime.Transient);
 
             services.AddHttpClient();
-
+            services.AddMemoryCache();
+            
             services.AddTransient<IUserProfileReceivingServiceContext, UserProfileReceivingServiceContext>();
             //services.AddTransient<IAccessTokenReceivingService<GoogleTokensModel>, GoogleAccessTokenReceivingService>();
 

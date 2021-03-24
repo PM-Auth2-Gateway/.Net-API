@@ -1,14 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PMAuth.AuthDbContext;
-using PMAuth.Exceptions;
+using Microsoft.Extensions.Caching.Memory;
 using PMAuth.Exceptions.Models;
+using PMAuth.Extensions;
 using PMAuth.Models.OAuthUniversal;
-using PMAuth.Services.Abstract;
-using PMAuth.Services.GoogleOAuth;
+using PMAuth.Models.RequestModels;
 
 namespace PMAuth.Controllers
 {
@@ -18,79 +14,72 @@ namespace PMAuth.Controllers
     [Route("[controller]")]
     public class ProfileController : ControllerBase
     {
-        private readonly IUserProfileReceivingServiceContext _userProfileReceivingServiceContext;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly BackOfficeContext _context;
+        private readonly IMemoryCache _memoryCache;
 
 #pragma warning disable 1591
-        public ProfileController(
-            IUserProfileReceivingServiceContext userProfileReceivingServiceContext,
-            IHttpClientFactory httpClientFactory,
-            BackOfficeContext context)
+        public ProfileController(IMemoryCache memoryCache)
         {
-            _userProfileReceivingServiceContext = userProfileReceivingServiceContext;
-            _httpClientFactory = httpClientFactory;
-            _context = context;
+            _memoryCache = memoryCache;
         }
-#pragma warning restore 1591
-
-       /// <summary>
-       /// Get user profile
-       /// </summary>
-       /// <param name="appId">Application id (this id admin receives in the backoffice)</param>
-       /// <param name="authCodeModel">Authorization code model </param>
-       /// <returns>UserProfile or AuthorizationCodeExchangeExceptionModel</returns>
+#pragma warning restore 1591 
+        /// <summary>
+        /// Get user profile
+        /// </summary>
+        /// <param name="appId">Application id (this id admin receives in the backoffice)</param>
+        /// <param name="sessionIdModel">Model which contains session ID</param>
+        /// <returns>UserProfile or ErrorModel</returns>
         [HttpPost("info")]
         [ProducesResponseType(typeof(UserProfile), 200)]
-        [ProducesResponseType(typeof(AuthorizationCodeExchangeExceptionModel), 400)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
         public async Task<IActionResult> GetUserProfileAsync(
-            [FromHeader(Name = "X-APP_ID")] int appId, 
-            [FromBody] AuthorizationCodeModel authCodeModel)
+            [FromHeader(Name = "App_id")] int appId, 
+            [FromBody] SessionIdModel sessionIdModel)
         {
-            if (authCodeModel.SocialId == _context.Socials.FirstOrDefault(s => s.Name.Equals("Google"))?.Id) // google
+            //todo add app_id check
+            if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
-                _userProfileReceivingServiceContext.SetStrategies(
-                    new GoogleAccessTokenReceivingService(_httpClientFactory, _context),
-                    new GoogleProfileManager());
-            }
-            else if (authCodeModel.SocialId == _context.Socials.FirstOrDefault(s => s.Name.Equals("Facebook"))?.Id) // facebook
-            {
-                //maybe it should be moved inside receivingServiceContext
-                
-               /* _userProfileReceivingServiceContext.SetStrategies(
-                    new FacebookAccessTokenReceivingService(_httpClientFactory, _context), 
-                    new FacebookProfileManager()); */
-            }
-            else
-            {
-                AuthorizationCodeExchangeExceptionModel exceptionModel = new AuthorizationCodeExchangeExceptionModel
+                return BadRequest(new ErrorModel
                 {
-                    Error = "Unregister social network.",
-                    ErrorDescription = "You are trying to use unregister social network. Social network with this ID" +
-                                       "doesnt exists."
-                };
-                return BadRequest(exceptionModel);
+                    Error = "Invalid session id",
+                    ErrorDescription = "There is no profile related to provided session id"
+                });
             }
 
-            try
+            if (_memoryCache.Peek<TempDummyMc>(sessionIdModel.SessionId) == null)
             {
-                UserProfile userProfile = await _userProfileReceivingServiceContext.Execute(appId, authCodeModel);
-                return Ok(userProfile);
+                return BadRequest(new ErrorModel
+                {
+                    Error = "Invalid session id",
+                    ErrorDescription = "There is no profile related to provided session id"
+                });
             }
-            catch (AuthorizationCodeExchangeException exception)
+            TempDummyMc sessionInfo = _memoryCache.Peek<TempDummyMc>(sessionIdModel.SessionId);
+            if (sessionInfo?.UserProfile == null)
             {
-                if (exception.Description != null)
+                int requestCounter = 0;
+                while (requestCounter < 20)
                 {
-                    return BadRequest(exception.Description);
-                }
-                else
-                {
-                    return BadRequest(new AuthorizationCodeExchangeExceptionModel()
+                    sessionInfo = _memoryCache.Peek<TempDummyMc>(sessionIdModel.SessionId);
+                    if (sessionInfo?.UserProfile != null)
                     {
-                        ErrorDescription = exception.Message
-                    });
+                        break;
+                    }
+
+                    await Task.Delay(500);
+                    requestCounter++;
                 }
             }
+            
+            if (sessionInfo?.UserProfile == null)
+            {
+                return BadRequest(new ErrorModel
+                {
+                    Error = "Invalid session id",
+                    ErrorDescription = "There is no profile related to provided session id"
+                });
+            }
+
+            return Ok(_memoryCache.Get<TempDummyMc>(sessionIdModel.SessionId).UserProfile);
         }
     }
 }
