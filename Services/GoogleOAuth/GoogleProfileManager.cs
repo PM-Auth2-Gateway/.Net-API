@@ -1,8 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Caching.Memory;
-using PMAuth.Extensions;
+
 using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Services.Abstract;
@@ -25,11 +26,18 @@ namespace PMAuth.Services.GoogleOAuth
             {
                 return await GetProfileFromAPICall(tokensModel);
             }*/
+
+            if (tokensModel == null)
+            {
+                return;
+            }
             
             UserProfile profile = GetProfileFromIdToken(tokensModel);
-            TempDummyMc model = _memoryCache.Peek<TempDummyMc>(sessionId);
-            model.UserProfile = profile;
-            // return profile;
+            bool isSuccess = _memoryCache.TryGetValue(sessionId, out CacheModel model);
+            if (isSuccess && model != null)
+            {
+                model.UserProfile = profile;
+            }
         }
         
         /*private async Task<UserProfile> GetProfileFromAPICall(GoogleTokensModel tokensModel)

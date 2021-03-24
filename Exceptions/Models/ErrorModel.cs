@@ -11,21 +11,18 @@ namespace PMAuth.Exceptions.Models
         /// <summary>
         /// Error
         /// </summary>
-        [FromQuery(Name = "error")]
         [JsonPropertyName("error")]
         public string Error { get; set; }
         
         /// <summary>
         /// Detailed description of an error
         /// </summary>
-        [FromQuery(Name = "error_description")]
         [JsonPropertyName("error_description")]
         public string ErrorDescription { get; set; }
         
         /// <summary>
         /// Error reason
         /// </summary>
-        [FromQuery(Name = "error_reason")]
         [JsonPropertyName("error_reason")]
         public string ErrorReason { get; set; }
     }

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
@@ -18,21 +20,26 @@ namespace PMAuth.Services.GoogleOAuth
     public class GoogleAccessTokenReceivingService : IAccessTokenReceivingService
     {
         private readonly BackOfficeContext _context;
+
+        private readonly IMemoryCache _memoryCache;
+
         //private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
         private readonly HttpClient _httpClient;
 
         public GoogleAccessTokenReceivingService(
             IHttpClientFactory httpClientFactory, 
-            BackOfficeContext context
+            BackOfficeContext context,
+            IMemoryCache memoryCache
             /*ILogger<GoogleAccessTokenReceivingService> logger*/) 
         {
             _context = context;
+            _memoryCache = memoryCache;
             //_logger = logger;
             _httpClient = httpClientFactory.CreateClient();
         }
         public async Task<TokenModel> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
         {
-            string responseBody = await SendRequest(appId, authorizationCodeModel);
+            string responseBody = await ExchangeCodeForTokens(appId, authorizationCodeModel);
             if (string.IsNullOrWhiteSpace(responseBody))
             {
                 return null;
@@ -54,18 +61,30 @@ namespace PMAuth.Services.GoogleOAuth
             }
         }
         
-        protected async Task<string> SendRequest(int appId, AuthorizationCodeModel authorizationCodeModel)
+        protected async Task<string> ExchangeCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
         {
+            bool isSuccess =
+                _memoryCache.TryGetValue(authorizationCodeModel.SessionId, out CacheModel sessionInformation);
+            if (isSuccess == false)
+            {
+                var errorExplanation = new ErrorModel
+                {
+                    Error = "Authorization timeout has expired.",
+                    ErrorDescription = "Try again later"
+                };
+                throw new AuthorizationCodeExchangeException(errorExplanation);
+            }
+            
             // if you need this code, think about moving it to another class
-            string tokenUri = "https://oauth2.googleapis.com/token";  //TODO should be added to database. for now it is hardcoded
+            string tokenUri = _context.Socials.FirstOrDefault(s => s.Id == sessionInformation.SocialId)?.TokenUrl; //"https://oauth2.googleapis.com/token"; 
             string code = authorizationCodeModel.AuthorizationCode;
-            string redirectUri = "https://localhost:5001/auth/google";//authorizationCodeModel.RedirectUri;
+            string redirectUri = sessionInformation.RedirectUri; // "https://localhost:5001/auth/google";
             /*string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId && 
-                                                               s.SocialId == authorizationCodeModel.SocialId)
+                                                               s.SocialId == sessionInformation.SocialId)
                                                                ?.ClientId;*/
             string clientId = "532364683542-3hg1fdiptik9lhbj22o72rrnsb9eqtvi.apps.googleusercontent.com";
             /*string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId &&
-                                                                s.SocialId == authorizationCodeModel.SocialId)
+                                                                s.SocialId == sessionInformation.SocialId)
                                                                 ?.SecretKey;*/
             string clientSecret = "zwqbWaKdRhyyQf6scdJWTiod";
 
@@ -73,10 +92,21 @@ namespace PMAuth.Services.GoogleOAuth
             {
                 var errorExplanation = new ErrorModel
                 {
-                    Error = "Secrets are unavailable",
+                    Error = "Trying to use unregistered social network",
                     ErrorDescription = "There is no client id or client secret key registered in our widget."
                 };
-                throw new AuthorizationCodeExchangeException("Error. Trying to use unregistered social network", errorExplanation);
+                throw new AuthorizationCodeExchangeException(errorExplanation);
+            }
+
+            if (string.IsNullOrEmpty(tokenUri))
+            {
+                var errorExplanation = new ErrorModel
+                {
+                    Error = "Trying to use unregistered social network",
+                    ErrorDescription = "This social service is not currently available"
+                };
+                
+                throw new AuthorizationCodeExchangeException(errorExplanation);
             }
             
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
@@ -91,7 +121,6 @@ namespace PMAuth.Services.GoogleOAuth
                     .AddQuery("scope", string.Empty)
                     .AddQuery("grant_type", "authorization_code")
             };
-            
             HttpResponseMessage response;
             try
             {
@@ -99,7 +128,6 @@ namespace PMAuth.Services.GoogleOAuth
             }
             catch (HttpRequestException exception)
             {
-                //_logger.LogInformation("Unable to retrieve response from the Google");
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Google", exception);
             }
 
