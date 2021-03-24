@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
 using PMAuth.Exceptions.Models;
+using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.RequestModels;
-using PMAuth.Services.Abstract;
-using PMAuth.Services.FacebookOAuth;
-using PMAuth.Services.GoogleOAuth;
 
 namespace PMAuth.Controllers
 {
@@ -50,7 +48,7 @@ namespace PMAuth.Controllers
                 });
             }
 
-            bool isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out TempDummyMc sessionInfo);
+            bool isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out CacheModel sessionInfo);
             if (isSuccess == false || sessionInfo == null)
             {
                 return BadRequest(new ErrorModel
@@ -86,7 +84,7 @@ namespace PMAuth.Controllers
                 });
             }
 
-            return Ok(_memoryCache.Get<TempDummyMc>(sessionIdModel.SessionId).UserProfile);
+            return Ok(_memoryCache.Get<CacheModel>(sessionIdModel.SessionId).UserProfile);
         }
     }
 }

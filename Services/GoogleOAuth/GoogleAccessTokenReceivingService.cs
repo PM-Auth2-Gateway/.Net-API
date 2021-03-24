@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -57,7 +58,7 @@ namespace PMAuth.Services.GoogleOAuth
         protected async Task<string> SendRequest(int appId, AuthorizationCodeModel authorizationCodeModel)
         {
             // if you need this code, think about moving it to another class
-            string tokenUri = "https://oauth2.googleapis.com/token";  //TODO should be added to database. for now it is hardcoded
+            string tokenUri = _context.Socials.FirstOrDefault(s => s.Id == ) "https://oauth2.googleapis.com/token";  //TODO should be added to database. for now it is hardcoded
             string code = authorizationCodeModel.AuthorizationCode;
             string redirectUri = "https://localhost:5001/auth/google";//authorizationCodeModel.RedirectUri;
             /*string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId && 

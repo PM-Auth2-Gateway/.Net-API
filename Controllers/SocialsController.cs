@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using PMAuth.AuthDbContext;
 using PMAuth.AuthDbContext.Entities;
 using PMAuth.Models;
+using PMAuth.Models.OAuthUniversal;
 
 namespace PMAuth.Controllers
 {
@@ -97,10 +96,11 @@ namespace PMAuth.Controllers
             }
 
             var sessionId = Guid.NewGuid().ToString();
-            cache.Set(sessionId, new CacheModel()
+            cache.Set(sessionId, new CacheModel
             {
                 SocialId = socialModel.SocialId,
-                Device = socialModel.Device
+                Device = socialModel.Device,
+                AppId = App_id
             },
             new MemoryCacheEntryOptions
             {

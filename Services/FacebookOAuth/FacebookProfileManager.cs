@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using PMAuth.Extensions;
 using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Services.Abstract;
@@ -27,7 +26,7 @@ namespace PMAuth.Services.FacebookOAuth
             }*/
             
             UserProfile profile = GetProfileFromIdToken(tokensModel);
-            TempDummyMc model = _memoryCache.Peek<TempDummyMc>(sessionId);
+            CacheModel model = _memoryCache.Get<CacheModel>(sessionId);
             model.UserProfile = profile;
             // return profile;
         }
