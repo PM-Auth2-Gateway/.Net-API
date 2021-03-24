@@ -5,6 +5,9 @@ using PMAuth.Exceptions.Models;
 using PMAuth.Extensions;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.RequestModels;
+using PMAuth.Services.Abstract;
+using PMAuth.Services.FacebookOAuth;
+using PMAuth.Services.GoogleOAuth;
 
 namespace PMAuth.Controllers
 {
@@ -39,6 +42,7 @@ namespace PMAuth.Controllers
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
                 return BadRequest(new ErrorModel
+
                 {
                     Error = "Invalid session id",
                     ErrorDescription = "There is no profile related to provided session id"

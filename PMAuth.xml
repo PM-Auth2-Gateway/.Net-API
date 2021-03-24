@@ -141,6 +141,11 @@
             Auth Uri
             </summary>
         </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Social.TokenUrl">
+            <summary>
+            Token Url
+            </summary>
+        </member>
         <member name="T:PMAuth.Controllers.ProfileController">
             <summary>
             Get user profile by authorization code 
@@ -401,9 +406,9 @@
             Auth Uri.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.Prompt">
+        <member name="P:PMAuth.Models.SocialLinkModel.RedirectUri">
             <summary>
-            Prompt.
+            Auth Uri.
             </summary>
         </member>
         <member name="P:PMAuth.Models.SocialLinkModel.ResponseType">
@@ -421,9 +426,9 @@
             Scope.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.AccessType">
+        <member name="P:PMAuth.Models.SocialLinkModel.State">
             <summary>
-            Access Type.
+            Scope.
             </summary>
         </member>
         <member name="T:PMAuth.Models.SocialModel">
@@ -434,6 +439,11 @@
         <member name="P:PMAuth.Models.SocialModel.SocialId">
             <summary>
             Social Id.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialModel.Device">
+            <summary>
+            Redirect Url 2
             </summary>
         </member>
         <member name="T:PMAuth.Models.SocialsModel">
