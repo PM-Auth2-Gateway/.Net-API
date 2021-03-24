@@ -8,6 +8,7 @@ using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Services.Abstract;
+using PMAuth.Services.FacebookOAuth;
 using PMAuth.Services.GoogleOAuth;
 
 namespace PMAuth.Controllers
@@ -56,10 +57,10 @@ namespace PMAuth.Controllers
             else if (authCodeModel.SocialId == _context.Socials.FirstOrDefault(s => s.Name.Equals("Facebook"))?.Id) // facebook
             {
                 //maybe it should be moved inside receivingServiceContext
-                
-               /* _userProfileReceivingServiceContext.SetStrategies(
-                    new FacebookAccessTokenReceivingService(_httpClientFactory, _context), 
-                    new FacebookProfileManager()); */
+
+                _userProfileReceivingServiceContext.SetStrategies(
+                    new FacebookAccessTokenReceivingService(_httpClientFactory, _context),
+                    new FacebookProfileManager());
             }
             else
             {
