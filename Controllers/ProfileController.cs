@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+
 using PMAuth.Exceptions.Models;
-using PMAuth.Extensions;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.RequestModels;
 using PMAuth.Services.Abstract;
@@ -49,7 +50,8 @@ namespace PMAuth.Controllers
                 });
             }
 
-            if (_memoryCache.Peek<TempDummyMc>(sessionIdModel.SessionId) == null)
+            bool isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out TempDummyMc sessionInfo);
+            if (isSuccess == false || sessionInfo == null)
             {
                 return BadRequest(new ErrorModel
                 {
@@ -57,28 +59,29 @@ namespace PMAuth.Controllers
                     ErrorDescription = "There is no profile related to provided session id"
                 });
             }
-            TempDummyMc sessionInfo = _memoryCache.Peek<TempDummyMc>(sessionIdModel.SessionId);
-            if (sessionInfo?.UserProfile == null)
+            isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
+            if (isSuccess && sessionInfo?.UserProfile == null)
             {
                 int requestCounter = 0;
-                while (requestCounter < 20)
+                while (requestCounter < 50)
                 {
-                    sessionInfo = _memoryCache.Peek<TempDummyMc>(sessionIdModel.SessionId);
-                    if (sessionInfo?.UserProfile != null)
+                    isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
+                    if (isSuccess && sessionInfo?.UserProfile != null)
                     {
                         break;
                     }
 
-                    await Task.Delay(500);
+                    await Task.Delay(200);
                     requestCounter++;
                 }
             }
+            //todo test timeout
             
             if (sessionInfo?.UserProfile == null)
             {
                 return BadRequest(new ErrorModel
                 {
-                    Error = "Invalid session id",
+                    Error = "Social service servers are currently unavailable",
                     ErrorDescription = "There is no profile related to provided session id"
                 });
             }

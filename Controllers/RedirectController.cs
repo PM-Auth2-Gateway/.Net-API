@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
-using PMAuth.Extensions;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Services.Abstract;
@@ -43,8 +45,7 @@ namespace PMAuth.Controllers
                 Device = "browser"
             }, new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(1),
-                SlidingExpiration =TimeSpan.FromMinutes(1)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 #pragma warning restore 1591
@@ -93,7 +94,7 @@ namespace PMAuth.Controllers
                 };
                 return BadRequest(exceptionModel);
             }
-
+            
             try
             {
                 _userProfileReceivingServiceContext.Execute(1, authorizationCode);
@@ -103,8 +104,8 @@ namespace PMAuth.Controllers
                 
             }
 
-            TempDummyMc sessionInfo = _memoryCache.Peek<TempDummyMc>(authorizationCode.SessionId);
-            if (string.IsNullOrWhiteSpace(sessionInfo?.Device))
+            bool isSuccess = _memoryCache.TryGetValue(authorizationCode.SessionId, out TempDummyMc sessionInfo);
+            if (isSuccess == false || string.IsNullOrWhiteSpace(sessionInfo?.Device))
             {
                 return BadRequest("Unknown session ID");
             }
