@@ -146,6 +146,11 @@
             Token Url - adress which operate with tokens
             </summary>
         </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Social.LogoPath">
+            <summary>
+            Path where stored a logo
+            </summary>
+        </member>
         <member name="T:PMAuth.Controllers.ProfileController">
             <summary>
             Get user profile by authorization code 

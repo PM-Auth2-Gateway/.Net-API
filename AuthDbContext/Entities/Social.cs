@@ -25,5 +25,10 @@
         /// Token Url - adress which operate with tokens
         /// </summary>
         public string TokenUrl { get; set; }
+
+        /// <summary>
+        /// Path where stored a logo
+        /// </summary>
+        public string LogoPath { get; set; }
     }
 }
