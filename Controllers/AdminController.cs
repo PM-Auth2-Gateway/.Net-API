@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using PMAuth.AuthDbContext;
 using PMAuth.AuthDbContext.Entities;
@@ -22,6 +23,7 @@ namespace PMAuth.Controllers
     public class AdminController : Controller
     {
         private readonly IMemoryCache _memoryCache;
+        private readonly ILogger _logger;
         private readonly BackOfficeContext _backOfficeContext;
         private readonly AuthService _authService;
         private readonly RefreshTokenService _refreshTokenService;
@@ -30,9 +32,11 @@ namespace PMAuth.Controllers
             BackOfficeContext backOfficeContext,
             AuthService authService,
             RefreshTokenService refreshTokenService,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            ILogger logger)
         {
             _memoryCache = memoryCache;
+            _logger = logger;
             _backOfficeContext = backOfficeContext;
             _authService = authService;
             _refreshTokenService = refreshTokenService;
@@ -43,6 +47,7 @@ namespace PMAuth.Controllers
         [FromHeader(Name = "App_id")] int appId,
         [FromBody] SessionIdModel sessionIdModel)
         {
+            _logger.LogDebug($"SessionId: {sessionIdModel?.SessionId}");
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
                 return BadRequest(new ErrorModel
@@ -61,13 +66,14 @@ namespace PMAuth.Controllers
                     ErrorDescription = "There is no profile related to provided session id"
                 });
             }
-
             isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
             if (isSuccess && sessionInfo?.UserProfile == null)
             {
                 int requestCounter = 0;
                 while (requestCounter < 50)
                 {
+                    _logger.LogDebug($"AccessToken: {sessionInfo.AccessToken}");
+                    _logger.LogDebug($"Email: {sessionInfo.UserProfile.Email}");
                     isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
                     if (isSuccess && sessionInfo?.UserProfile != null)
                     {
