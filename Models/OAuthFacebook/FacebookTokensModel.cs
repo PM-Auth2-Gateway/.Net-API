@@ -4,7 +4,7 @@ using PMAuth.Models.OAuthUniversal;
 namespace PMAuth.Models.OAuthFacebook
 {
     /// <summary>
-    /// Model for retrieving access and refresh tokens from Facebook 
+    /// Model for retrieving access token and scope from Facebook 
     /// </summary>
     public class FacebookTokensModel : TokenModel
     {

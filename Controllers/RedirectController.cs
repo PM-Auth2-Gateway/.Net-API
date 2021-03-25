@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-
+using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
@@ -30,18 +30,21 @@ namespace PMAuth.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly BackOfficeContext _context;
         private readonly IMemoryCache _memoryCache;
+        private readonly ILogger<RedirectController> logger;
 
 #pragma warning disable 1591
         public RedirectController(
             IUserProfileReceivingServiceContext userProfileReceivingServiceContext,
             IHttpClientFactory httpClientFactory,
             BackOfficeContext context,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            ILogger<RedirectController> logger)
         {
             _userProfileReceivingServiceContext = userProfileReceivingServiceContext;
             _httpClientFactory = httpClientFactory;
             _context = context;
             _memoryCache = memoryCache;
+            this.logger = logger;
         }
 #pragma warning restore 1591
 

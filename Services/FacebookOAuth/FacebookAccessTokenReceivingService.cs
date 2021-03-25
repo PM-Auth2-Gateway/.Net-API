@@ -4,7 +4,9 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
+using PMAuth.AuthDbContext.Entities;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
 using PMAuth.Extensions;
@@ -13,30 +15,43 @@ using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Services.Abstract;
 
-#pragma warning disable 1591
-
 namespace PMAuth.Services.FacebookOAuth
 {
+    /// <summary>
+    /// Service that operates Facebook Access token
+    /// </summary>
     public class FacebookAccessTokenReceivingService : IAccessTokenReceivingService
     {
         private readonly BackOfficeContext _context;
 
         private readonly IMemoryCache _memoryCache;
 
-        //private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
+        private readonly ILogger<FacebookAccessTokenReceivingService> _logger;
+
         private readonly HttpClient _httpClient;
 
+
+#pragma warning disable CS1591
         public FacebookAccessTokenReceivingService(
             IHttpClientFactory httpClientFactory, 
             BackOfficeContext context,
             IMemoryCache memoryCache
-            /*ILogger<GoogleAccessTokenReceivingService> logger*/) 
+            /*ILogger<FacebookAccessTokenReceivingService> logger*/) 
         {
             _context = context;
             _memoryCache = memoryCache;
             //_logger = logger;
             _httpClient = httpClientFactory.CreateClient();
         }
+
+        /// <summary>
+        /// Method that exchange user authorization code for tokens
+        /// </summary>
+        /// <param name="appId">Application Id</param>
+        /// <param name="authorizationCodeModel">
+        /// Authorization model that has code, scope and state
+        /// </param>
+        /// <returns>Tokens model</returns>
         public async Task<TokenModel> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
         {
             string responseBody = await ExchangeCodeForTokens(appId, authorizationCodeModel);
@@ -76,18 +91,19 @@ namespace PMAuth.Services.FacebookOAuth
                 throw new AuthorizationCodeExchangeException(errorExplanation);
             }
             
-            // if you need this code, think about moving it to another class
-            string tokenUri = _context.Socials.FirstOrDefault(s => s.Id == sessionInformation.SocialId)?.TokenUrl; //"https://oauth2.googleapis.com/token"; 
+            string tokenUri = _context.Socials.FirstOrDefault(s => s.Id == sessionInformation.SocialId)?.TokenUrl;
+
             string code = authorizationCodeModel.AuthorizationCode;
-            string redirectUri = sessionInformation.RedirectUri; // "https://localhost:5001/auth/google";
-            /*string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId && 
-                                                               s.SocialId == sessionInformation.SocialId)
-                                                               ?.ClientId;*/
-            string clientId = "929331344507670";
-            /*string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId &&
-                                                                s.SocialId == sessionInformation.SocialId)
-                                                                ?.SecretKey;*/
-            string clientSecret = "164d0e742d123c6547c641d9393b865c";
+
+            string redirectUri = sessionInformation.RedirectUri;
+
+            Setting setting = _context.Settings.FirstOrDefault(
+                    s => s.AppId == appId &&s.SocialId == sessionInformation.SocialId);
+
+            string clientId = setting?.ClientId;
+
+            string clientSecret = setting?.SecretKey;
+            
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             {
@@ -113,7 +129,7 @@ namespace PMAuth.Services.FacebookOAuth
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                //RequestUri = new Uri($"{tokenUri}?code={code}&redirect_uri={redirectUri}&client_id={clientId}&client_secret={clientSecret}&scope=&grant_type=authorization_code"),
+
                 RequestUri = new Uri(tokenUri)
                     .AddQuery("code", code)
                     .AddQuery("redirect_uri", redirectUri)
@@ -137,9 +153,9 @@ namespace PMAuth.Services.FacebookOAuth
             }
             catch (HttpRequestException exception)
             {
-                //_logger.LogInformation("Response StatusCode from the Google is unsuccessful when trying " +
+                //_logger.LogInformation("Response StatusCode from the Facebook is unsuccessful when trying " +
                 //                       "to exchange code for tokens");
-                throw await HandleUnsuccessfulStatusCode(response, exception); // is it a good practice? 
+                throw await HandleUnsuccessfulStatusCode(response, exception); 
             }
             return await response.Content.ReadAsStringAsync();
         }
