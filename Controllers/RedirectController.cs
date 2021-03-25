@@ -42,7 +42,7 @@ namespace PMAuth.Controllers
             _httpClientFactory = httpClientFactory;
             _context = context;
             _memoryCache = memoryCache;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger; //?? throw new ArgumentNullException(nameof(logger));
         }
 #pragma warning restore 1591
 
