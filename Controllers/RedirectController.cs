@@ -60,16 +60,12 @@ namespace PMAuth.Controllers
         {
             if (authorizationCode?.SessionId == null)
             {
-                return BadRequest(new ErrorModel
-                {
-                    Error = "Session Id is missing",
-                    ErrorDescription = "Check query parameters. AuthorizationCodeModel or Session Id is missing"
-                });
+                return BadRequest(ErrorModel.AuthError("Session Id is missing", "Something went wrong"));
             }
             
             if (error.Error != null || error.ErrorDescription != null)
             {
-                return BadRequest(authorizationCode.SessionId);
+                return BadRequest(ErrorModel.AuthError(error.Error, error.ErrorDescription));
             }
 
             _userProfileReceivingServiceContext.SetStrategies(
@@ -113,9 +109,10 @@ namespace PMAuth.Controllers
             CacheModel session = _memoryCache.Get<CacheModel>(authorizationCode.SessionId);
             if (session == null)
             {
-                return BadRequest("Authorization time has expired."); 
+                return BadRequest(ErrorModel.SessionIdError);
             }
             string device = session.Device.ToLower().Trim();
+            session.UserStartedAuthorization = true;
             
             try
             {
