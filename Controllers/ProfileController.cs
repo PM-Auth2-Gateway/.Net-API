@@ -4,14 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
 using PMAuth.Exceptions.Models;
-using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.RequestModels;
 
 namespace PMAuth.Controllers
 {
     /// <summary>
-    /// Get user profile by authorization code 
+    /// Get user profile by session id
     /// </summary>
     [Route("[controller]")]
     public class ProfileController : ControllerBase
@@ -25,11 +24,11 @@ namespace PMAuth.Controllers
         }
 #pragma warning restore 1591 
         /// <summary>
-        /// Get user profile
+        /// Get user profile. Max time of execution for this endpoint is 10 secs
         /// </summary>
         /// <param name="appId">Application id (this id admin receives in the backoffice)</param>
         /// <param name="sessionIdModel">Model which contains session ID</param>
-        /// <returns>UserProfile or ErrorModel</returns>
+        /// <returns>UserProfile or ErrorModel if profile wasn't found</returns>
         [HttpPost("info")]
         [ProducesResponseType(typeof(UserProfile), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]

@@ -7,7 +7,6 @@ using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
 using PMAuth.Extensions;
 using PMAuth.Models.OAuthFacebook;
-using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Services.Abstract;

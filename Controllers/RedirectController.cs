@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
-using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Models.RequestModels;
@@ -61,6 +58,15 @@ namespace PMAuth.Controllers
             [FromQuery] RedirectionErrorModelGoogle error, 
             [FromQuery] AuthorizationCodeModel authorizationCode)
         {
+            if (authorizationCode?.SessionId == null)
+            {
+                return BadRequest(new ErrorModel
+                {
+                    Error = "Session Id is missing",
+                    ErrorDescription = "Check query parameters. AuthorizationCodeModel or Session Id is missing"
+                });
+            }
+            
             if (error.Error != null || error.ErrorDescription != null)
             {
                 return BadRequest(authorizationCode.SessionId);

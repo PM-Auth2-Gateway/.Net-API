@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using PMAuth.Exceptions;
-using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 
 namespace PMAuth.Services.Abstract

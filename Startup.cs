@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,13 +13,11 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-using PMAuth.Models.OAuthGoogle;
 using PMAuth.Middleware;
 using PMAuth.AuthDbContext;
 using PMAuth.Services.Abstract;
 using PMAuth.Services.AuthAdmin;
 using PMAuth.Services.OAuthUniversal;
-using PMAuth.Services.GoogleOAuth;
 
 namespace PMAuth
 {
