@@ -30,7 +30,7 @@ namespace PMAuth.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly BackOfficeContext _context;
         private readonly IMemoryCache _memoryCache;
-        private readonly ILogger<RedirectController> logger;
+        private readonly ILogger<GoogleAccessTokenReceivingService> logger;
 
 #pragma warning disable 1591
         public RedirectController(
@@ -38,7 +38,7 @@ namespace PMAuth.Controllers
             IHttpClientFactory httpClientFactory,
             BackOfficeContext context,
             IMemoryCache memoryCache,
-            ILogger<RedirectController> logger)
+            ILogger<GoogleAccessTokenReceivingService> logger)
         {
             _userProfileReceivingServiceContext = userProfileReceivingServiceContext;
             _httpClientFactory = httpClientFactory;
@@ -67,7 +67,7 @@ namespace PMAuth.Controllers
             }
 
             _userProfileReceivingServiceContext.SetStrategies(
-                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache),
+                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache, logger),
                 new GoogleProfileManager(_memoryCache));
             
             return ContinueFlow(authorizationCode);
