@@ -17,14 +17,11 @@ namespace PMAuth.Services.AuthAdmin
         {
             this._backOfficeContext = _backOfficeContext;
         }
-        public ClaimsIdentity GetIdentity()
+        public ClaimsIdentity GetIdentity(string name)
         {
-            var admin = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == "admin");
-            if (admin == null)
-                return null;
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, admin.Name),
+                new Claim(ClaimsIdentity.DefaultNameClaimType, name),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin")
             };
             ClaimsIdentity claimsIdentity = //new ClaimsIdentity(claims, "Token");
@@ -42,18 +39,16 @@ namespace PMAuth.Services.AuthAdmin
             }
         }
 
-        public string GenerateToken(IEnumerable<Claim> claims)
+        public JwtSecurityToken GenerateToken(IEnumerable<Claim> claims)
         {
-            var jwt = new JwtSecurityToken(
+           return new JwtSecurityToken(
                 issuer: AuthOptions.ISSUER,
                 claims: claims, //the user's claims, for example new Claim[] { new Claim(ClaimTypes.Name, "The username"), //... 
                 notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddMinutes(5),
+                expires: DateTime.UtcNow.AddMinutes(AuthOptions.LIFETIME),
                 signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
                     SecurityAlgorithms.HmacSha256)
             );
-
-            return new JwtSecurityTokenHandler().WriteToken(jwt); //the method is called WriteToken but returns a string
         }
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {

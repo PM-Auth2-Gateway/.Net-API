@@ -29,6 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Log.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="PMAuth.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

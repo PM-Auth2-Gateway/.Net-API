@@ -148,16 +148,16 @@
         </member>
         <member name="T:PMAuth.Controllers.ProfileController">
             <summary>
-            Get user profile by authorization code 
+            Get user profile by session id
             </summary>
         </member>
         <member name="M:PMAuth.Controllers.ProfileController.GetUserProfileAsync(System.Int32,PMAuth.Models.RequestModels.SessionIdModel)">
             <summary>
-            Get user profile
+            Get user profile. Max time of execution for this endpoint is 10 secs
             </summary>
             <param name="appId">Application id (this id admin receives in the backoffice)</param>
             <param name="sessionIdModel">Model which contains session ID</param>
-            <returns>UserProfile or ErrorModel</returns>
+            <returns>UserProfile or ErrorModel if profile wasn't found</returns>
         </member>
         <member name="T:PMAuth.Controllers.RedirectController">
             <summary>
@@ -309,6 +309,16 @@
         <member name="P:PMAuth.Models.OAuthGoogle.GoogleTokensModel.RefreshToken">
             <summary>
             Refresh token
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthUniversal.AdminProfile">
+            <summary>
+            Unified model of admin profile
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.AdminProfile.Token">
+            <summary>
+            Access token what need from authentication
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthUniversal.CacheModel">

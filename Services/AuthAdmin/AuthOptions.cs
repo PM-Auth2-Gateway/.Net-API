@@ -7,7 +7,7 @@ namespace PMAuth.Services.AuthAdmin
     {
         public const string ISSUER = "MyAuthServer";
         const string KEY = "mysupersecret_secretkey!1232151525255_PM_Academy";
-        public const int LIFETIME = 5; 
+        public const int LIFETIME = 30; 
         public static SymmetricSecurityKey GetSymmetricSecurityKey()
         {
             return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(KEY));
