@@ -1,6 +1,8 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,12 +11,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
+using PMAuth.Models.OAuthGoogle;
 using PMAuth.Middleware;
 using PMAuth.AuthDbContext;
 using PMAuth.Services.Abstract;
+using PMAuth.Services.AuthAdmin;
 using PMAuth.Services.OAuthUniversal;
-
+using PMAuth.Services.GoogleOAuth;
 
 namespace PMAuth
 {
@@ -43,12 +49,60 @@ namespace PMAuth
         /// <param name="services">IServiceCollection</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false,
+                        ValidateIssuer = true,
+                        ValidIssuer = AuthOptions.ISSUER,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true,
+                    };
+                });
+            services.AddCors();
+
             services.AddHealthChecks();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PMAuth", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
 
+                        },
+                        new List<string>()
+                    }
+                });
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 if (File.Exists(xmlPath))
@@ -65,6 +119,8 @@ namespace PMAuth
             services.AddMemoryCache();
             
             services.AddTransient<IUserProfileReceivingServiceContext, UserProfileReceivingServiceContext>();
+            services.AddTransient<AuthService>();
+            services.AddSingleton<RefreshTokenService>();
             //services.AddTransient<IAccessTokenReceivingService<GoogleTokensModel>, GoogleAccessTokenReceivingService>();
 
         }
@@ -82,9 +138,16 @@ namespace PMAuth
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PMAuth v1"));
             }
+
+            app.UseCors(builder => builder.AllowAnyOrigin()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
+
             app.UseMiddleware<LogMiddleware>();
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {
