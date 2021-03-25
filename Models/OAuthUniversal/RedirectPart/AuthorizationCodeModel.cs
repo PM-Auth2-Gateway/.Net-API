@@ -5,7 +5,7 @@ namespace PMAuth.Models.OAuthUniversal.RedirectPart
     /// <summary>
     /// Authorization code model 
     /// </summary>
-    public class AuthorizationCodeModel // this model should be the same for Google and Facebook, I BELIEVE
+    public class AuthorizationCodeModel
     {
         /// <summary>
         /// Authorization code

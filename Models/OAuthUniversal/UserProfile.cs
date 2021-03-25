@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PMAuth.Models.OAuthUniversal
 {
@@ -11,32 +12,37 @@ namespace PMAuth.Models.OAuthUniversal
         /// Users unique ID in social network used for authorization
         /// </summary>
         public string Id { get; set; }
-        
+
         /// <summary>
         /// Access token received from the social network
         /// </summary>
-       // public string AccessToken { get; set; }
-        
+        // public string AccessToken { get; set; }
+
         /// <summary>
         /// Refresh token received from the social network (may be absent)
         /// </summary>
         //public string RefreshToken { get; set; }
-        
+
         /// <summary>
         /// Token expiration time in seconds received from the social network
         /// </summary>
         //public int ExpiresIn { get; set; }
-        
+
         /// <summary>
         /// User's first name received from the social network (may be absent)
         /// </summary>
         public string FirstName { get; set; }
-        
+
         /// <summary>
         /// User's last name received from the social network (may be absent)
         /// </summary>
         public string LastName { get; set; }
-        
+
+        /// <summary>
+        /// Full user's name
+        /// </summary>
+        public string Name { get; set; }
+
         /// <summary>
         /// User's email received from the social network (may be absent)
         /// </summary>
@@ -51,7 +57,7 @@ namespace PMAuth.Models.OAuthUniversal
         /// User's profile photo link received from the social network (may be absent)
         /// </summary>
         public string Photo { get; set; }
-        
+
         /// <summary>
         /// User's profile locale received from the social network (may be absent)
         /// </summary>
@@ -60,7 +66,8 @@ namespace PMAuth.Models.OAuthUniversal
         /// <summary>
         /// Key-value pairs ("paramName": "value") of additional information about user
         /// </summary>
-        public Dictionary<string, string> AdditionalInformation { get; set; } = new Dictionary<string, string>();
+        [JsonExtensionData]
+        public Dictionary<string, object> AdditionalInformation { get; set; } = new Dictionary<string, object>();
         
     }
 }

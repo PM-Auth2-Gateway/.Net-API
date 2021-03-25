@@ -1,39 +1,60 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
+using PMAuth.AuthDbContext.Entities;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
 using PMAuth.Extensions;
 using PMAuth.Models.OAuthFacebook;
-using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Services.Abstract;
 
-#pragma warning disable 1591
-
 namespace PMAuth.Services.FacebookOAuth
 {
+    /// <summary>
+    /// Service that operates Facebook Access token
+    /// </summary>
     public class FacebookAccessTokenReceivingService : IAccessTokenReceivingService
     {
         private readonly BackOfficeContext _context;
-        //private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
+
+        private readonly IMemoryCache _memoryCache;
+
+        private readonly ILogger<FacebookAccessTokenReceivingService> _logger;
+
         private readonly HttpClient _httpClient;
 
+
+#pragma warning disable CS1591
         public FacebookAccessTokenReceivingService(
             IHttpClientFactory httpClientFactory, 
-            BackOfficeContext context
-            /*ILogger<GoogleAccessTokenReceivingService> logger*/) 
+            BackOfficeContext context,
+            IMemoryCache memoryCache
+            /*ILogger<FacebookAccessTokenReceivingService> logger*/) 
         {
             _context = context;
+            _memoryCache = memoryCache;
             //_logger = logger;
             _httpClient = httpClientFactory.CreateClient();
         }
+
+        /// <summary>
+        /// Method that exchange user authorization code for tokens
+        /// </summary>
+        /// <param name="appId">Application Id</param>
+        /// <param name="authorizationCodeModel">
+        /// Authorization model that has code, scope and state
+        /// </param>
+        /// <returns>Tokens model</returns>
         public async Task<TokenModel> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
         {
-            string responseBody = await SendRequest(appId, authorizationCodeModel);
+            string responseBody = await ExchangeCodeForTokens(appId, authorizationCodeModel);
             if (string.IsNullOrWhiteSpace(responseBody))
             {
                 return null;
@@ -42,6 +63,7 @@ namespace PMAuth.Services.FacebookOAuth
             try
             {
                 FacebookTokensModel tokens = JsonSerializer.Deserialize<FacebookTokensModel>(responseBody);
+                tokens.Scope = authorizationCodeModel.Scope;
                 return tokens;
             }
             catch (Exception exception)
@@ -55,35 +77,59 @@ namespace PMAuth.Services.FacebookOAuth
             }
         }
         
-        protected async Task<string> SendRequest(int appId, AuthorizationCodeModel authorizationCodeModel)
+        protected async Task<string> ExchangeCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
         {
-            // if you need this code, think about moving it to another class
-            string tokenUri = "https://graph.facebook.com/v10.0/oauth/access_token";  //TODO should be added to database. for now it is hardcoded
+            bool isSuccess =
+                _memoryCache.TryGetValue(authorizationCodeModel.SessionId, out CacheModel sessionInformation);
+            if (isSuccess == false)
+            {
+                var errorExplanation = new ErrorModel
+                {
+                    Error = "Authorization timeout has expired.",
+                    ErrorDescription = "Try again later"
+                };
+                throw new AuthorizationCodeExchangeException(errorExplanation);
+            }
+            
+            string tokenUri = _context.Socials.FirstOrDefault(s => s.Id == sessionInformation.SocialId)?.TokenUrl;
+
             string code = authorizationCodeModel.AuthorizationCode;
-            string redirectUri = "https://localhost:44313/auth/facebook";//authorizationCodeModel.RedirectUri;
-            /*string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId && 
-                                                               s.SocialId == authorizationCodeModel.SocialId)
-                                                               ?.ClientId;*/
-            string clientId = "929331344507670";
-            /*string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId &&
-                                                                s.SocialId == authorizationCodeModel.SocialId)
-                                                                ?.SecretKey;*/
-            string clientSecret = "164d0e742d123c6547c641d9393b865c";
+
+            string redirectUri = sessionInformation.RedirectUri;
+
+            Setting setting = _context.Settings.FirstOrDefault(
+                    s => s.AppId == appId &&s.SocialId == sessionInformation.SocialId);
+
+            string clientId = setting?.ClientId;
+
+            string clientSecret = setting?.SecretKey;
+            
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             {
                 var errorExplanation = new ErrorModel
                 {
-                    Error = "Secrets are unavailable",
+                    Error = "Trying to use unregistered social network",
                     ErrorDescription = "There is no client id or client secret key registered in our widget."
                 };
-                throw new AuthorizationCodeExchangeException("Error. Trying to use unregistered social network", errorExplanation);
+                throw new AuthorizationCodeExchangeException(errorExplanation);
+            }
+
+            if (string.IsNullOrEmpty(tokenUri))
+            {
+                var errorExplanation = new ErrorModel
+                {
+                    Error = "Trying to use unregistered social network",
+                    ErrorDescription = "This social service is not currently available"
+                };
+                
+                throw new AuthorizationCodeExchangeException(errorExplanation);
             }
             
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                //RequestUri = new Uri($"{tokenUri}?code={code}&redirect_uri={redirectUri}&client_id={clientId}&client_secret={clientSecret}&scope=&grant_type=authorization_code"),
+
                 RequestUri = new Uri(tokenUri)
                     .AddQuery("code", code)
                     .AddQuery("redirect_uri", redirectUri)
@@ -91,7 +137,6 @@ namespace PMAuth.Services.FacebookOAuth
                     .AddQuery("client_secret", clientSecret)
                     .AddQuery("scope", string.Empty)
             };
-            
             HttpResponseMessage response;
             try
             {
@@ -99,7 +144,6 @@ namespace PMAuth.Services.FacebookOAuth
             }
             catch (HttpRequestException exception)
             {
-                //_logger.LogInformation("Unable to retrieve response from the Google");
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Facebook", exception);
             }
 
@@ -109,11 +153,10 @@ namespace PMAuth.Services.FacebookOAuth
             }
             catch (HttpRequestException exception)
             {
-                //_logger.LogInformation("Response StatusCode from the Google is unsuccessful when trying " +
+                //_logger.LogInformation("Response StatusCode from the Facebook is unsuccessful when trying " +
                 //                       "to exchange code for tokens");
-                throw await HandleUnsuccessfulStatusCode(response, exception); // is it a good practice? 
+                throw await HandleUnsuccessfulStatusCode(response, exception); 
             }
-            
             return await response.Content.ReadAsStringAsync();
         }
 

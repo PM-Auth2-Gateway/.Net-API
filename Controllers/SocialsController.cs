@@ -7,6 +7,7 @@ using PMAuth.AuthDbContext;
 using PMAuth.AuthDbContext.Entities;
 using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
+using PMAuth.Models.SocialsClient;
 
 namespace PMAuth.Controllers
 {
@@ -108,7 +109,7 @@ namespace PMAuth.Controllers
             },
             new MemoryCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
             });
             
             return new SocialLinkModel

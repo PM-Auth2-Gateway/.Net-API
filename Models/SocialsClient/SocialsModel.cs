@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PMAuth.AuthDbContext.Entities;
 
-namespace PMAuth.Models
+namespace PMAuth.Models.SocialsClient
 {
     /// <summary>
     /// A social model.
