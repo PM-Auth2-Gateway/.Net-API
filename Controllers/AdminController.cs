@@ -77,6 +77,7 @@ namespace PMAuth.Controllers
                     isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
                     if (isSuccess && sessionInfo?.UserProfile != null)
                     {
+                        _logger.LogInformation($"Done");
                         break;
                     }
 
@@ -95,7 +96,8 @@ namespace PMAuth.Controllers
                 });
             }
 
-            var admin = (AdminProfile)(_memoryCache.Get<CacheModel>(sessionIdModel.SessionId).UserProfile);
+            var admin = new AdminProfile(_memoryCache.Get<CacheModel>(sessionIdModel.SessionId).UserProfile);
+            _logger.LogInformation($"AdminId: {admin?.Id}" );
             //todo Authorize
             if (_backOfficeContext.Admins.FirstOrDefault(a => a.Name == admin.Id) == null)
                 _backOfficeContext.Admins.Add(new Admin() {Name = admin.Id});
