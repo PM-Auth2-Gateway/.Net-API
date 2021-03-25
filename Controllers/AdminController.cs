@@ -42,12 +42,29 @@ namespace PMAuth.Controllers
             _refreshTokenService = refreshTokenService;
         }
 
+        [HttpPost("testToken")]
+        public async Task<ActionResult<string>> GetTokenTest()
+        {
+            var identity = _authService.GetIdentity("admin");
+            if (identity == null)
+            {
+                return BadRequest();
+            }
+            var token =new JwtSecurityToken(
+                issuer: AuthOptions.ISSUER,
+                claims: identity.Claims,
+                notBefore: DateTime.UtcNow,
+                expires: DateTime.UtcNow.AddDays(1),
+                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
+                    SecurityAlgorithms.HmacSha256)
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
         [HttpPost("tokenAndProfile")]
         public async Task<ActionResult<AdminProfile>> GetTokenAndProfile(
         [FromHeader(Name = "App_id")] int appId,
         [FromBody] SessionIdModel sessionIdModel)
         {
-            _logger.LogInformation($"SessionId: {sessionIdModel?.SessionId}");
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
                 return BadRequest(new ErrorModel
@@ -72,8 +89,6 @@ namespace PMAuth.Controllers
                 int requestCounter = 0;
                 while (requestCounter < 50)
                 {
-                    _logger.LogInformation($"AccessToken: {sessionInfo?.AccessToken}");
-                    _logger.LogInformation($"Email: {sessionInfo?.UserProfile?.Email}");
                     isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
                     if (isSuccess && sessionInfo?.UserProfile != null)
                     {
@@ -97,10 +112,13 @@ namespace PMAuth.Controllers
             }
 
             var admin = new AdminProfile(_memoryCache.Get<CacheModel>(sessionIdModel.SessionId).UserProfile);
-            _logger.LogInformation($"AdminId: {admin?.Id}" );
-            //todo Authorize
+
             if (_backOfficeContext.Admins.FirstOrDefault(a => a.Name == admin.Id) == null)
-                _backOfficeContext.Admins.Add(new Admin() {Name = admin.Id});
+            {
+                await _backOfficeContext.Admins.AddAsync(new Admin() {Name = admin.Id});
+                await _backOfficeContext.SaveChangesAsync();
+            }
+
             var identity = _authService.GetIdentity(admin.Id);
             if (identity == null)
             {

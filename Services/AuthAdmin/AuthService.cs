@@ -13,9 +13,9 @@ namespace PMAuth.Services.AuthAdmin
     {
         private readonly BackOfficeContext _backOfficeContext;
 
-        public AuthService(BackOfficeContext _backOfficeContext)
+        public AuthService(BackOfficeContext backOfficeContext)
         {
-            this._backOfficeContext = _backOfficeContext;
+            this._backOfficeContext = backOfficeContext;
         }
         public ClaimsIdentity GetIdentity(string name)
         {
