@@ -6,7 +6,7 @@ namespace PMAuth.Exceptions
 {
     public class AuthorizationCodeExchangeException : Exception
     {
-        public AuthorizationCodeExchangeExceptionModel Description { get; }
+        public ErrorModel Description { get; }
         public AuthorizationCodeExchangeException()
         {
         }
@@ -20,13 +20,17 @@ namespace PMAuth.Exceptions
             : base(message, inner)
         {
         }
+        public AuthorizationCodeExchangeException(ErrorModel model) 
+        {
+            Description = model;
+        }
 
-        public AuthorizationCodeExchangeException(string message, AuthorizationCodeExchangeExceptionModel model) 
+        public AuthorizationCodeExchangeException(string message, ErrorModel model) 
             : base(message)
         {
             Description = model;
         }
-        public AuthorizationCodeExchangeException(string message, AuthorizationCodeExchangeExceptionModel model, Exception inner) 
+        public AuthorizationCodeExchangeException(string message, ErrorModel model, Exception inner) 
             : base(message, inner)
         {
             Description = model;

@@ -1,28 +1,25 @@
-﻿    using Microsoft.AspNetCore.Builder;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 using PMAuth.Middleware;
-
 using PMAuth.AuthDbContext;
-using System;
-    using System.Collections.Generic;
-    using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.IdentityModel.Tokens;
-    using PMAuth.Models.OAuthGoogle;
-    using PMAuth.Services.Abstract;
-    using PMAuth.Services.AuthAdmin;
-    using PMAuth.Services.GoogleOAuth;
-    using PMAuth.Services.OAuthUniversal;
+using PMAuth.Services.Abstract;
+using PMAuth.Services.AuthAdmin;
+using PMAuth.Services.OAuthUniversal;
 
-
-    namespace PMAuth
+namespace PMAuth
 {
     /// <summary>
     /// Startup
@@ -116,7 +113,8 @@ using System.Threading.Tasks;
                 , ServiceLifetime.Transient);
 
             services.AddHttpClient();
-
+            services.AddMemoryCache();
+            
             services.AddTransient<IUserProfileReceivingServiceContext, UserProfileReceivingServiceContext>();
             services.AddTransient<AuthService>();
             services.AddSingleton<RefreshTokenService>();

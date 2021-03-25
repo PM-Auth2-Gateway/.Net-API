@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace PMAuth.Models
 {
@@ -18,7 +14,7 @@ namespace PMAuth.Models
         public int SocialId { get; set; }
 
         /// <summary>
-        /// Redirect Url 2
+        /// Device - field which inform what type of device will recieve a redirect
         /// </summary>
         [JsonPropertyName("device")]
         public string Device { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace PMAuth.Models.OAuthUniversal
+﻿using System.Collections.Generic;
+
+namespace PMAuth.Models.OAuthUniversal
 {
     /// <summary>
     /// Unified model of user profile
@@ -13,17 +15,17 @@
         /// <summary>
         /// Access token received from the social network
         /// </summary>
-        public string AccessToken { get; set; }
+       // public string AccessToken { get; set; }
         
         /// <summary>
         /// Refresh token received from the social network (may be absent)
         /// </summary>
-        public string RefreshToken { get; set; }
+        //public string RefreshToken { get; set; }
         
         /// <summary>
         /// Token expiration time in seconds received from the social network
         /// </summary>
-        public int ExpiresIn { get; set; }
+        //public int ExpiresIn { get; set; }
         
         /// <summary>
         /// User's first name received from the social network (may be absent)
@@ -55,7 +57,10 @@
         /// </summary>
         public string Locale { get; set; }
 
-        /*public string Gender { get; set; }
-        public string BirthDate { get; set; }*/
+        /// <summary>
+        /// Key-value pairs ("paramName": "value") of additional information about user
+        /// </summary>
+        public Dictionary<string, string> AdditionalInformation { get; set; } = new Dictionary<string, string>();
+        
     }
 }

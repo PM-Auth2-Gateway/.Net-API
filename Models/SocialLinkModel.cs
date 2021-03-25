@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace PMAuth.Models
 {
@@ -12,19 +8,19 @@ namespace PMAuth.Models
     public class SocialLinkModel
     {
         /// <summary>
-        /// Auth Uri.
+        /// Auth Uri - base link of some service which offer authentication.
         /// </summary>
         [JsonPropertyName("auth_uri")]
         public string AuthUri { get; set; }
 
         /// <summary>
-        /// Auth Uri.
+        /// Redirect Uri - on which adress.
         /// </summary>
         [JsonPropertyName("redirect_uri")]
         public string RedirectUri { get; set; }
 
         /// <summary>
-        /// Response Type.
+        /// Response Type - default = code.
         /// </summary>
         [JsonPropertyName("response_type")]
         public string ResponseType { get; set; }
@@ -36,13 +32,13 @@ namespace PMAuth.Models
         public string ClientId { get; set; }
 
         /// <summary>
-        /// Scope.
+        /// Scope - bunch of accessed information by user.
         /// </summary>
         [JsonPropertyName("scope")]
         public string Scope { get; set; }
 
         /// <summary>
-        /// Scope.
+        /// State - session id.
         /// </summary>
         [JsonPropertyName("state")]
         public string State { get; set; }
