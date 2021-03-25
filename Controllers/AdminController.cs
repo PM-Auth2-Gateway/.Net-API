@@ -257,15 +257,18 @@ namespace PMAuth.Controllers
         {
             var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
             if (adminId == null)
-                return BadRequest();
+                return BadRequest("This admin is not exist");
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId) && (a.AdminId == adminId));
             if (resApp == null)
-                return BadRequest();
+                return BadRequest("This application is not exist");
             var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
             if (resSocial == null)
-                return BadRequest();
-            var admin = "admin";
+                return BadRequest("This social is not exist");
             var set = _backOfficeContext.Settings.FirstOrDefault(s => (s.AppId == appId) && (s.SocialId == socialId));
+            if (set == null)
+            {
+                return BadRequest("This setting is not exist");
+            }
             return Ok(new SettingModel(set.Id, set.AppId, _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name, set.SocialId, _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name, set.ClientId, set.SecretKey, set.Scope));
         }
         
@@ -291,7 +294,7 @@ namespace PMAuth.Controllers
                 AppId = appId,
                 SocialId = socialId,
             };
-            var set= _backOfficeContext.Settings.Add(setting).Entity;
+            var set=(await  _backOfficeContext.Settings.AddAsync(setting)).Entity;
             await _backOfficeContext.SaveChangesAsync();
             return Ok(new SettingModel(set.Id,set.AppId, _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name,set.SocialId, _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name,set.ClientId,set.SecretKey,set.Scope));
         }
