@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -66,7 +66,6 @@ namespace PMAuth
                     };
                 });
             services.AddCors();
-
             services.AddHealthChecks();
             services.AddControllers();
             services.AddSwaggerGen(c =>

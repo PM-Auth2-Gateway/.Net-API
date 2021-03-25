@@ -23,7 +23,7 @@ namespace PMAuth.Controllers
     public class AdminController : Controller
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly ILogger _logger;
+        private readonly ILogger<AdminController> _logger;
         private readonly BackOfficeContext _backOfficeContext;
         private readonly AuthService _authService;
         private readonly RefreshTokenService _refreshTokenService;
@@ -33,7 +33,7 @@ namespace PMAuth.Controllers
             AuthService authService,
             RefreshTokenService refreshTokenService,
             IMemoryCache memoryCache,
-            ILogger logger)
+            ILogger<AdminController> logger)
         {
             _memoryCache = memoryCache;
             _logger = logger;
