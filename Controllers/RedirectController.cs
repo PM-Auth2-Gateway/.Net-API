@@ -1,15 +1,11 @@
-﻿using System;
+﻿using System.Net.Http;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
-using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Models.RequestModels;
@@ -30,7 +26,7 @@ namespace PMAuth.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly BackOfficeContext _context;
         private readonly IMemoryCache _memoryCache;
-        private readonly ILogger<GoogleAccessTokenReceivingService> logger;
+        private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
 
 #pragma warning disable 1591
         public RedirectController(
@@ -44,13 +40,14 @@ namespace PMAuth.Controllers
             _httpClientFactory = httpClientFactory;
             _context = context;
             _memoryCache = memoryCache;
-            this.logger = logger;
+            _logger = logger;
         }
 #pragma warning restore 1591
 
         /// <summary>
         /// Handle redirect from Google
         /// </summary>
+        /// <param name="name"></param>
         /// <param name="error"></param>
         /// <param name="authorizationCode"></param>
         /// <returns></returns>
@@ -58,21 +55,27 @@ namespace PMAuth.Controllers
         [ProducesResponseType(typeof(UserProfile), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public IActionResult ReceiveAuthorizationCodeGoogle(
-            [FromQuery] RedirectionErrorModelGoogle error, 
+            string name,
+            [FromQuery] RedirectionErrorModelGoogle error,
             [FromQuery] AuthorizationCodeModel authorizationCode)
         {
+            if (authorizationCode?.SessionId == null)
+            {
+                return BadRequest(ErrorModel.AuthError("Session Id is missing", "Something went wrong"));
+            }
+
             if (error.Error != null || error.ErrorDescription != null)
             {
-                return BadRequest(authorizationCode.SessionId);
+                return BadRequest(ErrorModel.AuthError(error.Error, error.ErrorDescription));
             }
 
             _userProfileReceivingServiceContext.SetStrategies(
-                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache, logger),
+                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache, _logger),
                 new GoogleProfileManager(_memoryCache));
-            
+
             return ContinueFlow(authorizationCode);
         }
-        
+
         /// <summary>
         /// Handle redirect from Facebook
         /// </summary>
@@ -102,28 +105,29 @@ namespace PMAuth.Controllers
 
             return ContinueFlow(authorizationCode);
         }
-        
+
         private IActionResult ContinueFlow(AuthorizationCodeModel authorizationCode)
         {
             CacheModel session = _memoryCache.Get<CacheModel>(authorizationCode.SessionId);
             if (session == null)
             {
-                return BadRequest("Authorization time has expired."); 
+                return BadRequest(ErrorModel.SessionIdError);
             }
             string device = session.Device.ToLower().Trim();
-            
+            session.UserStartedAuthorization = true;
+
             try
             {
                 _userProfileReceivingServiceContext.Execute(session.AppId, authorizationCode);
             }
             catch (AuthorizationCodeExchangeException)
             {
-                
+
             }
-            
+
             if (device.Equals("browser"))
             {
-                return new ContentResult 
+                return new ContentResult
                 {
                     ContentType = "text/html",
                     Content = "<script>window.close()</script>"
