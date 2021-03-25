@@ -130,7 +130,7 @@ namespace PMAuth.Services.GoogleOAuth
             catch (HttpRequestException exception)
             {
                 _logger.LogWarning("The request failed due to an underlying issue such as " +
-                                       "network connectivity, DNS failure, server certificate validation or timeout");
+                                   "network connectivity, DNS failure, server certificate validation or timeout");
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Google", exception);
             }
 
