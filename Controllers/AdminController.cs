@@ -47,7 +47,7 @@ namespace PMAuth.Controllers
         [FromHeader(Name = "App_id")] int appId,
         [FromBody] SessionIdModel sessionIdModel)
         {
-            _logger.LogDebug($"SessionId: {sessionIdModel?.SessionId}");
+            _logger.LogInformation($"SessionId: {sessionIdModel?.SessionId}");
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
                 return BadRequest(new ErrorModel
@@ -72,8 +72,8 @@ namespace PMAuth.Controllers
                 int requestCounter = 0;
                 while (requestCounter < 50)
                 {
-                    _logger.LogDebug($"AccessToken: {sessionInfo.AccessToken}");
-                    _logger.LogDebug($"Email: {sessionInfo.UserProfile.Email}");
+                    _logger.LogInformation($"AccessToken: {sessionInfo?.AccessToken}");
+                    _logger.LogInformation($"Email: {sessionInfo?.UserProfile?.Email}");
                     isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
                     if (isSuccess && sessionInfo?.UserProfile != null)
                     {
