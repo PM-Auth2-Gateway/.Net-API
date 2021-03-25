@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
+using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Models.RequestModels;
 using PMAuth.Services.Abstract;
+using PMAuth.Services.FacebookOAuth;
 using PMAuth.Services.GoogleOAuth;
 
 namespace PMAuth.Controllers
@@ -25,7 +30,7 @@ namespace PMAuth.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly BackOfficeContext _context;
         private readonly IMemoryCache _memoryCache;
-        private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
+        private readonly ILogger<RedirectController> logger;
 
 #pragma warning disable 1591
         public RedirectController(
@@ -33,20 +38,19 @@ namespace PMAuth.Controllers
             IHttpClientFactory httpClientFactory,
             BackOfficeContext context,
             IMemoryCache memoryCache,
-            ILogger<GoogleAccessTokenReceivingService> logger)
+            ILogger<RedirectController> logger)
         {
             _userProfileReceivingServiceContext = userProfileReceivingServiceContext;
             _httpClientFactory = httpClientFactory;
             _context = context;
             _memoryCache = memoryCache;
-            _logger = logger; //?? throw new ArgumentNullException(nameof(logger));
+            this.logger = logger;
         }
 #pragma warning restore 1591
 
         /// <summary>
         /// Handle redirect from Google
         /// </summary>
-        /// <param name="name"></param>
         /// <param name="error"></param>
         /// <param name="authorizationCode"></param>
         /// <returns></returns>
@@ -54,26 +58,16 @@ namespace PMAuth.Controllers
         [ProducesResponseType(typeof(UserProfile), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public IActionResult ReceiveAuthorizationCodeGoogle(
-            string name,
             [FromQuery] RedirectionErrorModelGoogle error, 
             [FromQuery] AuthorizationCodeModel authorizationCode)
         {
-            if (authorizationCode?.SessionId == null)
-            {
-                return BadRequest(new ErrorModel
-                {
-                    Error = "Session Id is missing",
-                    ErrorDescription = "Check query parameters. AuthorizationCodeModel or Session Id is missing"
-                });
-            }
-            
             if (error.Error != null || error.ErrorDescription != null)
             {
                 return BadRequest(authorizationCode.SessionId);
             }
 
             _userProfileReceivingServiceContext.SetStrategies(
-                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache, _logger),
+                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache),
                 new GoogleProfileManager(_memoryCache));
             
             return ContinueFlow(authorizationCode);
@@ -82,7 +76,6 @@ namespace PMAuth.Controllers
         /// <summary>
         /// Handle redirect from Facebook
         /// </summary>
-        /// <param name="name"></param>
         /// <param name="error"></param>
         /// <param name="authorizationCode"></param>
         /// <returns></returns>
@@ -90,22 +83,24 @@ namespace PMAuth.Controllers
         [ProducesResponseType(typeof(UserProfile), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public IActionResult ReceiveAuthorizationCodeFacebook(
-            string name,
             [FromQuery] RedirectionErrorModelFacebook error,
             [FromQuery] AuthorizationCodeModel authorizationCode)
         {
-            throw new NotImplementedException();
-            /*if (//check for error)
+            if (error.Error != null || error.ErrorDescription != null)
             {
                 return BadRequest(authorizationCode.SessionId);
             }
-        
+
             //set strategies
             _userProfileReceivingServiceContext.SetStrategies(
-                new GoogleAccessTokenReceivingService(_httpClientFactory, _context),
-                new GoogleProfileManager(_memoryCache));
+                new FacebookAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache),
+                new FacebookProfileManager(_memoryCache, _httpClientFactory));
 
-            return ContinueFlow(authorizationCode);*/
+            _memoryCache.TryGetValue(authorizationCode.SessionId, out CacheModel cache);
+            string scope =_context.Settings.FirstOrDefault(x => x.AppId == cache.AppId && x.SocialId == cache.SocialId).Scope;
+            authorizationCode.Scope = scope;
+
+            return ContinueFlow(authorizationCode);
         }
         
         private IActionResult ContinueFlow(AuthorizationCodeModel authorizationCode)
@@ -121,7 +116,7 @@ namespace PMAuth.Controllers
             {
                 _userProfileReceivingServiceContext.Execute(session.AppId, authorizationCode);
             }
-            catch (AuthorizationCodeExchangeException exception)
+            catch (AuthorizationCodeExchangeException)
             {
                 
             }

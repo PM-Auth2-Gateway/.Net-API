@@ -1,7 +1,13 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Caching.Memory;
+using PMAuth.Extensions;
+using PMAuth.Models.OAuthFacebook;
 using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Services.Abstract;
@@ -9,60 +15,81 @@ using PMAuth.Services.Abstract;
 
 namespace PMAuth.Services.FacebookOAuth
 {
+    /// <summary>
+    /// Managing user's Facebook profile information 
+    /// - get user info via tokens
+    /// </summary>
     public class FacebookProfileManager : IProfileManagingService
     {
         private readonly IMemoryCache _memoryCache;
+        private readonly HttpClient _httpClient;
+        private readonly FacebookProperties facebookProperties;
 
-        public FacebookProfileManager(IMemoryCache memoryCache)
+        public FacebookProfileManager(IMemoryCache memoryCache, IHttpClientFactory httpClientFactory)
         {
             _memoryCache = memoryCache;
+            _httpClient = httpClientFactory.CreateClient();
+
+            var json = File.ReadAllText("facebookProperties.json");
+            facebookProperties = JsonSerializer.Deserialize<FacebookProperties>(json);
         }
+
         public async Task GetUserProfileAsync(TokenModel rawTokenModel, string sessionId)
         {
-            GoogleTokensModel tokensModel = (GoogleTokensModel) rawTokenModel;
-            /*if (string.IsNullOrWhiteSpace(tokensModel.IdToken))
+            FacebookTokensModel tokensModel = (FacebookTokensModel) rawTokenModel;
+
+            if (tokensModel == null)
             {
-                return await GetProfileFromAPICall(tokensModel);
-            }*/
+                return;
+            }
             
-            UserProfile profile = GetProfileFromIdToken(tokensModel);
-            CacheModel model = _memoryCache.Get<CacheModel>(sessionId);
-            model.UserProfile = profile;
-            // return profile;
-        }
-        
-        /*private async Task<UserProfile> GetProfileFromAPICall(GoogleTokensModel tokensModel)
-        {
-            // here can be awaitable code, so GetUserProfileAsync should stay async for now
-            //TODO add variant of getting user profile via Google OAuth API
-            return null;
-        }*/
-        
-        private UserProfile GetProfileFromIdToken(GoogleTokensModel tokensModel)
-        {
-            var jwtEncodedString = tokensModel.IdToken;
+            UserProfile profile = await GetProfileFromAccessTokenAsync(tokensModel);
 
-            var token = new JwtSecurityToken(jwtEncodedString);
-            UserProfile userProfile = new UserProfile
+            if (profile == null)
             {
-                Id = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value,
-                //AccessToken = tokensModel.AccessToken,
-                //RefreshToken = tokensModel.RefreshToken,
-                //ExpiresIn = tokensModel.ExpiresIn,
-                Email = token.Claims.FirstOrDefault(c => c.Type == "email")?.Value,
-                FirstName = token.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value,
-                LastName = token.Claims.FirstOrDefault(c => c.Type == "family_name")?.Value,
-                Photo = token.Claims.FirstOrDefault(c => c.Type == "picture")?.Value,
-                Locale = token.Claims.FirstOrDefault(c => c.Type == "locale")?.Value,
-            };
-
-            string isVerifiedEmailString = token.Claims.FirstOrDefault(c => c.Type == "email_verified")?.Value;
-            if (!string.IsNullOrWhiteSpace(isVerifiedEmailString) && bool.TryParse(isVerifiedEmailString, out bool isVerifiedBool))
-            {
-                userProfile.IsVerifiedEmail = isVerifiedBool;
+                return;
             }
 
-            return userProfile;
+            bool isSuccess = _memoryCache.TryGetValue(sessionId, out CacheModel model);
+            if (isSuccess && model != null)
+            {
+                model.UserProfile = profile;
+            }
+        }
+
+
+        private async Task<UserProfile> GetProfileFromAccessTokenAsync(FacebookTokensModel tokensModel)
+        {
+            string fields = ReformScopeToFields.Transform(tokensModel.Scope);
+
+            
+            string url = facebookProperties.GetProfileLink + tokensModel.AccessToken + fields;
+            var response = await _httpClient.GetAsync(url);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            } catch (HttpRequestException)
+            {
+                return null;
+            }
+
+            string facebookInfoJson = await response.Content.ReadAsStringAsync();
+
+            UserProfile facebookInfo = JsonSerializer.Deserialize<UserProfile>(facebookInfoJson);
+
+            if (!string.IsNullOrEmpty(facebookInfo.Name))
+            {
+                var names = facebookInfo.Name.Split(" ");
+                if(names.Length == 2)
+                {
+                    facebookInfo.FirstName = names[0];
+                    facebookInfo.LastName = names[1];
+                }
+                
+            }
+
+            return facebookInfo;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace PMAuth.Models
+namespace PMAuth.Models.SocialsClient
 {
     /// <summary>
     /// Requested social model
