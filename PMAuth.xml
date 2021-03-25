@@ -169,10 +169,11 @@
             Controller for handling redirect from social network services
             </summary>
         </member>
-        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeGoogle(PMAuth.Models.RequestModels.RedirectionErrorModelGoogle,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeGoogle(System.String,PMAuth.Models.RequestModels.RedirectionErrorModelGoogle,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
             <summary>
             Handle redirect from Google
             </summary>
+            <param name="name"></param>
             <param name="error"></param>
             <param name="authorizationCode"></param>
             <returns></returns>
@@ -249,6 +250,14 @@
             Error model that will be returned if something will go wrong after user redirection to social network service 
             </summary>
         </member>
+        <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorCode">
+            <summary>
+            Error code.
+            10 - Session id expired or doesn't exists
+            12 - User aborted authorization
+            14 - Error occured during authorization
+            </summary>
+        </member>
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.Error">
             <summary>
             Error
@@ -257,11 +266,6 @@
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorDescription">
             <summary>
             Detailed description of an error
-            </summary>
-        </member>
-        <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorReason">
-            <summary>
-            Error reason
             </summary>
         </member>
         <member name="T:PMAuth.Extensions.ReformScopeToFields">
@@ -400,6 +404,11 @@
         <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.RedirectUri">
             <summary>
             Redirect Url
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.UserStartedAuthorization">
+            <summary>
+            If error occured this property is not null. If it is null, then everything is fine
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel">
