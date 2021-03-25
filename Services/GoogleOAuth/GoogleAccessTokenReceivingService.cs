@@ -125,32 +125,28 @@ namespace PMAuth.Services.GoogleOAuth
             HttpResponseMessage response;
             try
             {
-                _logger.LogWarning("Response on token uri sent");
                 response = await _httpClient.SendAsync(httpRequestMessage);
             }
             catch (HttpRequestException exception)
             {
-                _logger.LogWarning("Response StatusCode from the Google is unsuccessful when trying " +
-                                   "to exchange code for tokens");
+                _logger.LogWarning("The request failed due to an underlying issue such as " +
+                                       "network connectivity, DNS failure, server certificate validation or timeout");
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Google", exception);
             }
 
             try
             {
-                _logger.LogWarning("EnsureSuccessStatusCode executed");
                 response.EnsureSuccessStatusCode(); // throws HttpRequestException if StatusCode unsuccessful
             }
             catch (HttpRequestException exception)
             {
-                string responseRaw1 = await response.Content.ReadAsStringAsync();
+                string responseRaw = await response.Content.ReadAsStringAsync();
                 _logger.LogWarning("Response StatusCode from the Google is unsuccessful when trying " +
-                                   $"to exchange code for tokens.............Response received !statcod: {responseRaw1}");
+                                   $"to exchange code for tokens\nResponse received: {responseRaw}");
                 throw await HandleUnsuccessfulStatusCode(response, exception); // is it a good practice? 
             }
             
-            string responseRaw = await response.Content.ReadAsStringAsync();
-            _logger.LogWarning($"Response received: {responseRaw}");
-            return responseRaw;
+            return await response.Content.ReadAsStringAsync();
         }
 
         private async Task<AuthorizationCodeExchangeException> HandleUnsuccessfulStatusCode(HttpResponseMessage response, HttpRequestException exception)
