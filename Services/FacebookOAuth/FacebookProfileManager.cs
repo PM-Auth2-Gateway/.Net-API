@@ -1,21 +1,19 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Caching.Memory;
-
 using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Services.Abstract;
 #pragma warning disable 1591
 
-namespace PMAuth.Services.GoogleOAuth
+namespace PMAuth.Services.FacebookOAuth
 {
-    public class GoogleProfileManager : IProfileManagingService
+    public class FacebookProfileManager : IProfileManagingService
     {
         private readonly IMemoryCache _memoryCache;
 
-        public GoogleProfileManager(IMemoryCache memoryCache)
+        public FacebookProfileManager(IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
         }
@@ -26,18 +24,11 @@ namespace PMAuth.Services.GoogleOAuth
             {
                 return await GetProfileFromAPICall(tokensModel);
             }*/
-
-            if (tokensModel == null)
-            {
-                return;
-            }
             
             UserProfile profile = GetProfileFromIdToken(tokensModel);
-            bool isSuccess = _memoryCache.TryGetValue(sessionId, out CacheModel model);
-            if (isSuccess && model != null)
-            {
-                model.UserProfile = profile;
-            }
+            CacheModel model = _memoryCache.Get<CacheModel>(sessionId);
+            model.UserProfile = profile;
+            // return profile;
         }
         
         /*private async Task<UserProfile> GetProfileFromAPICall(GoogleTokensModel tokensModel)

@@ -42,12 +42,12 @@
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.Admin.Id">
             <summary>
-            Id
+            Admin Id
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.Admin.Name">
             <summary>
-            Name
+            Admin Name
             </summary>
         </member>
         <member name="T:PMAuth.AuthDbContext.Entities.App">
@@ -62,7 +62,7 @@
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.App.Name">
             <summary>
-            Name
+            Application Name
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.App.AdminId">
@@ -87,7 +87,7 @@
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.Setting.AppId">
             <summary>
-            App Id
+            Application Id
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.Setting.App">
@@ -112,12 +112,12 @@
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.Setting.SecretKey">
             <summary>
-            Secret Key
+            Secret Key - secret field setting in application
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.Setting.Scope">
             <summary>
-            Scope
+            Scope - bunch of accessed information by user.
             </summary>
         </member>
         <member name="T:PMAuth.AuthDbContext.Entities.Social">
@@ -138,12 +138,12 @@
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.Social.AuthUri">
             <summary>
-            Auth Uri
+            Auth Uri - base link of some service which offer authentication.
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.Entities.Social.TokenUrl">
             <summary>
-            Token Url
+            Token Url - adress which operate with tokens
             </summary>
         </member>
         <member name="T:PMAuth.Controllers.ProfileController">
@@ -151,24 +151,48 @@
             Get user profile by authorization code 
             </summary>
         </member>
-        <member name="M:PMAuth.Controllers.ProfileController.GetUserProfileAsync(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Controllers.ProfileController.GetUserProfileAsync(System.Int32,PMAuth.Models.RequestModels.SessionIdModel)">
             <summary>
             Get user profile
             </summary>
             <param name="appId">Application id (this id admin receives in the backoffice)</param>
-            <param name="authCodeModel">Authorization code model </param>
-            <returns>UserProfile or AuthorizationCodeExchangeExceptionModel</returns>
+            <param name="sessionIdModel">Model which contains session ID</param>
+            <returns>UserProfile or ErrorModel</returns>
+        </member>
+        <member name="T:PMAuth.Controllers.RedirectController">
+            <summary>
+            Controller for handling redirect from social network services
+            </summary>
+        </member>
+        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeGoogle(System.String,PMAuth.Models.RequestModels.RedirectionErrorModelGoogle,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+            <summary>
+            Handle redirect from Google
+            </summary>
+            <param name="name"></param>
+            <param name="error"></param>
+            <param name="authorizationCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeFacebook(System.String,PMAuth.Models.RequestModels.RedirectionErrorModelFacebook,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+            <summary>
+            Handle redirect from Facebook
+            </summary>
+            <param name="name"></param>
+            <param name="error"></param>
+            <param name="authorizationCode"></param>
+            <returns></returns>
         </member>
         <member name="T:PMAuth.Controllers.SocialsController">
             <summary>
             Controller that operate socials.
             </summary>
         </member>
-        <member name="M:PMAuth.Controllers.SocialsController.#ctor(PMAuth.AuthDbContext.BackOfficeContext)">
+        <member name="M:PMAuth.Controllers.SocialsController.#ctor(PMAuth.AuthDbContext.BackOfficeContext,Microsoft.Extensions.Caching.Memory.IMemoryCache)">
             <summary>
             SocialsController constructor
             </summary>
             <param name="context">BackOfficeContext</param>
+            <param name="cache"></param>
         </member>
         <member name="M:PMAuth.Controllers.SocialsController.GetAllSocials(System.Int32)">
             <summary>
@@ -217,19 +241,49 @@
             Ny i zachem ti syda zawel???
             </remarks>
         </member>
-        <member name="T:PMAuth.Exceptions.Models.AuthorizationCodeExchangeExceptionModel">
+        <member name="T:PMAuth.Exceptions.Models.ErrorModel">
             <summary>
-            Error model. It will be put in response if something went wrong while getting user profile from social network
+            Error model that will be returned if something will go wrong after user redirection to social network service 
             </summary>
         </member>
-        <member name="P:PMAuth.Exceptions.Models.AuthorizationCodeExchangeExceptionModel.ErrorDescription">
+        <member name="P:PMAuth.Exceptions.Models.ErrorModel.Error">
+            <summary>
+            Error
+            </summary>
+        </member>
+        <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorDescription">
             <summary>
             Detailed description of an error
             </summary>
         </member>
-        <member name="P:PMAuth.Exceptions.Models.AuthorizationCodeExchangeExceptionModel.Error">
+        <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorReason">
             <summary>
-            Error message
+            Error reason
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthFacebook.FacebookTokensModel">
+            <summary>
+            Model for retrieving access and refresh tokens from Facebook 
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.IdToken">
+            <summary>
+            JWT token which contains all user info according to used scope
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.TokenType">
+            <summary>
+            Token type, always Bearer
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.Scope">
+            <summary>
+            Used scope
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.RefreshToken">
+            <summary>
+            Refresh token
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthGoogle.GoogleTokensModel">
@@ -257,24 +311,59 @@
             Refresh token
             </summary>
         </member>
-        <member name="T:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel">
+        <member name="T:PMAuth.Models.OAuthUniversal.CacheModel">
+            <summary>
+            CasheModel for store info in cache
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.SocialId">
+            <summary>
+            Social Id.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.AccessToken">
+            <summary>
+            Access Token - allow user receiving information about him
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.UserProfile">
+            <summary>
+            User Profile where stored user info
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.Device">
+            <summary>
+            Device - field which inform what type of device will recieve a redirect
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.AppId">
+            <summary>
+            Application Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.RedirectUri">
+            <summary>
+            Redirect Url
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel">
             <summary>
             Authorization code model 
             </summary>
         </member>
-        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.SocialId">
+        <member name="P:PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel.AuthorizationCode">
             <summary>
-            Id of the social network through which authorization is made
+            Authorization code
             </summary>
         </member>
-        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.AuthorizationCode">
+        <member name="P:PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel.Scope">
             <summary>
-            Authorization code itself
+            Scope
             </summary>
         </member>
-        <member name="P:PMAuth.Models.OAuthUniversal.AuthorizationCodeModel.RedirectUri">
+        <member name="P:PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel.SessionId">
             <summary>
-            RedirectUri, for now it is hardcoded, so you can type anything here
+            Session ID
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthUniversal.TokenModel">
@@ -300,21 +389,6 @@
         <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.Id">
             <summary>
             Users unique ID in social network used for authorization
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.AccessToken">
-            <summary>
-            Access token received from the social network
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.RefreshToken">
-            <summary>
-            Refresh token received from the social network (may be absent)
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.ExpiresIn">
-            <summary>
-            Token expiration time in seconds received from the social network
             </summary>
         </member>
         <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.FirstName">
@@ -345,6 +419,21 @@
         <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.Locale">
             <summary>
             User's profile locale received from the social network (may be absent)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.AdditionalInformation">
+            <summary>
+            Key-value pairs ("paramName": "value") of additional information about user
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.RequestModels.RedirectionErrorModelGoogle.Error">
+            <summary>
+            Error
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.RequestModels.RedirectionErrorModelGoogle.ErrorDescription">
+            <summary>
+            Detailed description of an error
             </summary>
         </member>
         <member name="P:PMAuth.Models.SettingModel.Id">
@@ -394,17 +483,17 @@
         </member>
         <member name="P:PMAuth.Models.SocialLinkModel.AuthUri">
             <summary>
-            Auth Uri.
+            Auth Uri - base link of some service which offer authentication.
             </summary>
         </member>
         <member name="P:PMAuth.Models.SocialLinkModel.RedirectUri">
             <summary>
-            Auth Uri.
+            Redirect Uri - on which adress.
             </summary>
         </member>
         <member name="P:PMAuth.Models.SocialLinkModel.ResponseType">
             <summary>
-            Response Type.
+            Response Type - default = code.
             </summary>
         </member>
         <member name="P:PMAuth.Models.SocialLinkModel.ClientId">
@@ -414,12 +503,12 @@
         </member>
         <member name="P:PMAuth.Models.SocialLinkModel.Scope">
             <summary>
-            Scope.
+            Scope - bunch of accessed information by user.
             </summary>
         </member>
         <member name="P:PMAuth.Models.SocialLinkModel.State">
             <summary>
-            Scope.
+            State - session id.
             </summary>
         </member>
         <member name="T:PMAuth.Models.SocialModel">
@@ -434,7 +523,7 @@
         </member>
         <member name="P:PMAuth.Models.SocialModel.Device">
             <summary>
-            Redirect Url 2
+            Device - field which inform what type of device will recieve a redirect
             </summary>
         </member>
         <member name="T:PMAuth.Models.SocialsModel">
@@ -447,7 +536,7 @@
         </member>
         <member name="P:PMAuth.Models.SocialsModel.Socials">
             <summary>
-            List of socials.
+            List of socials which is registered by user in some application.
             </summary>
         </member>
         <member name="T:PMAuth.Program">
@@ -468,7 +557,7 @@
             <param name="args">string[] args</param>
             <returns>IHostBuilder</returns>
         </member>
-        <member name="M:PMAuth.Services.Abstract.IAccessTokenReceivingService.ExchangeAuthorizationCodeForTokens(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Services.Abstract.IAccessTokenReceivingService.ExchangeAuthorizationCodeForTokens(System.Int32,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
             <summary>
             Method for exchanging authorization code for access token
             </summary>
@@ -480,7 +569,7 @@
             DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
             </exception>
         </member>
-        <member name="M:PMAuth.Services.Abstract.IProfileManager.GetUserProfileAsync(PMAuth.Models.OAuthUniversal.TokenModel)">
+        <member name="M:PMAuth.Services.Abstract.IProfileManagingService.GetUserProfileAsync(PMAuth.Models.OAuthUniversal.TokenModel,System.String)">
             <summary>
             
             </summary>
@@ -500,14 +589,14 @@
                 introduce a new type of exception to avoid leaky abstraction
             </summary>
         </member>
-        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.SetStrategies(PMAuth.Services.Abstract.IAccessTokenReceivingService,PMAuth.Services.Abstract.IProfileManager)">
+        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.SetStrategies(PMAuth.Services.Abstract.IAccessTokenReceivingService,PMAuth.Services.Abstract.IProfileManagingService)">
             <summary>
             Set code flow for chosen social network
             </summary>
             <param name="accessTokenReceivingStrategy">service which exchanges authorization token on access token</param>
             <param name="profileManagerStrategy">service which gets user profile from social network and return unified user profile</param>
         </member>
-        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.Execute(System.Int32,PMAuth.Models.OAuthUniversal.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext.Execute(System.Int32,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
             <summary>
             Get user profile by authorization code
             </summary>

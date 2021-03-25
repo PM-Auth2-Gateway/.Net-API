@@ -10,7 +10,7 @@
         /// </summary>
         public int Id { get; set; }
         /// <summary>
-        /// Name
+        /// Application Name
         /// </summary>
         public string Name { get; set; }
 

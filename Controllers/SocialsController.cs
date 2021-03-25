@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using PMAuth.AuthDbContext;
 using PMAuth.AuthDbContext.Entities;
 using PMAuth.Models;
+using PMAuth.Models.OAuthUniversal;
 
 namespace PMAuth.Controllers
 {
@@ -18,14 +18,17 @@ namespace PMAuth.Controllers
     public class SocialsController : Controller
     {
         private readonly BackOfficeContext context;
+        private readonly IMemoryCache cache;
 
         /// <summary>
         /// SocialsController constructor
         /// </summary>
         /// <param name="context">BackOfficeContext</param>
-        public SocialsController(BackOfficeContext context)
+        /// <param name="cache"></param>
+        public SocialsController(BackOfficeContext context, IMemoryCache cache)
         {
             this.context = context;
+            this.cache = cache;
         }
 
         /// <summary>
@@ -44,19 +47,19 @@ namespace PMAuth.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public ActionResult<SocialsModel> GetAllSocials([FromHeader] int App_id)
         {
-            var socialIds = context.Settings.Where(x => x.AppId == App_id).Select(x => x.SocialId).Distinct().ToList();
+            var socialIds = context.Settings.Where(x => x.AppId == App_id).Select(x => x.SocialId).Distinct();
 
-            if (socialIds == null) return BadRequest();
+            var socials = context.Socials.Where(x => socialIds.Contains(x.Id)).ToList();
 
-            List<Social> socials = new List<Social>();
-            foreach(int socialId in socialIds)
+            if (socials.Count == 0)
             {
-                socials.Add(context.Socials.FirstOrDefault(social => social.Id == socialId));
+                return BadRequest();
             }
-            
-            if (socials.Count == 0) return BadRequest();
 
-            return new SocialsModel() { Socials = socials };
+            return new SocialsModel() 
+            { 
+                Socials = socials
+            };
 
         }
 
@@ -80,20 +83,42 @@ namespace PMAuth.Controllers
         {
             Setting setting = context.Settings.FirstOrDefault(x => x.AppId == App_id && x.SocialId == socialModel.SocialId);
 
-            if (setting == null) return BadRequest();
+            if (setting == null)
+            {
+                return BadRequest();
+            }
 
             Social social = context.Socials.FirstOrDefault(x => x.Id == setting.SocialId);
 
-            if (social == null) return BadRequest();
+            if (social == null)
+            {
+                return BadRequest();
+            }
+            
+            string socialName = context.Socials.FirstOrDefault(x => x.Id == socialModel.SocialId).Name.ToLower();
+            string redirectUri = $"{Request.Scheme}://{Request.Host}/auth/{socialName}";
 
-            return new SocialLinkModel()
+            var sessionId = Guid.NewGuid().ToString();
+            cache.Set(sessionId, new CacheModel
+            {
+                SocialId = socialModel.SocialId,
+                Device = socialModel.Device,
+                AppId = App_id,
+                RedirectUri = redirectUri
+            },
+            new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+            });
+            
+            return new SocialLinkModel
             {
                 AuthUri = social.AuthUri,
-                RedirectUri = "redirect_uri",
+                RedirectUri = redirectUri,
                 ResponseType = "code",
                 ClientId = setting.ClientId,
                 Scope = setting.Scope,
-                State = "session_id"
+                State = sessionId
             };
         }
     }
