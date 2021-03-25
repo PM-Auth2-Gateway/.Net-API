@@ -108,7 +108,7 @@ namespace PMAuth.Controllers
             },
             new MemoryCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
             });
             
             return new SocialLinkModel

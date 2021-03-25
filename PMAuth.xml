@@ -266,11 +266,6 @@
             Model for retrieving access and refresh tokens from Facebook 
             </summary>
         </member>
-        <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.IdToken">
-            <summary>
-            JWT token which contains all user info according to used scope
-            </summary>
-        </member>
         <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.TokenType">
             <summary>
             Token type, always Bearer
@@ -279,11 +274,6 @@
         <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.Scope">
             <summary>
             Used scope
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.RefreshToken">
-            <summary>
-            Refresh token
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthGoogle.GoogleTokensModel">
