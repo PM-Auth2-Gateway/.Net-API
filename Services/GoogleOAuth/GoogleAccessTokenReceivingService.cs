@@ -142,8 +142,9 @@ namespace PMAuth.Services.GoogleOAuth
             }
             catch (HttpRequestException exception)
             {
+                string responseRaw1 = await response.Content.ReadAsStringAsync();
                 _logger.LogWarning("Response StatusCode from the Google is unsuccessful when trying " +
-                                   "to exchange code for tokens");
+                                   $"to exchange code for tokens.............Response received !statcod: {responseRaw1}");
                 throw await HandleUnsuccessfulStatusCode(response, exception); // is it a good practice? 
             }
             
