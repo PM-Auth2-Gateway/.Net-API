@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
@@ -23,18 +24,18 @@ namespace PMAuth.Services.GoogleOAuth
 
         private readonly IMemoryCache _memoryCache;
 
-        //private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
+        private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
         private readonly HttpClient _httpClient;
 
         public GoogleAccessTokenReceivingService(
             IHttpClientFactory httpClientFactory, 
             BackOfficeContext context,
-            IMemoryCache memoryCache
-            /*ILogger<GoogleAccessTokenReceivingService> logger*/) 
+            IMemoryCache memoryCache,
+            ILogger<GoogleAccessTokenReceivingService> logger) 
         {
             _context = context;
             _memoryCache = memoryCache;
-            //_logger = logger;
+            _logger = logger;
             _httpClient = httpClientFactory.CreateClient();
         }
         public async Task<TokenModel> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
@@ -124,25 +125,31 @@ namespace PMAuth.Services.GoogleOAuth
             HttpResponseMessage response;
             try
             {
+                _logger.LogWarning("Response on token uri sent");
                 response = await _httpClient.SendAsync(httpRequestMessage);
             }
             catch (HttpRequestException exception)
             {
+                _logger.LogWarning("Response StatusCode from the Google is unsuccessful when trying " +
+                                   "to exchange code for tokens");
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Google", exception);
             }
 
             try
             {
+                _logger.LogWarning("EnsureSuccessStatusCode executed");
                 response.EnsureSuccessStatusCode(); // throws HttpRequestException if StatusCode unsuccessful
             }
             catch (HttpRequestException exception)
             {
-                //_logger.LogInformation("Response StatusCode from the Google is unsuccessful when trying " +
-                //                       "to exchange code for tokens");
+                _logger.LogWarning("Response StatusCode from the Google is unsuccessful when trying " +
+                                   "to exchange code for tokens");
                 throw await HandleUnsuccessfulStatusCode(response, exception); // is it a good practice? 
             }
             
-            return await response.Content.ReadAsStringAsync();
+            string responseRaw = await response.Content.ReadAsStringAsync();
+            _logger.LogWarning($"Response received: {responseRaw}");
+            return responseRaw;
         }
 
         private async Task<AuthorizationCodeExchangeException> HandleUnsuccessfulStatusCode(HttpResponseMessage response, HttpRequestException exception)
