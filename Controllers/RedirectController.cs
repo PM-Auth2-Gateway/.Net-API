@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-
+using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
@@ -28,18 +28,21 @@ namespace PMAuth.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly BackOfficeContext _context;
         private readonly IMemoryCache _memoryCache;
+        private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
 
 #pragma warning disable 1591
         public RedirectController(
             IUserProfileReceivingServiceContext userProfileReceivingServiceContext,
             IHttpClientFactory httpClientFactory,
             BackOfficeContext context,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            ILogger<GoogleAccessTokenReceivingService> logger)
         {
             _userProfileReceivingServiceContext = userProfileReceivingServiceContext;
             _httpClientFactory = httpClientFactory;
             _context = context;
             _memoryCache = memoryCache;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 #pragma warning restore 1591
 
@@ -64,7 +67,7 @@ namespace PMAuth.Controllers
             }
 
             _userProfileReceivingServiceContext.SetStrategies(
-                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache),
+                new GoogleAccessTokenReceivingService(_httpClientFactory, _context, _memoryCache, _logger),
                 new GoogleProfileManager(_memoryCache));
             
             return ContinueFlow(authorizationCode);
