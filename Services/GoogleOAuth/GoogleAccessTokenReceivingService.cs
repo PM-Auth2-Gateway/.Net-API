@@ -56,6 +56,7 @@ namespace PMAuth.Services.GoogleOAuth
                 if (exception is ArgumentNullException ||
                     exception is JsonException)
                 {
+                    _logger.LogError($"Unable to deserialize response body. Received response body:\n{responseBody}");
                     return null;
                 }
                 throw;
@@ -68,6 +69,8 @@ namespace PMAuth.Services.GoogleOAuth
                 _memoryCache.TryGetValue(authorizationCodeModel.SessionId, out CacheModel sessionInformation);
             if (isSuccess == false)
             {
+                _logger.LogError("Unable to find session id in memory cache." +
+                                 "Authorization timeout has expired");
                 var errorExplanation = new ErrorModel
                 {
                     Error = "Authorization timeout has expired.",
@@ -91,6 +94,7 @@ namespace PMAuth.Services.GoogleOAuth
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             {
+                _logger.LogError("Client id or client secret is null or empty");
                 var errorExplanation = new ErrorModel
                 {
                     Error = "Trying to use unregistered social network",
@@ -101,6 +105,8 @@ namespace PMAuth.Services.GoogleOAuth
 
             if (string.IsNullOrEmpty(tokenUri))
             {
+                _logger.LogError("Token uri is null or empty");
+
                 var errorExplanation = new ErrorModel
                 {
                     Error = "Trying to use unregistered social network",
@@ -128,7 +134,7 @@ namespace PMAuth.Services.GoogleOAuth
             }
             catch (HttpRequestException exception)
             {
-                _logger.LogWarning("The request failed due to an underlying issue such as " +
+                _logger.LogError("The request failed due to an underlying issue such as " +
                                    "network connectivity, DNS failure, server certificate validation or timeout");
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Google", exception);
             }
@@ -139,10 +145,9 @@ namespace PMAuth.Services.GoogleOAuth
             }
             catch (HttpRequestException exception)
             {
-                string responseRaw = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning("Response StatusCode from the Google is unsuccessful when trying " +
-                                   $"to exchange code for tokens\nResponse received: {responseRaw}");
-                throw await HandleUnsuccessfulStatusCode(response, exception); // is it a good practice? 
+                _logger.LogError("Response StatusCode from the Google " +
+                                 "is unsuccessful when trying to exchange code for tokens");
+                throw await HandleUnsuccessfulStatusCode(response, exception);
             }
             
             return await response.Content.ReadAsStringAsync();
@@ -163,6 +168,9 @@ namespace PMAuth.Services.GoogleOAuth
                 if (jsonException is ArgumentNullException ||
                     jsonException is JsonException)
                 {
+                    _logger.LogError("Unable to deserialize error response\n" +
+                                     $"Response body: {responseBody}");
+                    
                     return new AuthorizationCodeExchangeException("Response StatusCode from the Google " +
                                                                   "is unsuccessful when trying to exchange code " +
                                                                   "for tokens", exception);
