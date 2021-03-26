@@ -9,6 +9,7 @@ namespace PMAuth.Services.Abstract
 {
     public interface IAccessTokenReceivingService // T is a model that contains tokens
     {
+        string SocialServiceName { get; }
         /// <summary>
         /// Method for exchanging authorization code for access token
         /// </summary>

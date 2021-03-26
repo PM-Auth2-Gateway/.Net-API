@@ -22,6 +22,8 @@ namespace PMAuth.Services.FacebookOAuth
     /// </summary>
     public class FacebookAccessTokenReceivingService : IAccessTokenReceivingService
     {
+        public string SocialServiceName => "facebook";
+
         private readonly BackOfficeContext _context;
 
         private readonly IMemoryCache _memoryCache;

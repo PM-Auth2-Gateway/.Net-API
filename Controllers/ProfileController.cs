@@ -1,8 +1,6 @@
 ﻿using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using PMAuth.AuthDbContext;
 using PMAuth.Exceptions.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.RequestModels;
@@ -73,8 +71,8 @@ namespace PMAuth.Controllers
             
             if (sessionInfo?.UserProfile == null)
             {
-                return BadRequest(ErrorModel.AuthError("Error occured during the authorization process",
-                    "Unable to receive user's profile for some reasons"));
+                return BadRequest(ErrorModel.AuthError("Error occured during the authorization process. " +
+                                                       "Unable to receive user's profile for some reasons"));
             }
 
             return Ok(_memoryCache.Get<CacheModel>(sessionIdModel.SessionId).UserProfile);
