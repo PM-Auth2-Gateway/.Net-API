@@ -14,21 +14,6 @@ namespace PMAuth.Models.OAuthUniversal
         public string Id { get; set; }
 
         /// <summary>
-        /// Access token received from the social network
-        /// </summary>
-        // public string AccessToken { get; set; }
-
-        /// <summary>
-        /// Refresh token received from the social network (may be absent)
-        /// </summary>
-        //public string RefreshToken { get; set; }
-
-        /// <summary>
-        /// Token expiration time in seconds received from the social network
-        /// </summary>
-        //public int ExpiresIn { get; set; }
-
-        /// <summary>
         /// User's first name received from the social network (may be absent)
         /// </summary>
         public string FirstName { get; set; }

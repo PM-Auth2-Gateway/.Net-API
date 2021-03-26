@@ -73,6 +73,7 @@ namespace PMAuth.Services.FacebookOAuth
                 if (exception is ArgumentNullException ||
                     exception is JsonException)
                 {
+                    _logger.LogError($"Unable to deserialize response body. Received response body:\n{responseBody}");
                     return null;
                 }
                 throw;
@@ -90,6 +91,8 @@ namespace PMAuth.Services.FacebookOAuth
                     Error = "Authorization timeout has expired.",
                     ErrorDescription = "Try again later"
                 };
+                _logger.LogError("Unable to find session id in memory cache." +
+                                 "Authorization timeout has expired");
                 throw new AuthorizationCodeExchangeException(errorExplanation);
             }
             
@@ -109,6 +112,7 @@ namespace PMAuth.Services.FacebookOAuth
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             {
+                _logger.LogError("Client id or client secret is null or empty");
                 var errorExplanation = new ErrorModel
                 {
                     Error = "Trying to use unregistered social network",
@@ -119,6 +123,7 @@ namespace PMAuth.Services.FacebookOAuth
 
             if (string.IsNullOrEmpty(tokenUri))
             {
+                _logger.LogError("Token uri is null or empty");
                 var errorExplanation = new ErrorModel
                 {
                     Error = "Trying to use unregistered social network",
@@ -146,6 +151,9 @@ namespace PMAuth.Services.FacebookOAuth
             }
             catch (HttpRequestException exception)
             {
+                _logger.LogError("The request failed due to an underlying issue such as " +
+                                 "network connectivity, DNS failure, server certificate validation or timeout");
+                
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Facebook", exception);
             }
 
@@ -155,8 +163,8 @@ namespace PMAuth.Services.FacebookOAuth
             }
             catch (HttpRequestException exception)
             {
-                //_logger.LogInformation("Response StatusCode from the Facebook is unsuccessful when trying " +
-                //                       "to exchange code for tokens");
+                _logger.LogError("Response StatusCode from the Facebook " +
+                                 "is unsuccessful when trying to exchange code for tokens");
                 throw await HandleUnsuccessfulStatusCode(response, exception); 
             }
             return await response.Content.ReadAsStringAsync();
@@ -177,6 +185,10 @@ namespace PMAuth.Services.FacebookOAuth
                 if (jsonException is ArgumentNullException ||
                     jsonException is JsonException)
                 {
+                    _logger.LogError("Response StatusCode from the Facebook is unsuccessful " +
+                                     "when trying to exchange code for tokens." +
+                                     "Unable to deserialize error response\n" +
+                                     $"Response body: {responseBody}");
                     return new AuthorizationCodeExchangeException("Response StatusCode from the Facebook " +
                                                                   "is unsuccessful when trying to exchange code " +
                                                                   "for tokens", exception);

@@ -6,27 +6,32 @@
     <members>
         <member name="T:PMAuth.AuthDbContext.BackOfficeContext">
             <summary>
-            BackOfficeContext
+            Data Base Context that operate tables in ORM system
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.BackOfficeContext.Admins">
             <summary>
-            Admins DbSet
+            Data Base table - Admins
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.BackOfficeContext.Apps">
             <summary>
-            Apps DbSet
+            Data Base table - Apps
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.BackOfficeContext.Socials">
             <summary>
-            Socials DbSet
+            Data Base table - Socials
             </summary>
         </member>
         <member name="P:PMAuth.AuthDbContext.BackOfficeContext.Settings">
             <summary>
-            Settings DbSet
+            Data Base table - Settings
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.BackOfficeContext.RefreshTokens">
+            <summary>
+            Data Base table - RefreshTokens
             </summary>
         </member>
         <member name="M:PMAuth.AuthDbContext.BackOfficeContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{PMAuth.AuthDbContext.BackOfficeContext})">
@@ -73,6 +78,26 @@
         <member name="P:PMAuth.AuthDbContext.Entities.App.Admin">
             <summary>
             Admin entity
+            </summary>
+        </member>
+        <member name="T:PMAuth.AuthDbContext.Entities.RefreshToken">
+            <summary>
+            Entity that handle refresh token and his expires time.
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.RefreshToken.Id">
+            <summary>
+            Refresh Token Id.
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.RefreshToken.RefreshTokenValue">
+            <summary>
+            Handle Refresh Token Value
+            </summary>
+        </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.RefreshToken.ExpiresTime">
+            <summary>
+            Expires time of refresh token.
             </summary>
         </member>
         <member name="T:PMAuth.AuthDbContext.Entities.Setting">
@@ -440,9 +465,19 @@
             User id.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Name">
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.FirstName">
             <summary>
-            User full name.
+            User first name.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.LastName">
+            <summary>
+            User last name.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.FullName">
+            <summary>
+            Full user's name
             </summary>
         </member>
         <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Email">
