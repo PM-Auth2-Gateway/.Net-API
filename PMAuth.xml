@@ -169,11 +169,10 @@
             Controller for handling redirect from social network services
             </summary>
         </member>
-        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeGoogle(System.String,PMAuth.Models.RequestModels.RedirectionErrorModelGoogle,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeGoogle(PMAuth.Models.RequestModels.RedirectionErrorModelGoogle,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
             <summary>
             Handle redirect from Google
             </summary>
-            <param name="name"></param>
             <param name="error"></param>
             <param name="authorizationCode"></param>
             <returns></returns>

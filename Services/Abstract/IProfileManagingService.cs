@@ -8,6 +8,7 @@ namespace PMAuth.Services.Abstract
     /// </summary>
     public interface IProfileManagingService
     {
+        public string SocialServiceName { get; }
         /// <summary>
         /// Method gets user profile in registered socials,
         ///     by their tokens and user session id.
