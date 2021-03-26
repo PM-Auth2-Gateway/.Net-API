@@ -125,8 +125,6 @@ namespace PMAuth
 
             services.AddScoped<IProfileManagingService, GoogleProfileManager>();
             services.AddScoped<IProfileManagingService, FacebookProfileManager>();
-            //services.AddTransient<IAccessTokenReceivingService<GoogleTokensModel>, GoogleAccessTokenReceivingService>();
-
         }
 
         /// <summary>
