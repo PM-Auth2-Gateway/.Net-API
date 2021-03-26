@@ -1,10 +1,12 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +20,9 @@ using PMAuth.Services.AuthAdmin;
 
 namespace PMAuth.Controllers
 {
+    /// <summary>
+    /// Admin Api for access to setting application
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class AdminController : Controller
@@ -28,6 +33,7 @@ namespace PMAuth.Controllers
         private readonly AuthService _authService;
         private readonly RefreshTokenService _refreshTokenService;
 
+        /// <inheritdoc />
         public AdminController(
             BackOfficeContext backOfficeContext,
             AuthService authService,
@@ -41,16 +47,15 @@ namespace PMAuth.Controllers
             _authService = authService;
             _refreshTokenService = refreshTokenService;
         }
-
+        /// <summary>
+        /// Get token for testing
+        /// </summary>
+        /// <returns>Token</returns>
         [HttpPost("testToken")]
-        public async Task<ActionResult<string>> GetTokenTest()
+        public ActionResult<string> GetTokenTest()
         {
             var identity = _authService.GetIdentity("admin");
-            if (identity == null)
-            {
-                return BadRequest();
-            }
-            var token =new JwtSecurityToken(
+            var token = new JwtSecurityToken(
                 issuer: AuthOptions.ISSUER,
                 claims: identity.Claims,
                 notBefore: DateTime.UtcNow,
@@ -60,29 +65,32 @@ namespace PMAuth.Controllers
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        /// <summary>
+        /// Get admin profile with token access
+        /// </summary>
+        /// <param name="sessionIdModel">Model which contains session ID</param>
+        /// <returns>AdminProfile or ErrorModel if profile wasn't found</returns>
         [HttpPost("tokenAndProfile")]
-        public async Task<ActionResult<AdminProfile>> GetTokenAndProfile(
-        [FromHeader(Name = "App_id")] int appId,
-        [FromBody] SessionIdModel sessionIdModel)
+        [ProducesResponseType(typeof(AdminProfile), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public async Task<ActionResult<AdminProfile>> GetTokenAndProfile([FromBody,Required] SessionIdModel sessionIdModel)
         {
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
-                return BadRequest(new ErrorModel
-                {
-                    Error = "Invalid session id",
-                    ErrorDescription = "There is no profile related to provided session id"
-                });
+                return BadRequest(ErrorModel.SessionIdError);
             }
 
             bool isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out CacheModel sessionInfo);
             if (isSuccess == false || sessionInfo == null)
             {
-                return BadRequest(new ErrorModel
-                {
-                    Error = "Invalid session id",
-                    ErrorDescription = "There is no profile related to provided session id"
-                });
+                return BadRequest(ErrorModel.SessionIdError);
             }
+
+            if (sessionInfo.UserStartedAuthorization == false)
+            {
+                return BadRequest(ErrorModel.AuthAborted);
+            }
+
             isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
             if (isSuccess && sessionInfo?.UserProfile == null)
             {
@@ -92,7 +100,6 @@ namespace PMAuth.Controllers
                     isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
                     if (isSuccess && sessionInfo?.UserProfile != null)
                     {
-                        _logger.LogInformation($"Done");
                         break;
                     }
 
@@ -101,14 +108,10 @@ namespace PMAuth.Controllers
                 }
             }
 
-
             if (sessionInfo?.UserProfile == null)
             {
-                return BadRequest(new ErrorModel
-                {
-                    Error = "Social service servers are currently unavailable",
-                    ErrorDescription = "There is no profile related to provided session id"
-                });
+                return BadRequest(ErrorModel.AuthError("Error occured during the authorization process. " +
+                                                       "Unable to receive user's profile for some reasons"));
             }
 
             var admin = new AdminProfile(_memoryCache.Get<CacheModel>(sessionIdModel.SessionId).UserProfile);
@@ -120,10 +123,6 @@ namespace PMAuth.Controllers
             }
 
             var identity = _authService.GetIdentity(admin.Id);
-            if (identity == null)
-            {
-                return BadRequest();
-            }
             var jwt = _authService.GenerateToken(identity.Claims);
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             var refreshToken = _authService.GenerateRefreshToken();
@@ -131,23 +130,30 @@ namespace PMAuth.Controllers
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
                 new CookieOptions
                 {
-                    HttpOnly = true
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax
                 });
             admin.Token = encodedJwt;
             return new JsonResult(admin);
         }
-
+        /// <summary>
+        /// Get new access token 
+        /// </summary>
+        /// <param name="token">Old access token</param>
+        /// <returns>AuthModel or error if refresh token wasn't found</returns>
         [HttpPost("refreshToken")]
-        public ActionResult<AuthModel> Refresh(string token)
+        [ProducesResponseType(typeof(AuthModel), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public ActionResult<AuthModel> Refresh([Required,FromHeader]string token)
         {
             var refreshToken = Request.Cookies?["X-Refresh-Token"];
             if (refreshToken == null)
-                return BadRequest();
+                return BadRequest(ErrorModel.TokenErrorModel("Http request don't have refreshToken"));
             var principal = _authService.GetPrincipalFromExpiredToken(token);
             var username = principal.Identity.Name;
             var savedRefreshToken = _refreshTokenService.GetRefreshToken(username); //retrieve the refresh token from a data store
             if (savedRefreshToken != refreshToken)
-                throw new SecurityTokenException("Invalid refresh token");
+                return BadRequest(ErrorModel.TokenErrorModel("Server don't have refresh token"));
 
             var newJwtToken = _authService.GenerateToken(principal.Claims);
             var newRefreshToken = _authService.GenerateRefreshToken();
@@ -156,147 +162,255 @@ namespace PMAuth.Controllers
             Response.Cookies.Append("X-Refresh-Token",refreshToken,
                 new CookieOptions
                 {
-                    HttpOnly = true
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax
                 });
             return new JsonResult(new AuthModel(username, new JwtSecurityTokenHandler().WriteToken(newJwtToken)));
         }
 
+        /// <summary>
+        /// Get all applications foe logged in admin
+        /// </summary>
+        /// <returns>AppModel[] or error if refresh admin wasn't found</returns>
         [HttpGet]
         [Route("applications")]
         [Authorize]
-        public async Task<ActionResult<AppModel[]>> GetApps()
+        [ProducesResponseType(typeof(AppModel[]), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public ActionResult<AppModel[]> GetApps()
         {
+            string error = _authService.CheckId(User.Identity.Name);
+            if (error != null)
+            {
+                return BadRequest(error);
+            }
             var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
-            if (adminId == null)
-                return BadRequest();
-            var arrApp = _backOfficeContext.Apps.Where(a => a.AdminId == adminId).Select(s=>new AppModel(s.Id,s.Name)).ToArray();
+            var arrApp = _backOfficeContext.Apps.Where(a => a.AdminId == adminId)
+                .Select(s => new AppModel(s.Id, s.Name)).ToArray();
             return Ok(arrApp);
         }
 
+        /// <summary>
+        /// Post new application 
+        /// </summary>
+        /// <param name="createApp">Information about application</param>
+        /// <returns>AppModel or error if admin Id wasn't found</returns>
         [HttpPost]
         [Route("applications")]
         [Authorize]
-        public async Task<ActionResult<AppModel>> PostApp([FromBody] CreateAppModel createApp)
+        [ProducesResponseType(typeof(AppModel), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public async Task<ActionResult<AppModel>> PostApp([FromBody,Required] CreateAppModel createApp)
         {
+            string error = _authService.CheckId(User.Identity.Name);
+            if (error != null)
+            {
+                return BadRequest(ErrorModel.IdErrorModel(error));
+            }
             var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
-            if (adminId == null)
-                return BadRequest();
-            var app = new App() {Name = createApp.Name, AdminId = (int)adminId };
-            var resApp = _backOfficeContext.Apps.Add(app).Entity;
+            // ReSharper disable once PossibleInvalidOperationException
+            var app = new App() {Name = createApp.Name, AdminId = (int)adminId};
+            var resApp = (await _backOfficeContext.Apps.AddAsync(app)).Entity;
             await _backOfficeContext.SaveChangesAsync();
-            return Ok(new AppModel(resApp.Id,resApp.Name));
+            return Ok(new AppModel(resApp.Id, resApp.Name));
         }
 
+        /// <summary>
+        /// Get information about application 
+        /// </summary>
+        /// <param name="appId">Id application</param>
+        /// <returns>AppModel or error if admin,app Id wasn't found</returns>
         [HttpGet]
         [Route("applications/{appId}")]
         [Authorize]
-        public async Task<ActionResult<AppModel>> GetAppInfo([FromRoute] int appId)
+        [ProducesResponseType(typeof(AppModel), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public ActionResult<AppModel> GetAppInfo([FromRoute,Required] int appId)
         {
+            string error = _authService.CheckId(User.Identity.Name, appId);
+            if (error != null)
+            {
+                return BadRequest(ErrorModel.IdErrorModel(error));
+            }
+
             var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
-            if (adminId == null)
-                return BadRequest();
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId) && (a.AdminId == adminId));
-            if (resApp == null)
-                return BadRequest();
-            return Ok(new AppModel(resApp.Id,resApp.Name));
+            // ReSharper disable once PossibleNullReferenceException
+            return Ok(new AppModel(resApp.Id, resApp.Name));
         }
+
+        /// <summary>
+        /// Delete application 
+        /// </summary>
+        /// <param name="appId">Id application</param>
+        /// <returns>200 or error if admin,app Id wasn't found</returns>
         [HttpDelete]
         [Route("applications/{appId}")]
         [Authorize]
-        public async Task<ActionResult> DeleteApp([FromRoute] int appId)
+        [ProducesResponseType( 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public async Task<ActionResult> DeleteApp([FromRoute, Required] int appId)
         {
+            string error = _authService.CheckId(User.Identity.Name, appId);
+            if (error != null)
+            {
+                return BadRequest(ErrorModel.IdErrorModel(error));
+            }
             var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
-            if (adminId == null)
-                return BadRequest();
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId) && (a.AdminId == adminId));
-            if (resApp == null)
-                return BadRequest();
-            _backOfficeContext.Remove(resApp);
-                await _backOfficeContext.SaveChangesAsync();
-                return Ok();
-
+            _backOfficeContext.Apps.Remove(resApp!);
+            await _backOfficeContext.SaveChangesAsync();
+            return Ok();
         }
-
+        /// <summary>
+        /// Put information of application 
+        /// </summary>
+        /// <param name="appId">Id application</param>
+        /// <param name="createApp">Object save information about application</param>
+        /// <returns>AppModel or error if admin,app id wasn't found</returns>
         [HttpPut]
         [Route("applications/{appId}")]
         [Authorize]
-        public async Task<ActionResult<AppModel>> PutApp([FromRoute] int appId, [FromBody] CreateAppModel createApp)
+        [ProducesResponseType(typeof(AppModel), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public async Task<ActionResult<AppModel>> PutApp([FromRoute, Required] int appId, [FromBody,Required] CreateAppModel createApp)
         {
+            string error = _authService.CheckId(User.Identity.Name, appId);
+            if (error != null)
+            {
+                return BadRequest(ErrorModel.IdErrorModel(error));
+            }
             var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
-            if (adminId == null)
-                return BadRequest();
             var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId) && (a.AdminId == adminId));
-            if (resApp == null)
-                return BadRequest();
             resApp.Name = createApp.Name;
             await _backOfficeContext.SaveChangesAsync();
             return Ok(new AppModel(resApp.Id, resApp.Name));
-
         }
 
-
+        /// <summary>
+        /// Get list of Socials which have settings for application
+        /// </summary>
+        /// <param name="appId">Id application</param>
+        /// <returns>SocialModelResponse[] or error if admin,app id wasn't found</returns>
         [HttpGet]
         [Route("applications/{appId}/socials")]
         [Authorize]
-        public async Task<ActionResult<SocialModelResponsecs[]>> GetSocials([FromRoute] int appId)
+        [ProducesResponseType(typeof(SocialModelResponse[]), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public ActionResult<SocialModelResponse[]> GetSocials([FromRoute, Required] int appId)
         {
-            var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
-            if (adminId == null)
-                return BadRequest();
-            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId) && (a.AdminId == adminId));
-            if (resApp == null)
-                return BadRequest();
-            var arrSoc = _backOfficeContext.Socials.Select(
-                s => new SocialModelResponsecs(s.Id, s.Name, _backOfficeContext.Settings.Any(s => s.SocialId == s.Id))).ToArray();
+            string error = _authService.CheckId(User.Identity.Name, appId);
+            if (error != null)
+            {
+                return BadRequest(ErrorModel.IdErrorModel(error));
+            }
+            var arrSoc = _backOfficeContext.Socials.Select(s => 
+                    new SocialModelResponse(s.Id, s.Name,  _backOfficeContext.Settings.
+                        Any(set => (s.Id == set.SocialId)&&(set.AppId == appId)))).ToArray();
             return Ok(arrSoc);
         }
+        /// <summary>
+        /// Get settings of application
+        /// </summary>
+        /// <param name="appId">Id application</param>
+        /// <param name="socialId">Id social</param>
+        /// <returns>SettingModel or error if admin,app,social id wasn't found</returns>
         [HttpGet]
         [Route("applications/{appId}/socials/{socialId}")]
         [Authorize]
-        public async Task<ActionResult<SettingModel>> GetSocialSetting([FromRoute] int socialId,[FromRoute] int appId)
+        [ProducesResponseType(typeof(SettingModel), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public ActionResult<SettingModel> GetSocialSetting([FromRoute, Required] int socialId,[FromRoute, Required] int appId)
         {
-            var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
-            if (adminId == null)
-                return BadRequest("This admin is not exist");
-            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId) && (a.AdminId == adminId));
-            if (resApp == null)
-                return BadRequest("This application is not exist");
-            var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
-            if (resSocial == null)
-                return BadRequest("This social is not exist");
-            var set = _backOfficeContext.Settings.FirstOrDefault(s => (s.AppId == appId) && (s.SocialId == socialId));
-            if (set == null)
+            string error = _authService.CheckId(User.Identity.Name, appId, socialId);
+            if (error != null)
             {
-                return BadRequest("This setting is not exist");
+                return BadRequest(ErrorModel.IdErrorModel(error));
             }
-            return Ok(new SettingModel(set.Id, set.AppId, _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name, set.SocialId, _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name, set.ClientId, set.SecretKey, set.Scope));
+            var set = _backOfficeContext.Settings.FirstOrDefault(s => (s.AppId == appId) && (s.SocialId == socialId));
+            // ReSharper disable once PossibleNullReferenceException
+            return Ok(
+                new SettingModel(
+                    set.Id, 
+                    set.AppId, 
+                    _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name, 
+                    set.SocialId, 
+                    _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name,
+                    set.ClientId, set.SecretKey, set.Scope));
         }
-        
+        /// <summary>
+        /// Post social settings of application
+        /// </summary>
+        /// <param name="appId">Id application</param>
+        /// <param name="socialId">Id social</param>
+        /// <param name="social">information of social setting</param>
+        /// <returns>SettingModel or error if admin,app,social id wasn't found</returns>
         [HttpPost]
         [Route("applications/{appId}/socials/{socialId}")]
         [Authorize]
-        public async Task<ActionResult<SettingModel>> PostSocialSetting([FromRoute] int socialId,[FromRoute] int appId, [FromBody] SocialCreateModel social)
+        [ProducesResponseType(typeof(SettingModel), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public async Task<ActionResult<SettingModel>> PostSocialSetting([FromRoute, Required] int socialId,[FromRoute, Required] int appId, [FromBody] SocialCreateModel social)
         {
-            var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
-            if (adminId == null)
-                return BadRequest();
-            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId)&&(a.AdminId == adminId));
-            if (resApp == null)
-                return BadRequest();
-            var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
-            if (resSocial == null)
-                return BadRequest();
-            var setting = new Setting()
+            string error = _authService.CheckId(User.Identity.Name, appId, socialId);
+            switch (error)
             {
-                ClientId = social.ClientId,
-                SecretKey = social.SecretKey,
-                Scope = social.Scope,
-                AppId = appId,
-                SocialId = socialId,
-            };
-            var set=(await  _backOfficeContext.Settings.AddAsync(setting)).Entity;
+                case "This setting is not existed":
+                {
+                    var setting = new Setting()
+                    {
+                        ClientId = social.ClientId,
+                        SecretKey = social.SecretKey,
+                        Scope = social.Scope,
+                        AppId = appId,
+                        SocialId = socialId,
+                    };
+                    var set = (await _backOfficeContext.Settings.AddAsync(setting)).Entity;
+                    await _backOfficeContext.SaveChangesAsync();
+                    return Ok(new SettingModel(set.Id, set.AppId,
+                        _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name, set.SocialId,
+                        _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name, set.ClientId, set.SecretKey,
+                        set.Scope));
+                }
+                case null:
+                    return BadRequest(ErrorModel.IdErrorModel("This setting already exist"));
+                default:
+                    return BadRequest(ErrorModel.IdErrorModel(error));
+            }
+        }
+        /// <summary>
+        /// Put social settings of application
+        /// </summary>
+        /// <param name="appId">Id application</param>
+        /// <param name="socialId">Id social</param>
+        /// <param name="social">information of social setting</param>
+        /// <returns>SettingModel or error if admin,app,social id wasn't found</returns>
+        [HttpPut]
+        [Route("applications/{appId}/socials/{socialId}")]
+        [Authorize]
+        [ProducesResponseType(typeof(SettingModel), 200)]
+        [ProducesResponseType(typeof(ErrorModel), 400)]
+        public async Task<ActionResult<SettingModel>> PutSocialSetting([FromRoute, Required] int socialId, [FromRoute, Required] int appId, [FromBody] SocialCreateModel social)
+        {
+            string error = _authService.CheckId(User.Identity.Name, appId, socialId);
+            if (error != null)
+            {
+                return BadRequest(ErrorModel.IdErrorModel(error));
+            }
+            var set = _backOfficeContext.Settings.FirstOrDefault(s => (s.AppId == appId) && (s.SocialId == socialId));
+            // ReSharper disable once PossibleNullReferenceException
+            set.ClientId = social.ClientId;
+            set.SecretKey = social.SecretKey;
+            set.Scope = social.Scope;
             await _backOfficeContext.SaveChangesAsync();
-            return Ok(new SettingModel(set.Id,set.AppId, _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name,set.SocialId, _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name,set.ClientId,set.SecretKey,set.Scope));
+            return Ok(
+                new SettingModel(
+                    set.Id,
+                    set.AppId,
+                    _backOfficeContext.Apps.FirstOrDefault(s => s.Id == appId)?.Name, 
+                    set.SocialId,
+                    _backOfficeContext.Socials.FirstOrDefault(s => s.Id == socialId)?.Name, 
+                    set.ClientId, set.SecretKey, set.Scope));
         }
     }
 }

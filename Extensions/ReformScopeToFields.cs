@@ -38,13 +38,14 @@ namespace PMAuth.Extensions
                 if (scopeUnit.StartsWith("user_"))
                 {
                     fields.Add(scopeUnit.Substring(5));
-                } else
+                } 
+                else if(!scopeUnit.Equals("public_profile"))
                 {
                     fields.Add(scopeUnit);
                 }
             }
 
-            return "&fields=" + string.Join(",", fields);
+            return "," + string.Join(",", fields);
         }
     }
 }

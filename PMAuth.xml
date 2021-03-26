@@ -151,6 +151,102 @@
             Path where stored a logo
             </summary>
         </member>
+        <member name="T:PMAuth.Controllers.AdminController">
+            <summary>
+            Admin Api for access to setting application
+            </summary>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.#ctor(PMAuth.AuthDbContext.BackOfficeContext,PMAuth.Services.AuthAdmin.AuthService,PMAuth.Services.AuthAdmin.RefreshTokenService,Microsoft.Extensions.Caching.Memory.IMemoryCache,Microsoft.Extensions.Logging.ILogger{PMAuth.Controllers.AdminController})">
+            <inheritdoc />
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.GetTokenTest">
+            <summary>
+            Get token for testing
+            </summary>
+            <returns>Token</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.GetTokenAndProfile(PMAuth.Models.RequestModels.SessionIdModel)">
+            <summary>
+            Get admin profile with token access
+            </summary>
+            <param name="sessionIdModel">Model which contains session ID</param>
+            <returns>AdminProfile or ErrorModel if profile wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.Refresh(System.String)">
+            <summary>
+            Get new access token 
+            </summary>
+            <param name="token">Old access token</param>
+            <returns>AuthModel or error if refresh token wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.GetApps">
+            <summary>
+            Get all applications foe logged in admin
+            </summary>
+            <returns>AppModel[] or error if refresh admin wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.PostApp(PMAuth.Models.CreateAppModel)">
+            <summary>
+            Post new application 
+            </summary>
+            <param name="createApp">Information about application</param>
+            <returns>AppModel or error if admin Id wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.GetAppInfo(System.Int32)">
+            <summary>
+            Get information about application 
+            </summary>
+            <param name="appId">Id application</param>
+            <returns>AppModel or error if admin,app Id wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.DeleteApp(System.Int32)">
+            <summary>
+            Delete application 
+            </summary>
+            <param name="appId">Id application</param>
+            <returns>200 or error if admin,app Id wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.PutApp(System.Int32,PMAuth.Models.CreateAppModel)">
+            <summary>
+            Put information of application 
+            </summary>
+            <param name="appId">Id application</param>
+            <param name="createApp">Object save information about application</param>
+            <returns>AppModel or error if admin,app id wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.GetSocials(System.Int32)">
+            <summary>
+            Get list of Socials which have settings for application
+            </summary>
+            <param name="appId">Id application</param>
+            <returns>SocialModelResponse[] or error if admin,app id wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.GetSocialSetting(System.Int32,System.Int32)">
+            <summary>
+            Get settings of application
+            </summary>
+            <param name="appId">Id application</param>
+            <param name="socialId">Id social</param>
+            <returns>SettingModel or error if admin,app,social id wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.PostSocialSetting(System.Int32,System.Int32,PMAuth.Models.SocialCreateModel)">
+            <summary>
+            Post social settings of application
+            </summary>
+            <param name="appId">Id application</param>
+            <param name="socialId">Id social</param>
+            <param name="social">information of social setting</param>
+            <returns>SettingModel or error if admin,app,social id wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.PutSocialSetting(System.Int32,System.Int32,PMAuth.Models.SocialCreateModel)">
+            <summary>
+            Put social settings of application
+            </summary>
+            <param name="appId">Id application</param>
+            <param name="socialId">Id social</param>
+            <param name="social">information of social setting</param>
+            <returns>SettingModel or error if admin,app,social id wasn't found</returns>
+        </member>
         <member name="T:PMAuth.Controllers.ProfileController">
             <summary>
             Get user profile by session id
@@ -255,6 +351,8 @@
             10 - Session id expired or doesn't exists
             12 - User aborted authorization
             14 - Error occured during authorization
+            16 - Invalid id
+            18 - Token error
             </summary>
         </member>
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.Error">
@@ -285,6 +383,53 @@
                 as Http query
             </returns>
         </member>
+        <member name="T:PMAuth.Models.AppModel">
+            <summary>
+            Model application with information
+            </summary>
+        </member>
+        <member name="M:PMAuth.Models.AppModel.#ctor(System.Int32,System.String)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.AppModel.Id">
+            <summary>
+            Application Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.AppModel.Name">
+            <summary>
+            Name application
+            </summary>
+        </member>
+        <member name="M:PMAuth.Models.AuthModel.#ctor(System.String,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="name"></param>
+            <param name="token"></param>
+        </member>
+        <member name="P:PMAuth.Models.AuthModel.Name">
+            <summary>
+            Name admin
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.AuthModel.Token">
+            <summary>
+            Jwt Access token
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.CreateAppModel">
+            <summary>
+            Model of information about application will be created
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.CreateAppModel.Name">
+            <summary>
+            Name application
+            </summary>
+        </member>
         <member name="T:PMAuth.Models.OAuthFacebook.FacebookInfoModel">
             <summary>
             Facebook user information model on scopes
@@ -295,9 +440,19 @@
             User id.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Name">
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.FirstName">
             <summary>
-            User full name.
+            User first name.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.LastName">
+            <summary>
+            User last name.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.FullName">
+            <summary>
+            Full user's name
             </summary>
         </member>
         <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Email">
@@ -369,6 +524,9 @@
             <summary>
             Access token what need from authentication
             </summary>
+        </member>
+        <member name="M:PMAuth.Models.OAuthUniversal.AdminProfile.#ctor(PMAuth.Models.OAuthUniversal.UserProfile)">
+            <inheritdoc />
         </member>
         <member name="T:PMAuth.Models.OAuthUniversal.CacheModel">
             <summary>
@@ -544,6 +702,62 @@
             <summary>
             Scope
             </summary>
+        </member>
+        <member name="M:PMAuth.Models.SettingModel.#ctor(System.Int32,System.Int32,System.String,System.Int32,System.String,System.String,System.String,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="id"></param>
+            <param name="appId"></param>
+            <param name="appName"></param>
+            <param name="socialId"></param>
+            <param name="socialName"></param>
+            <param name="clientId"></param>
+            <param name="secretKey"></param>
+            <param name="scope"></param>
+        </member>
+        <member name="P:PMAuth.Models.SocialCreateModel.ClientId">
+            <summary>
+            Client Id
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialCreateModel.Scope">
+            <summary>
+            Scope
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialCreateModel.SecretKey">
+            <summary>
+            Secret Key
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.SocialModelResponse">
+            <summary>
+            Model of information about social 
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialModelResponse.Id">
+            <summary>
+            Id social
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialModelResponse.Name">
+            <summary>
+            Name social
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialModelResponse.IsSetting">
+            <summary>
+            True if this social have setting for application
+            </summary>
+        </member>
+        <member name="M:PMAuth.Models.SocialModelResponse.#ctor(System.Int32,System.String,System.Boolean)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="id"></param>
+            <param name="name"></param>
+            <param name="isSetting"></param>
         </member>
         <member name="T:PMAuth.Models.SocialsClient.SocialLinkModel">
             <summary>

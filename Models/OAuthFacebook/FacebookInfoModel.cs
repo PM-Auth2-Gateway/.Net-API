@@ -18,10 +18,22 @@ namespace PMAuth.Models.OAuthFacebook
         public string Id { get; set; }
 
         /// <summary>
-        /// User full name.
+        /// User first name.
+        /// </summary>
+        [JsonPropertyName("first_name")]
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// User last name.
+        /// </summary>
+        [JsonPropertyName("last_name")]
+        public string LastName { get; set; }
+
+        /// <summary>
+        /// Full user's name
         /// </summary>
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string FullName { get; set; }
 
         /// <summary>
         /// User registered Email.

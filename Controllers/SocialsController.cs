@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using PMAuth.AuthDbContext;
 using PMAuth.AuthDbContext.Entities;
-using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.SocialsClient;
 

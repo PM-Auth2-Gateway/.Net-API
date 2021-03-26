@@ -12,6 +12,8 @@ namespace PMAuth.Exceptions.Models
         /// 10 - Session id expired or doesn't exists
         /// 12 - User aborted authorization
         /// 14 - Error occured during authorization
+        /// 16 - Invalid id
+        /// 18 - Token error
         /// </summary>
         public int ErrorCode { get; set; }
         
@@ -26,7 +28,7 @@ namespace PMAuth.Exceptions.Models
         /// </summary>
         [JsonPropertyName("error_description")]
         public string ErrorDescription { get; set; }
-
+        
         public static ErrorModel SessionIdError => new ErrorModel
         {
             ErrorCode = 10,
@@ -45,6 +47,18 @@ namespace PMAuth.Exceptions.Models
         {
             ErrorCode = 14,
             Error = "Authorization error",
+            ErrorDescription = description
+        };
+        public static ErrorModel IdErrorModel(string description) => new ErrorModel
+        {
+            ErrorCode = 16,
+            Error = "Invalid id",
+            ErrorDescription = description
+        };
+        public static ErrorModel TokenErrorModel(string description) => new ErrorModel
+        {
+            ErrorCode = 18,
+            Error = "Token error",
             ErrorDescription = description
         };
     }
