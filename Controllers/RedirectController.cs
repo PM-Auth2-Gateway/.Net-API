@@ -136,7 +136,7 @@ namespace PMAuth.Controllers
             catch (AuthorizationCodeExchangeException exception)
             {
                 _logger.LogError("Error occured during authorization code exchange or process of receiving user profile from social service\n " +
-                                 $"Error: {exception.Description.Error}\n ErrorDescription: {exception.Description.ErrorDescription}");
+                                 $"Error: {exception.Description?.Error}\n ErrorDescription: {exception.Description?.ErrorDescription}");
             }
 
             if (device.Equals("browser"))
