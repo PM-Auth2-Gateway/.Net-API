@@ -48,7 +48,7 @@ namespace PMAuth.Controllers
             _refreshTokenService = refreshTokenService;
         }
         /// <summary>
-        /// Get token from testing
+        /// Get token for testing
         /// </summary>
         /// <returns>Token</returns>
         [HttpPost("testToken")]
@@ -130,7 +130,8 @@ namespace PMAuth.Controllers
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
                 new CookieOptions
                 {
-                    HttpOnly = true
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax
                 });
             admin.Token = encodedJwt;
             return new JsonResult(admin);
@@ -161,13 +162,14 @@ namespace PMAuth.Controllers
             Response.Cookies.Append("X-Refresh-Token",refreshToken,
                 new CookieOptions
                 {
-                    HttpOnly = true
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax
                 });
             return new JsonResult(new AuthModel(username, new JwtSecurityTokenHandler().WriteToken(newJwtToken)));
         }
 
         /// <summary>
-        /// Get all applications from login admin
+        /// Get all applications foe logged in admin
         /// </summary>
         /// <returns>AppModel[] or error if refresh admin wasn't found</returns>
         [HttpGet]
@@ -205,7 +207,6 @@ namespace PMAuth.Controllers
             {
                 return BadRequest(ErrorModel.IdErrorModel(error));
             }
-
             var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == User.Identity.Name)?.Id;
             // ReSharper disable once PossibleInvalidOperationException
             var app = new App() {Name = createApp.Name, AdminId = (int)adminId};
