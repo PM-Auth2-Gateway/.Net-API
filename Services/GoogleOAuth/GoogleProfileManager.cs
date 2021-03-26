@@ -13,6 +13,8 @@ namespace PMAuth.Services.GoogleOAuth
 {
     public class GoogleProfileManager : IProfileManagingService
     {
+        public string SocialServiceName => "google";
+
         private readonly IMemoryCache _memoryCache;
 
         public GoogleProfileManager(IMemoryCache memoryCache)
