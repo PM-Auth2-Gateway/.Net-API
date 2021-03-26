@@ -8,6 +8,14 @@ namespace PMAuth.Exceptions.Models
     public class ErrorModel
     {
         /// <summary>
+        /// Error code.
+        /// 10 - Session id expired or doesn't exists
+        /// 12 - User aborted authorization
+        /// 14 - Error occured during authorization
+        /// </summary>
+        public int ErrorCode { get; set; }
+        
+        /// <summary>
         /// Error
         /// </summary>
         [JsonPropertyName("error")]
@@ -18,11 +26,26 @@ namespace PMAuth.Exceptions.Models
         /// </summary>
         [JsonPropertyName("error_description")]
         public string ErrorDescription { get; set; }
+
+        public static ErrorModel SessionIdError => new ErrorModel
+        {
+            ErrorCode = 10,
+            Error = "Session id expired or doesn't exists",
+            ErrorDescription = "There is no profile related to provided session id"
+        };
         
-        /// <summary>
-        /// Error reason
-        /// </summary>
-        [JsonPropertyName("error_reason")]
-        public string ErrorReason { get; set; }
+        public static ErrorModel AuthAborted => new ErrorModel
+        {
+            ErrorCode = 12,
+            Error = "User did not confirm authorization",
+            ErrorDescription = "User dropped authorization process"
+        };
+        
+        public static ErrorModel AuthError(string description) => new ErrorModel
+        {
+            ErrorCode = 14,
+            Error = "Authorization error",
+            ErrorDescription = description
+        };
     }
 }

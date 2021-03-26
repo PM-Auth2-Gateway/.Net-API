@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using PMAuth.AuthDbContext.Entities;
 
-namespace PMAuth.Models
+namespace PMAuth.Models.SocialsClient
 {
     /// <summary>
     /// A social model.

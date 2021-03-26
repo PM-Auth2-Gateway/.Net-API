@@ -34,5 +34,10 @@
         /// Redirect Url
         /// </summary>
         public string RedirectUri { get; set; }
+
+        /// <summary>
+        /// If error occured this property is not null. If it is null, then everything is fine
+        /// </summary>
+        public bool UserStartedAuthorization { get; set; }
     }
 }

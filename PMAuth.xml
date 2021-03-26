@@ -146,6 +146,11 @@
             Token Url - adress which operate with tokens
             </summary>
         </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Social.LogoPath">
+            <summary>
+            Path where stored a logo
+            </summary>
+        </member>
         <member name="T:PMAuth.Controllers.ProfileController">
             <summary>
             Get user profile by session id
@@ -164,20 +169,18 @@
             Controller for handling redirect from social network services
             </summary>
         </member>
-        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeGoogle(System.String,PMAuth.Models.RequestModels.RedirectionErrorModelGoogle,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeGoogle(PMAuth.Models.RequestModels.RedirectionErrorModelGoogle,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
             <summary>
             Handle redirect from Google
             </summary>
-            <param name="name"></param>
             <param name="error"></param>
             <param name="authorizationCode"></param>
             <returns></returns>
         </member>
-        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeFacebook(System.String,PMAuth.Models.RequestModels.RedirectionErrorModelFacebook,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+        <member name="M:PMAuth.Controllers.RedirectController.ReceiveAuthorizationCodeFacebook(PMAuth.Models.RequestModels.RedirectionErrorModelFacebook,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
             <summary>
             Handle redirect from Facebook
             </summary>
-            <param name="name"></param>
             <param name="error"></param>
             <param name="authorizationCode"></param>
             <returns></returns>
@@ -207,7 +210,7 @@
             Get SocialModel from app_id header
             </remarks>
         </member>
-        <member name="M:PMAuth.Controllers.SocialsController.GetLinkParameters(System.Int32,PMAuth.Models.SocialModel)">
+        <member name="M:PMAuth.Controllers.SocialsController.GetLinkParameters(System.Int32,PMAuth.Models.SocialsClient.SocialModel)">
             <summary>
             Get parameters for social auth link.
             </summary>
@@ -246,6 +249,14 @@
             Error model that will be returned if something will go wrong after user redirection to social network service 
             </summary>
         </member>
+        <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorCode">
+            <summary>
+            Error code.
+            10 - Session id expired or doesn't exists
+            12 - User aborted authorization
+            14 - Error occured during authorization
+            </summary>
+        </member>
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.Error">
             <summary>
             Error
@@ -256,19 +267,62 @@
             Detailed description of an error
             </summary>
         </member>
-        <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorReason">
+        <member name="T:PMAuth.Extensions.ReformScopeToFields">
             <summary>
-            Error reason
+            Class reform all scope values to Facebook fields, to perform user info request.
+            </summary>
+        </member>
+        <member name="M:PMAuth.Extensions.ReformScopeToFields.Transform(System.String)">
+            <summary>
+            Method checks if scope is empty or null, then return nothing;
+            Else transform sopes to fields values
+            </summary>
+            <param name="scope">User Scope</param>
+            <returns>
+            Empty string if scope is emty
+                Or
+            Valid fields values, 
+                as Http query
+            </returns>
+        </member>
+        <member name="T:PMAuth.Models.OAuthFacebook.FacebookInfoModel">
+            <summary>
+            Facebook user information model on scopes
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Id">
+            <summary>
+            User id.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Name">
+            <summary>
+            User full name.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Email">
+            <summary>
+            User registered Email.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.AdditionalInformation">
+            <summary>
+            Key-value pairs ("paramName": "value") of additional information about user.
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthFacebook.FacebookProperties">
+            <summary>
+            Json facebook properties
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookProperties.GetProfileLink">
+            <summary>
+            Facebook link that getting user info
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthFacebook.FacebookTokensModel">
             <summary>
-            Model for retrieving access and refresh tokens from Facebook 
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.IdToken">
-            <summary>
-            JWT token which contains all user info according to used scope
+            Model for retrieving access token and scope from Facebook 
             </summary>
         </member>
         <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.TokenType">
@@ -279,11 +333,6 @@
         <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.Scope">
             <summary>
             Used scope
-            </summary>
-        </member>
-        <member name="P:PMAuth.Models.OAuthFacebook.FacebookTokensModel.RefreshToken">
-            <summary>
-            Refresh token
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthGoogle.GoogleTokensModel">
@@ -356,6 +405,11 @@
             Redirect Url
             </summary>
         </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.UserStartedAuthorization">
+            <summary>
+            If error occured this property is not null. If it is null, then everything is fine
+            </summary>
+        </member>
         <member name="T:PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel">
             <summary>
             Authorization code model 
@@ -409,6 +463,11 @@
         <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.LastName">
             <summary>
             User's last name received from the social network (may be absent)
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.Name">
+            <summary>
+            Full user's name
             </summary>
         </member>
         <member name="P:PMAuth.Models.OAuthUniversal.UserProfile.Email">
@@ -486,57 +545,57 @@
             Scope
             </summary>
         </member>
-        <member name="T:PMAuth.Models.SocialLinkModel">
+        <member name="T:PMAuth.Models.SocialsClient.SocialLinkModel">
             <summary>
             Social Link parameters
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.AuthUri">
+        <member name="P:PMAuth.Models.SocialsClient.SocialLinkModel.AuthUri">
             <summary>
             Auth Uri - base link of some service which offer authentication.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.RedirectUri">
+        <member name="P:PMAuth.Models.SocialsClient.SocialLinkModel.RedirectUri">
             <summary>
             Redirect Uri - on which adress.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.ResponseType">
+        <member name="P:PMAuth.Models.SocialsClient.SocialLinkModel.ResponseType">
             <summary>
             Response Type - default = code.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.ClientId">
+        <member name="P:PMAuth.Models.SocialsClient.SocialLinkModel.ClientId">
             <summary>
             Client Id.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.Scope">
+        <member name="P:PMAuth.Models.SocialsClient.SocialLinkModel.Scope">
             <summary>
             Scope - bunch of accessed information by user.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialLinkModel.State">
+        <member name="P:PMAuth.Models.SocialsClient.SocialLinkModel.State">
             <summary>
             State - session id.
             </summary>
         </member>
-        <member name="T:PMAuth.Models.SocialModel">
+        <member name="T:PMAuth.Models.SocialsClient.SocialModel">
             <summary>
             Requested social model
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialModel.SocialId">
+        <member name="P:PMAuth.Models.SocialsClient.SocialModel.SocialId">
             <summary>
             Social Id.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.SocialModel.Device">
+        <member name="P:PMAuth.Models.SocialsClient.SocialModel.Device">
             <summary>
             Device - field which inform what type of device will recieve a redirect
             </summary>
         </member>
-        <member name="T:PMAuth.Models.SocialsModel">
+        <member name="T:PMAuth.Models.SocialsClient.SocialsModel">
             <summary>
             A social model.
             </summary>
@@ -544,7 +603,7 @@
             Model has list of socials.
             </remarks>
         </member>
-        <member name="P:PMAuth.Models.SocialsModel.Socials">
+        <member name="P:PMAuth.Models.SocialsClient.SocialsModel.Socials">
             <summary>
             List of socials which is registered by user in some application.
             </summary>
@@ -579,12 +638,23 @@
             DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
             </exception>
         </member>
+        <member name="T:PMAuth.Services.Abstract.IProfileManagingService">
+            <summary>
+            Managing user's profile information
+            </summary>
+        </member>
         <member name="M:PMAuth.Services.Abstract.IProfileManagingService.GetUserProfileAsync(PMAuth.Models.OAuthUniversal.TokenModel,System.String)">
             <summary>
-            
+            Method gets user profile in registered socials,
+                by their tokens and user session id.
             </summary>
-            <param name="tokensModel"></param>
-            <returns></returns>
+            <param name="tokensModel">
+            Token model, which contains tokens and may being extends.
+            </param>
+            <param name="sessionId">
+            User session Id that gives when user push the auth button
+            </param>
+            <returns>Nothing</returns>
         </member>
         <member name="T:PMAuth.Services.Abstract.IUserProfileReceivingServiceContext">
             <summary>
@@ -617,6 +687,27 @@
             The request failed due to an underlying issue such as network connectivity,
             DNS failure, server certificate validation, timeout or HTTP response is unsuccessful.
             </exception>
+        </member>
+        <member name="T:PMAuth.Services.FacebookOAuth.FacebookAccessTokenReceivingService">
+            <summary>
+            Service that operates Facebook Access token
+            </summary>
+        </member>
+        <member name="M:PMAuth.Services.FacebookOAuth.FacebookAccessTokenReceivingService.ExchangeAuthorizationCodeForTokens(System.Int32,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
+            <summary>
+            Method that exchange user authorization code for tokens
+            </summary>
+            <param name="appId">Application Id</param>
+            <param name="authorizationCodeModel">
+            Authorization model that has code, scope and state
+            </param>
+            <returns>Tokens model</returns>
+        </member>
+        <member name="T:PMAuth.Services.FacebookOAuth.FacebookProfileManager">
+            <summary>
+            Managing user's Facebook profile information 
+            - get user info via tokens
+            </summary>
         </member>
         <member name="T:PMAuth.Services.MigrationService">
             <summary>

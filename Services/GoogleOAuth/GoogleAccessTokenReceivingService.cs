@@ -20,10 +20,10 @@ namespace PMAuth.Services.GoogleOAuth
 {
     public class GoogleAccessTokenReceivingService : IAccessTokenReceivingService
     {
+        public string SocialServiceName => "google";
+        
         private readonly BackOfficeContext _context;
-
         private readonly IMemoryCache _memoryCache;
-
         private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
         private readonly HttpClient _httpClient;
 
@@ -113,7 +113,6 @@ namespace PMAuth.Services.GoogleOAuth
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                //RequestUri = new Uri($"{tokenUri}?code={code}&redirect_uri={redirectUri}&client_id={clientId}&client_secret={clientSecret}&scope=&grant_type=authorization_code"),
                 RequestUri = new Uri(tokenUri)
                     .AddQuery("code", code)
                     .AddQuery("redirect_uri", redirectUri)
@@ -130,7 +129,7 @@ namespace PMAuth.Services.GoogleOAuth
             catch (HttpRequestException exception)
             {
                 _logger.LogWarning("The request failed due to an underlying issue such as " +
-                                       "network connectivity, DNS failure, server certificate validation or timeout");
+                                   "network connectivity, DNS failure, server certificate validation or timeout");
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Google", exception);
             }
 
