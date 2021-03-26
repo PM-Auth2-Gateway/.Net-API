@@ -138,7 +138,11 @@ namespace PMAuth.Controllers
             _refreshTokenService.SaveRefreshToken(refreshToken);
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
                 new CookieOptions
-                { });
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
             admin.Token = encodedJwt;
             return new JsonResult(admin);
         }
@@ -166,7 +170,12 @@ namespace PMAuth.Controllers
             _refreshTokenService.DeleteRefreshToken(refreshToken);
             _refreshTokenService.SaveRefreshToken(newRefreshToken);
             Response.Cookies.Append("X-Refresh-Token",refreshToken,
-                new CookieOptions { });
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
             return new JsonResult(new AuthModel(username, new JwtSecurityTokenHandler().WriteToken(newJwtToken)));
         }
 
