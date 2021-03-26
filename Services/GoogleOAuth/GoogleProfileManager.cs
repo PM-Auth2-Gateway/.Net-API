@@ -45,7 +45,6 @@ namespace PMAuth.Services.GoogleOAuth
         /*private async Task<UserProfile> GetProfileFromAPICall(GoogleTokensModel tokensModel)
         {
             // here can be awaitable code, so GetUserProfileAsync should stay async for now
-            //TODO add variant of getting user profile via Google OAuth API
             return null;
         }*/
         

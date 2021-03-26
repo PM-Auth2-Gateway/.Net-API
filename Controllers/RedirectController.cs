@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
@@ -10,6 +12,7 @@ using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Models.RequestModels;
 using PMAuth.Services.Abstract;
 
+
 namespace PMAuth.Controllers
 {
     /// <summary>
@@ -17,6 +20,7 @@ namespace PMAuth.Controllers
     /// </summary>
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
+    [SuppressMessage("ReSharper", "TemplateIsNotCompileTimeConstantProblem")]
     public class RedirectController : ControllerBase
     {
         private readonly IUserProfileReceivingServiceContext _userProfileReceivingServiceContext;
@@ -24,6 +28,7 @@ namespace PMAuth.Controllers
         private readonly IEnumerable<IProfileManagingService> _profileManagingServices;
         private readonly BackOfficeContext _context;
         private readonly IMemoryCache _memoryCache;
+        private readonly ILogger<RedirectController> _logger;
 
 #pragma warning disable 1591
         public RedirectController(
@@ -31,12 +36,14 @@ namespace PMAuth.Controllers
             IEnumerable<IAccessTokenReceivingService> tokenReceivingServices,
             IEnumerable<IProfileManagingService> profileManagingServices,
             IMemoryCache memoryCache,
-            BackOfficeContext context)
+            BackOfficeContext context, 
+            ILogger<RedirectController> logger)
         {
             _userProfileReceivingServiceContext = userProfileReceivingServiceContext;
             _tokenReceivingServices = tokenReceivingServices;
             _profileManagingServices = profileManagingServices;
             _context = context;
+            _logger = logger;
             _memoryCache = memoryCache;
         }
 #pragma warning restore 1591
@@ -56,11 +63,14 @@ namespace PMAuth.Controllers
         {
             if (authorizationCode?.SessionId == null)
             {
+                _logger.LogError("Received redirect request from Google without session id (state)");
                 return BadRequest(ErrorModel.AuthError("Session Id is missing."));
             }
 
             if (error.Error != null || error.ErrorDescription != null)
             {
+                _logger.LogError("Received redirect request from Google with error query params: " +
+                                 $"{error.Error}  |  {error.ErrorDescription}");
                 return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
             }
             
@@ -87,11 +97,14 @@ namespace PMAuth.Controllers
         {
             if (authorizationCode?.SessionId == null)
             {
+                _logger.LogError("Received redirect request from Facebook without session id (state)");
                 return BadRequest(ErrorModel.AuthError("Session Id is missing."));
             }
             
             if (error.Error != null || error.ErrorDescription != null)
             {
+                _logger.LogError("Received redirect request from Facebook with error query params: " +
+                                 $"{error.Error}  |  {error.ErrorDescription}");
                 return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
             }
 
@@ -112,6 +125,7 @@ namespace PMAuth.Controllers
             CacheModel session = _memoryCache.Get<CacheModel>(authorizationCode.SessionId);
             if (session == null)
             {
+                _logger.LogError("Authorization time has expired");
                 return BadRequest(ErrorModel.AuthError("Time for authorization has expired"));
             }
             string device = session.Device.ToLower().Trim();
@@ -121,9 +135,12 @@ namespace PMAuth.Controllers
             {
                 _userProfileReceivingServiceContext.Execute(session.AppId, authorizationCode);
             }
-            catch (AuthorizationCodeExchangeException)
+            catch (AuthorizationCodeExchangeException exception)
             {
-
+                _logger.LogError("Error occured during authorization code exchange " +
+                                 "or process of receiving user profile from social service " +
+                                 $"Error: {exception.Description.Error}\n" +
+                                 $"ErrorDescription^ {exception.Description.ErrorDescription}");
             }
 
             if (device.Equals("browser"))
