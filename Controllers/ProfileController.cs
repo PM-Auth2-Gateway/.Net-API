@@ -36,6 +36,7 @@ namespace PMAuth.Controllers
         [HttpPost("info")]
         [ProducesResponseType(typeof(UserProfile), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
+        [ProducesResponseType(typeof(ErrorModel), 401)]
         public async Task<IActionResult> GetUserProfileAsync(
             [FromHeader(Name = "App_id")] int appId, 
             [FromBody] SessionIdModel sessionIdModel)
@@ -56,7 +57,7 @@ namespace PMAuth.Controllers
 
             if (sessionInfo.UserStartedAuthorization == false)
             {
-                return BadRequest(ErrorModel.AuthAborted);
+                return BadRequest(ErrorModel.AuthorizationAborted);
             }
             
             isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
@@ -81,7 +82,7 @@ namespace PMAuth.Controllers
             {
                 _logger.LogError("Unable to find user's profile in memory cache." +
                                  "Error occured during the authorization process");
-                return BadRequest(ErrorModel.AuthError("Error occured during the authorization process. " +
+                return BadRequest(ErrorModel.AuthorizationError("Error occured during the authorization process. " +
                                                        "Unable to receive user's profile for some reasons"));
             }
 

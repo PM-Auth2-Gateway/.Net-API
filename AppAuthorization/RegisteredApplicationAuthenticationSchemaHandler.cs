@@ -3,9 +3,13 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using PMAuth.AuthDbContext;
+using PMAuth.Exceptions.Models;
+
 #pragma warning disable 1591
 
 namespace PMAuth.AppAuthorization
@@ -28,19 +32,19 @@ namespace PMAuth.AppAuthorization
         {
             if (Request.Headers.ContainsKey("App_id") == false)
             {
-                return AuthenticateResult.Fail("Missing App_id Header");
+                return await HandleAuthenticationFail("Missing App_id Header");
             }
 
             string appIdRaw = Request.Headers["App_id"];
             if (int.TryParse(appIdRaw, out int appId) == false)
             {
-                return AuthenticateResult.Fail("Invalid App_id Header");
+                return await HandleAuthenticationFail("Invalid App_id Header");
             }
 
             bool isRegistered = _context.Apps.Any(a => a.Id == appId);
             if (isRegistered == false)
             {
-                return AuthenticateResult.Fail("Unregistered App_id");
+                return await HandleAuthenticationFail("Unregistered App_id");
             }
             
             Claim[] claims = {
@@ -52,6 +56,17 @@ namespace PMAuth.AppAuthorization
             AuthenticationTicket ticket = new AuthenticationTicket(principal, Scheme.Name);
                     
             return AuthenticateResult.Success(ticket);
+        }
+
+        private async Task<AuthenticateResult> HandleAuthenticationFail(string errorMessage)
+        {
+            Context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            
+            string result = JsonConvert.SerializeObject(ErrorModel.UnauthorizedAccessModel(errorMessage));
+            Context.Response.ContentType = "application/json";
+            await Context.Response.WriteAsync(result);
+            
+            return AuthenticateResult.Fail(errorMessage);
         }
     }
 }
