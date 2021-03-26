@@ -24,7 +24,7 @@ namespace PMAuth.Services.AuthAdmin
                 new Claim(ClaimsIdentity.DefaultNameClaimType, name),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin")
             };
-            ClaimsIdentity claimsIdentity = //new ClaimsIdentity(claims, "Token");
+            ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
             return claimsIdentity;
@@ -69,6 +69,36 @@ namespace PMAuth.Services.AuthAdmin
                 throw new SecurityTokenException("Invalid token");
 
             return principal;
+        }
+
+        public string CheckId(string adminName)
+        {
+            var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == adminName)?.Id;
+            return adminId == null ? "This admin is not existed" : null;
+        }
+        public string CheckId(string adminName, int appId)
+        {
+            var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == adminName)?.Id;
+            if(adminId == null)
+                return "This admin is not existed";
+            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId) && (a.AdminId == adminId));
+            return resApp == null ? "This application is not existed" : null;
+
+        }
+
+        public string CheckId(string adminName, int appId, int socialId)
+        {
+            var adminId = _backOfficeContext.Admins.FirstOrDefault(a => a.Name == adminName)?.Id;
+            if (adminId == null)
+                return "This admin is not existed";
+            var resApp = _backOfficeContext.Apps.FirstOrDefault(a => (a.Id == appId) && (a.AdminId == adminId));
+            if (resApp == null)
+                return "This application is not existed";
+            var resSocial = _backOfficeContext.Socials.FirstOrDefault(a => a.Id == socialId);
+            if (resSocial == null)
+                return "This social is not existed";
+            var set = _backOfficeContext.Settings.FirstOrDefault(s =>(s.AppId == appId) && (s.SocialId == socialId));
+            return set == null ? "This setting is not existed" : null;
         }
     }
 }

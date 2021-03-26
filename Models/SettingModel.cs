@@ -1,43 +1,64 @@
-﻿namespace PMAuth.Models
+﻿using System.Text.Json.Serialization;
+
+namespace PMAuth.Models
 {
     public class SettingModel
     {
         /// <summary>
         /// Setting id (identity)
         /// </summary>
-        public int Id { get; set; }
+        [JsonPropertyName("id")]
+        public int Id { get; }
 
         /// <summary>
         /// App Id
         /// </summary>
-        public int AppId { get; set; }
+        [JsonPropertyName("app_id")]
+        public int AppId { get;  }
         /// <summary>
         /// App name
         /// </summary>
-        public string AppName { get; set; }
+        [JsonPropertyName("app_name")]
+        public string AppName { get;  }
 
         /// <summary>
         /// Social Id
         /// </summary>
-        public int SocialId { get; set; }
+        [JsonPropertyName("social_id")]
+        public int SocialId { get;  }
         /// <summary>
         /// Social name
         /// </summary>
-        public string SocialName { get; set; }
+        [JsonPropertyName("social_name")]
+        public string SocialName { get; }
 
         /// <summary>
         /// Client Id
         /// </summary>
-        public string ClientId { get; set; }
+        [JsonPropertyName("client_id")]
+        public string ClientId { get;  }
         /// <summary>
         /// Secret Key
         /// </summary>
-        public string SecretKey { get; set; }
+        [JsonPropertyName("secret_key")]
+        public string SecretKey { get;  }
         /// <summary>
         /// Scope
         /// </summary>
-        public string Scope { get; set; }
+        [JsonPropertyName("scope")]
+        public string Scope { get;  }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="appId"></param>
+        /// <param name="appName"></param>
+        /// <param name="socialId"></param>
+        /// <param name="socialName"></param>
+        /// <param name="clientId"></param>
+        /// <param name="secretKey"></param>
+        /// <param name="scope"></param>
         public SettingModel(int id, int appId, string appName, int socialId, string socialName, string clientId, string secretKey, string scope)
         {
             Id = id;
