@@ -1,36 +1,46 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using PMAuth.AuthDbContext;
+using PMAuth.AuthDbContext.Entities;
 
 namespace PMAuth.Services.AuthAdmin
 {
     public class RefreshTokenService
     {
-        private readonly ConcurrentDictionary<string, RefreshTokenModel> refreshTokenDictionary = new ConcurrentDictionary<string, RefreshTokenModel>();
+        private readonly BackOfficeContext _backOfficeContext;
 
-        public string GetRefreshToken(string login)
+        public RefreshTokenService(BackOfficeContext backOfficeContext)
         {
-            var removes= refreshTokenDictionary.Where(r => r.Value.TimeOut());
-            removes.Select(r => refreshTokenDictionary.TryRemove(r.Key, out _));
-            if (refreshTokenDictionary.TryGetValue(login, out RefreshTokenModel token))
-            {
-                return token.RefreshToken;
-            }
-
-            return null;
+            _backOfficeContext = backOfficeContext;
         }
 
-        internal void DeleteRefreshToken(string username)
+        internal bool CheckRefreshToken(string token)
         {
-            refreshTokenDictionary.TryRemove(username,out _);
+            return _backOfficeContext.RefreshTokens.FirstOrDefault(r=>r.RefreshTokenValue == token)!=null;
         }
 
-        internal void SaveRefreshToken(string username, string newRefreshToken)
+        internal void DeleteRefreshToken(string token)
         {
-            if(!refreshTokenDictionary.TryAdd(username,new RefreshTokenModel(newRefreshToken,DateTime.UtcNow)))
+            if (!CheckRefreshToken(token))
             {
-                refreshTokenDictionary[username] = new RefreshTokenModel(newRefreshToken, DateTime.UtcNow);
+                return;
             }
+
+            var refresh = _backOfficeContext.RefreshTokens.FirstOrDefault(r => r.RefreshTokenValue == token);
+            _backOfficeContext.RefreshTokens.Remove(refresh);
+            _backOfficeContext.SaveChanges();
+        }
+
+        internal void SaveRefreshToken(string newRefreshToken)
+        {
+            _backOfficeContext.RefreshTokens.Add(new RefreshToken()
+            {
+                RefreshTokenValue = newRefreshToken,
+                ExpiresTime = DateTime.UtcNow.AddDays(AuthOptions.LIFETIMEREFRESH)
+            });
+
+            _backOfficeContext.SaveChanges();
         }
     } 
 }

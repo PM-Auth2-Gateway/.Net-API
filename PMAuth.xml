@@ -206,7 +206,7 @@
         </member>
         <member name="M:PMAuth.Controllers.AdminController.GetApps">
             <summary>
-            Get all applications foe logged in admin
+            Get all applications for logged in admin
             </summary>
             <returns>AppModel[] or error if refresh admin wasn't found</returns>
         </member>
