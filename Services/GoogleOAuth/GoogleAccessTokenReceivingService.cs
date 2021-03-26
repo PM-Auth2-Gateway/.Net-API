@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
@@ -19,22 +20,22 @@ namespace PMAuth.Services.GoogleOAuth
 {
     public class GoogleAccessTokenReceivingService : IAccessTokenReceivingService
     {
+        public string SocialServiceName => "google";
+        
         private readonly BackOfficeContext _context;
-
         private readonly IMemoryCache _memoryCache;
-
-        //private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
+        private readonly ILogger<GoogleAccessTokenReceivingService> _logger;
         private readonly HttpClient _httpClient;
 
         public GoogleAccessTokenReceivingService(
             IHttpClientFactory httpClientFactory, 
             BackOfficeContext context,
-            IMemoryCache memoryCache
-            /*ILogger<GoogleAccessTokenReceivingService> logger*/) 
+            IMemoryCache memoryCache,
+            ILogger<GoogleAccessTokenReceivingService> logger) 
         {
             _context = context;
             _memoryCache = memoryCache;
-            //_logger = logger;
+            _logger = logger;
             _httpClient = httpClientFactory.CreateClient();
         }
         public async Task<TokenModel> ExchangeAuthorizationCodeForTokens(int appId, AuthorizationCodeModel authorizationCodeModel)
@@ -112,7 +113,6 @@ namespace PMAuth.Services.GoogleOAuth
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                //RequestUri = new Uri($"{tokenUri}?code={code}&redirect_uri={redirectUri}&client_id={clientId}&client_secret={clientSecret}&scope=&grant_type=authorization_code"),
                 RequestUri = new Uri(tokenUri)
                     .AddQuery("code", code)
                     .AddQuery("redirect_uri", redirectUri)
@@ -128,6 +128,8 @@ namespace PMAuth.Services.GoogleOAuth
             }
             catch (HttpRequestException exception)
             {
+                _logger.LogWarning("The request failed due to an underlying issue such as " +
+                                   "network connectivity, DNS failure, server certificate validation or timeout");
                 throw new AuthorizationCodeExchangeException("Unable to retrieve response from the Google", exception);
             }
 
@@ -137,8 +139,9 @@ namespace PMAuth.Services.GoogleOAuth
             }
             catch (HttpRequestException exception)
             {
-                //_logger.LogInformation("Response StatusCode from the Google is unsuccessful when trying " +
-                //                       "to exchange code for tokens");
+                string responseRaw = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Response StatusCode from the Google is unsuccessful when trying " +
+                                   $"to exchange code for tokens\nResponse received: {responseRaw}");
                 throw await HandleUnsuccessfulStatusCode(response, exception); // is it a good practice? 
             }
             

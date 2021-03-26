@@ -1,14 +1,10 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Caching.Memory;
 using PMAuth.Extensions;
 using PMAuth.Models.OAuthFacebook;
-using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Services.Abstract;
 #pragma warning disable 1591
@@ -21,6 +17,8 @@ namespace PMAuth.Services.FacebookOAuth
     /// </summary>
     public class FacebookProfileManager : IProfileManagingService
     {
+        public string SocialServiceName => "facebook";
+
         private readonly IMemoryCache _memoryCache;
         private readonly HttpClient _httpClient;
         private readonly FacebookProperties facebookProperties;

@@ -97,7 +97,7 @@ namespace PMAuth.Controllers
             }
             
             string socialName = context.Socials.FirstOrDefault(x => x.Id == socialModel.SocialId).Name.ToLower();
-            string redirectUri = $"{Request.Scheme}://{Request.Host}/auth/{socialName}";
+            string redirectUri = $"https://{Request.Host}/auth/{socialName}";
 
             var sessionId = Guid.NewGuid().ToString();
             cache.Set(sessionId, new CacheModel

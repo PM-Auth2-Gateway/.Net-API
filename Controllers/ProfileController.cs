@@ -1,17 +1,14 @@
 ﻿using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-
 using PMAuth.Exceptions.Models;
-using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.RequestModels;
 
 namespace PMAuth.Controllers
 {
     /// <summary>
-    /// Get user profile by authorization code 
+    /// Get user profile by session id
     /// </summary>
     [Route("[controller]")]
     public class ProfileController : ControllerBase
@@ -25,11 +22,11 @@ namespace PMAuth.Controllers
         }
 #pragma warning restore 1591 
         /// <summary>
-        /// Get user profile
+        /// Get user profile. Max time of execution for this endpoint is 10 secs
         /// </summary>
         /// <param name="appId">Application id (this id admin receives in the backoffice)</param>
         /// <param name="sessionIdModel">Model which contains session ID</param>
-        /// <returns>UserProfile or ErrorModel</returns>
+        /// <returns>UserProfile or ErrorModel if profile wasn't found</returns>
         [HttpPost("info")]
         [ProducesResponseType(typeof(UserProfile), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
@@ -40,21 +37,18 @@ namespace PMAuth.Controllers
             //todo add app_id check
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
-                return BadRequest(new ErrorModel
-                {
-                    Error = "Invalid session id",
-                    ErrorDescription = "There is no profile related to provided session id"
-                });
+                return BadRequest(ErrorModel.SessionIdError);
             }
 
             bool isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out CacheModel sessionInfo);
             if (isSuccess == false || sessionInfo == null)
             {
-                return BadRequest(new ErrorModel
-                {
-                    Error = "Invalid session id",
-                    ErrorDescription = "There is no profile related to provided session id"
-                });
+                return BadRequest(ErrorModel.SessionIdError);
+            }
+
+            if (sessionInfo.UserStartedAuthorization == false)
+            {
+                return BadRequest(ErrorModel.AuthAborted);
             }
             
             isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
@@ -77,11 +71,8 @@ namespace PMAuth.Controllers
             
             if (sessionInfo?.UserProfile == null)
             {
-                return BadRequest(new ErrorModel
-                {
-                    Error = "Social service servers are currently unavailable",
-                    ErrorDescription = "There is no profile related to provided session id"
-                });
+                return BadRequest(ErrorModel.AuthError("Error occured during the authorization process. " +
+                                                       "Unable to receive user's profile for some reasons"));
             }
 
             return Ok(_memoryCache.Get<CacheModel>(sessionIdModel.SessionId).UserProfile);

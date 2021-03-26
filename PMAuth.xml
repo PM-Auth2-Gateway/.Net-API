@@ -153,16 +153,16 @@
         </member>
         <member name="T:PMAuth.Controllers.ProfileController">
             <summary>
-            Get user profile by authorization code 
+            Get user profile by session id
             </summary>
         </member>
         <member name="M:PMAuth.Controllers.ProfileController.GetUserProfileAsync(System.Int32,PMAuth.Models.RequestModels.SessionIdModel)">
             <summary>
-            Get user profile
+            Get user profile. Max time of execution for this endpoint is 10 secs
             </summary>
             <param name="appId">Application id (this id admin receives in the backoffice)</param>
             <param name="sessionIdModel">Model which contains session ID</param>
-            <returns>UserProfile or ErrorModel</returns>
+            <returns>UserProfile or ErrorModel if profile wasn't found</returns>
         </member>
         <member name="T:PMAuth.Controllers.RedirectController">
             <summary>
@@ -249,6 +249,14 @@
             Error model that will be returned if something will go wrong after user redirection to social network service 
             </summary>
         </member>
+        <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorCode">
+            <summary>
+            Error code.
+            10 - Session id expired or doesn't exists
+            12 - User aborted authorization
+            14 - Error occured during authorization
+            </summary>
+        </member>
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.Error">
             <summary>
             Error
@@ -257,11 +265,6 @@
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorDescription">
             <summary>
             Detailed description of an error
-            </summary>
-        </member>
-        <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorReason">
-            <summary>
-            Error reason
             </summary>
         </member>
         <member name="T:PMAuth.Extensions.ReformScopeToFields">
@@ -357,6 +360,16 @@
             Refresh token
             </summary>
         </member>
+        <member name="T:PMAuth.Models.OAuthUniversal.AdminProfile">
+            <summary>
+            Unified model of admin profile
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.AdminProfile.Token">
+            <summary>
+            Access token what need from authentication
+            </summary>
+        </member>
         <member name="T:PMAuth.Models.OAuthUniversal.CacheModel">
             <summary>
             CasheModel for store info in cache
@@ -390,6 +403,11 @@
         <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.RedirectUri">
             <summary>
             Redirect Url
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthUniversal.CacheModel.UserStartedAuthorization">
+            <summary>
+            If error occured this property is not null. If it is null, then everything is fine
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel">
