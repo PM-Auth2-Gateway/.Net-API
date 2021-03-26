@@ -131,7 +131,8 @@ namespace PMAuth.Controllers
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Lax
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
                 });
             admin.Token = encodedJwt;
             return new JsonResult(admin);
@@ -163,13 +164,14 @@ namespace PMAuth.Controllers
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Lax
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
                 });
             return new JsonResult(new AuthModel(username, new JwtSecurityTokenHandler().WriteToken(newJwtToken)));
         }
 
         /// <summary>
-        /// Get all applications foe logged in admin
+        /// Get all applications for logged in admin
         /// </summary>
         /// <returns>AppModel[] or error if refresh admin wasn't found</returns>
         [HttpGet]
