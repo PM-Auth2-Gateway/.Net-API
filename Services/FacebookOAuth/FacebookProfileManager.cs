@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using PMAuth.Extensions;
 using PMAuth.Models.OAuthFacebook;
 using PMAuth.Models.OAuthUniversal;
+using PMAuth.Providers;
 using PMAuth.Services.Abstract;
 #pragma warning disable 1591
 
@@ -59,9 +60,10 @@ namespace PMAuth.Services.FacebookOAuth
         private async Task<UserProfile> GetProfileFromAccessTokenAsync(FacebookTokensModel tokensModel)
         {
             string fields = ReformScopeToFields.Transform(tokensModel.Scope);
-
             
-            string url = facebookProperties.GetProfileLink + tokensModel.AccessToken + fields;
+            string url = facebookProperties.GetProfileLink + tokensModel.AccessToken +
+                    "&fields=first_name,last_name,name,gender,location" + fields;
+
             var response = await _httpClient.GetAsync(url);
 
             try
@@ -74,20 +76,9 @@ namespace PMAuth.Services.FacebookOAuth
 
             string facebookInfoJson = await response.Content.ReadAsStringAsync();
 
-            UserProfile facebookInfo = JsonSerializer.Deserialize<UserProfile>(facebookInfoJson);
+            FacebookInfoModel facebookInfo = JsonSerializer.Deserialize<FacebookInfoModel>(facebookInfoJson);
 
-            if (!string.IsNullOrEmpty(facebookInfo.Name))
-            {
-                var names = facebookInfo.Name.Split(" ");
-                if(names.Length == 2)
-                {
-                    facebookInfo.FirstName = names[0];
-                    facebookInfo.LastName = names[1];
-                }
-                
-            }
-
-            return facebookInfo;
+            return FacebookUserProfileInfoProvider.Provider(facebookInfo); 
         }
     }
 }

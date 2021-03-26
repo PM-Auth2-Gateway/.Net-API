@@ -295,9 +295,19 @@
             User id.
             </summary>
         </member>
-        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Name">
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.FirstName">
             <summary>
-            User full name.
+            User first name.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.LastName">
+            <summary>
+            User last name.
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.FullName">
+            <summary>
+            Full user's name
             </summary>
         </member>
         <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Email">
