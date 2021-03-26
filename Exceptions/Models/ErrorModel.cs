@@ -41,10 +41,10 @@ namespace PMAuth.Exceptions.Models
             ErrorDescription = "User dropped authorization process"
         };
         
-        public static ErrorModel AuthError(string error, string description) => new ErrorModel
+        public static ErrorModel AuthError(string description) => new ErrorModel
         {
             ErrorCode = 14,
-            Error = error,
+            Error = "Authorization error",
             ErrorDescription = description
         };
     }

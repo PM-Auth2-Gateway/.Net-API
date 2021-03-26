@@ -56,12 +56,12 @@ namespace PMAuth.Controllers
         {
             if (authorizationCode?.SessionId == null)
             {
-                return BadRequest(ErrorModel.AuthError("Session Id is missing", "Something went wrong"));
+                return BadRequest(ErrorModel.AuthError("Session Id is missing."));
             }
 
             if (error.Error != null || error.ErrorDescription != null)
             {
-                return BadRequest(ErrorModel.AuthError(error.Error, error.ErrorDescription));
+                return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
             }
             
             string socialServiceName = "google";
@@ -85,13 +85,17 @@ namespace PMAuth.Controllers
             [FromQuery] RedirectionErrorModelFacebook error,
             [FromQuery] AuthorizationCodeModel authorizationCode)
         {
+            if (authorizationCode?.SessionId == null)
+            {
+                return BadRequest(ErrorModel.AuthError("Session Id is missing."));
+            }
+            
             if (error.Error != null || error.ErrorDescription != null)
             {
-                return BadRequest(ErrorModel.AuthError(error.Error, error.ErrorDescription));
+                return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
             }
 
             string socialServiceName = "facebook";
-            //set strategies
             _userProfileReceivingServiceContext.SetStrategies(
                 _tokenReceivingServices.First(s => s.SocialServiceName == socialServiceName),
                 _profileManagingServices.First(s => s.SocialServiceName == socialServiceName));
@@ -108,7 +112,7 @@ namespace PMAuth.Controllers
             CacheModel session = _memoryCache.Get<CacheModel>(authorizationCode.SessionId);
             if (session == null)
             {
-                return BadRequest(ErrorModel.SessionIdError);
+                return BadRequest(ErrorModel.AuthError("Time for authorization has expired"));
             }
             string device = session.Device.ToLower().Trim();
             session.UserStartedAuthorization = true;
