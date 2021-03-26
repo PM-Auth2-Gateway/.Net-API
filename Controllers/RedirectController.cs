@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -55,8 +56,8 @@ namespace PMAuth.Controllers
         /// <param name="authorizationCode"></param>
         /// <returns></returns>
         [HttpGet("auth/google")]
-        [ProducesResponseType(typeof(UserProfile), 200)]
-        [ProducesResponseType(typeof(ErrorModel), 400)]
+        [ProducesResponseType(typeof(UserProfile), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorModel), (int)HttpStatusCode.BadRequest)]
         public IActionResult ReceiveAuthorizationCodeGoogle(
             [FromQuery] RedirectionErrorModelGoogle error,
             [FromQuery] AuthorizationCodeModel authorizationCode)
