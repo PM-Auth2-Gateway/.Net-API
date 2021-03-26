@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ namespace PMAuth.Controllers
     /// Get user profile by session id
     /// </summary>
     [Route("[controller]")]
+    [Authorize(AuthenticationSchemes = "RegisteredAppAuthentication")]
     public class ProfileController : ControllerBase
     {
         private readonly IMemoryCache _memoryCache;
@@ -38,7 +40,6 @@ namespace PMAuth.Controllers
             [FromHeader(Name = "App_id")] int appId, 
             [FromBody] SessionIdModel sessionIdModel)
         {
-            //todo add app_id check
             if (sessionIdModel == null || string.IsNullOrWhiteSpace(sessionIdModel.SessionId))
             {
                 _logger.LogError("Request body doesn't contain session id or it is empty");
