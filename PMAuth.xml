@@ -177,7 +177,7 @@
             Get new access token 
             </summary>
             <param name="token">Old access token</param>
-            <returns>AuthModel or ErrorModel if refresh token wasn't found</returns>
+            <returns>AuthModel or error if refresh token wasn't found</returns>
         </member>
         <member name="M:PMAuth.Controllers.AdminController.GetApps">
             <summary>
@@ -351,6 +351,8 @@
             10 - Session id expired or doesn't exists
             12 - User aborted authorization
             14 - Error occured during authorization
+            16 - Invalid id
+            18 - Token error
             </summary>
         </member>
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.Error">
