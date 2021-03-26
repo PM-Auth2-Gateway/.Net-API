@@ -145,7 +145,9 @@ namespace PMAuth.Services.GoogleOAuth
             }
             catch (HttpRequestException exception)
             {
-                throw await HandleUnsuccessfulStatusCode(response, exception); // is it a good practice? 
+                _logger.LogError("Response StatusCode from the Google " +
+                                 "is unsuccessful when trying to exchange code for tokens");
+                throw await HandleUnsuccessfulStatusCode(response, exception);
             }
             
             return await response.Content.ReadAsStringAsync();
@@ -166,12 +168,9 @@ namespace PMAuth.Services.GoogleOAuth
                 if (jsonException is ArgumentNullException ||
                     jsonException is JsonException)
                 {
-                    _logger.LogError("Response StatusCode from the Google " +
-                                     "is unsuccessful when trying to exchange code for tokens. ");
-                    _logger.LogError("Response StatusCode from the Google is unsuccessful " +
-                                     "when trying to exchange code for tokens." +
-                                     "Unable to deserialize error response\n" +
+                    _logger.LogError("Unable to deserialize error response\n" +
                                      $"Response body: {responseBody}");
+                    
                     return new AuthorizationCodeExchangeException("Response StatusCode from the Google " +
                                                                   "is unsuccessful when trying to exchange code " +
                                                                   "for tokens", exception);
