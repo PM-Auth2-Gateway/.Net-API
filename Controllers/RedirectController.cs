@@ -69,8 +69,7 @@ namespace PMAuth.Controllers
 
             if (error.Error != null || error.ErrorDescription != null)
             {
-                _logger.LogError("Received redirect request from Google with error query params: " +
-                                 $"{error.Error}  |  {error.ErrorDescription}");
+                _logger.LogError(@$"Received redirect request from Google with error query params: {error.Error}  |  {error.ErrorDescription}");
                 return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
             }
             
@@ -103,8 +102,7 @@ namespace PMAuth.Controllers
             
             if (error.Error != null || error.ErrorDescription != null)
             {
-                _logger.LogError("Received redirect request from Facebook with error query params: " +
-                                 $"{error.Error}  |  {error.ErrorDescription}");
+                _logger.LogError(@$"Received redirect request from Facebook with error query params: {error.Error}  |  {error.ErrorDescription}");
                 return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
             }
 
@@ -137,10 +135,8 @@ namespace PMAuth.Controllers
             }
             catch (AuthorizationCodeExchangeException exception)
             {
-                _logger.LogError("Error occured during authorization code exchange " +
-                                 "or process of receiving user profile from social service " +
-                                 $"Error: {exception.Description.Error}\n" +
-                                 $"ErrorDescription^ {exception.Description.ErrorDescription}");
+                _logger.LogError("Error occured during authorization code exchange or process of receiving user profile from social service\n " +
+                                 $"Error: {exception.Description.Error}\n ErrorDescription: {exception.Description.ErrorDescription}");
             }
 
             if (device.Equals("browser"))

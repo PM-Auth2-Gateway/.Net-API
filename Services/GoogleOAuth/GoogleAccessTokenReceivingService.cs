@@ -56,8 +56,7 @@ namespace PMAuth.Services.GoogleOAuth
                 if (exception is ArgumentNullException ||
                     exception is JsonException)
                 {
-                    _logger.LogError("Unable to deserialize response body. Received response body:\n" +
-                                     $"{responseBody}");
+                    _logger.LogError($"Unable to deserialize response body. Received response body:\n{responseBody}");
                     return null;
                 }
                 throw;
