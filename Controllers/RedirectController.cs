@@ -64,13 +64,13 @@ namespace PMAuth.Controllers
             if (authorizationCode?.SessionId == null)
             {
                 _logger.LogError("Received redirect request from Google without session id (state)");
-                return BadRequest(ErrorModel.AuthError("Session Id is missing."));
+                return BadRequest(ErrorModel.AuthorizationError("Session Id is missing."));
             }
 
             if (error.Error != null || error.ErrorDescription != null)
             {
                 _logger.LogError(@$"Received redirect request from Google with error query params: {error.Error}  |  {error.ErrorDescription}");
-                return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
+                return BadRequest(ErrorModel.AuthorizationError($"{error.Error} {error.ErrorDescription}"));
             }
             
             string socialServiceName = "google";
@@ -97,13 +97,13 @@ namespace PMAuth.Controllers
             if (authorizationCode?.SessionId == null)
             {
                 _logger.LogError("Received redirect request from Facebook without session id (state)");
-                return BadRequest(ErrorModel.AuthError("Session Id is missing."));
+                return BadRequest(ErrorModel.AuthorizationError("Session Id is missing."));
             }
             
             if (error.Error != null || error.ErrorDescription != null)
             {
                 _logger.LogError(@$"Received redirect request from Facebook with error query params: {error.Error}  |  {error.ErrorDescription}");
-                return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
+                return BadRequest(ErrorModel.AuthorizationError($"{error.Error} {error.ErrorDescription}"));
             }
 
             string socialServiceName = "facebook";
@@ -124,7 +124,7 @@ namespace PMAuth.Controllers
             if (session == null)
             {
                 _logger.LogError("Authorization time has expired");
-                return BadRequest(ErrorModel.AuthError("Time for authorization has expired"));
+                return BadRequest(ErrorModel.AuthorizationError("Time for authorization has expired"));
             }
             string device = session.Device.ToLower().Trim();
             session.UserStartedAuthorization = true;
