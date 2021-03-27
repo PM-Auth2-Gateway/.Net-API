@@ -71,7 +71,7 @@ namespace PMAuth.Controllers
             var refreshToken = _authService.GenerateRefreshToken();
             _refreshTokenService.SaveRefreshToken(refreshToken);
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
-                new CookieOptions {HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7) });
+                new CookieOptions { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7), SameSite = SameSiteMode.None });
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
@@ -143,7 +143,7 @@ namespace PMAuth.Controllers
                 return BadRequest(ErrorModel.TokenErrorModel("Server don't have refresh token"));////
             _logger.LogInformation(refreshToken);
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
-                new CookieOptions { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7) });
+                new CookieOptions { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7), SameSite = SameSiteMode.None });
             admin.Token = encodedJwt;
             return new JsonResult(admin);
         }
@@ -172,8 +172,8 @@ namespace PMAuth.Controllers
             var newRefreshToken = _authService.GenerateRefreshToken();
             _refreshTokenService.DeleteRefreshToken(refreshToken);
             _refreshTokenService.SaveRefreshToken(newRefreshToken);
-            Response.Cookies.Append("X-Refresh-Token", refreshToken,
-                new CookieOptions { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7) });
+            Response.Cookies.Append("X-Refresh-Token", newRefreshToken,
+                new CookieOptions { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7), SameSite = SameSiteMode.None});
             return new JsonResult(new AuthModel(username, new JwtSecurityTokenHandler().WriteToken(newJwtToken)));
         }
 
