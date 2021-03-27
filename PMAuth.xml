@@ -120,6 +120,11 @@
             Scope - bunch of accessed information by user.
             </summary>
         </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.IsActive">
+            <summary>
+            Is a social disabled or enabled 
+            </summary>
+        </member>
         <member name="T:PMAuth.AuthDbContext.Entities.Social">
             <summary>
             Social entity

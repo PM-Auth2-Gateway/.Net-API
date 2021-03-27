@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using PMAuth.AuthDbContext;
@@ -15,6 +16,7 @@ namespace PMAuth.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
+    [Authorize(AuthenticationSchemes = "RegisteredAppAuthentication")]
     public class SocialsController : Controller
     {
         private readonly BackOfficeContext context;
@@ -45,15 +47,19 @@ namespace PMAuth.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(SocialsModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         public ActionResult<SocialsModel> GetAllSocials([FromHeader] int App_id)
         {
-            var socialIds = context.Settings.Where(x => x.AppId == App_id).Select(x => x.SocialId).Distinct();
+            var socialIds = context.Settings
+                .Where(x => x.AppId == App_id && x.IsActive && 
+                    !string.IsNullOrEmpty(x.SecretKey) && !string.IsNullOrEmpty(x.ClientId) && !string.IsNullOrEmpty(x.Scope))
+                .Select(x => x.SocialId).Distinct();
 
             var socials = context.Socials.Where(x => socialIds.Contains(x.Id)).ToList();
 
             if (socials.Count == 0)
             {
-                return BadRequest();
+                return BadRequest("There is no socials registered this user");
             }
 
             return new SocialsModel() 
@@ -79,20 +85,22 @@ namespace PMAuth.Controllers
         [HttpPost("auth-link")]
         [ProducesResponseType(typeof(SocialLinkModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         public ActionResult<SocialLinkModel> GetLinkParameters([FromHeader] int App_id, [FromBody] SocialModel socialModel)
         {
-            Setting setting = context.Settings.FirstOrDefault(x => x.AppId == App_id && x.SocialId == socialModel.SocialId);
+            Setting setting = context.Settings
+                .FirstOrDefault(x => x.AppId == App_id && x.SocialId == socialModel.SocialId && x.IsActive);
 
             if (setting == null)
             {
-                return BadRequest();
+                return BadRequest("User settings are missing or social is disabled");
             }
 
             Social social = context.Socials.FirstOrDefault(x => x.Id == setting.SocialId);
 
             if (social == null)
             {
-                return BadRequest();
+                return BadRequest("Can't find social");
             }
             
             string socialName = context.Socials.FirstOrDefault(x => x.Id == socialModel.SocialId).Name.ToLower();
