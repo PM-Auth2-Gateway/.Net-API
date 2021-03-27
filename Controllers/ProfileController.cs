@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -34,8 +35,9 @@ namespace PMAuth.Controllers
         /// <param name="sessionIdModel">Model which contains session ID</param>
         /// <returns>UserProfile or ErrorModel if profile wasn't found</returns>
         [HttpPost("info")]
-        [ProducesResponseType(typeof(UserProfile), 200)]
-        [ProducesResponseType(typeof(ErrorModel), 400)]
+        [ProducesResponseType(typeof(UserProfile), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), (int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> GetUserProfileAsync(
             [FromHeader(Name = "App_id")] int appId, 
             [FromBody] SessionIdModel sessionIdModel)
@@ -56,7 +58,7 @@ namespace PMAuth.Controllers
 
             if (sessionInfo.UserStartedAuthorization == false)
             {
-                return BadRequest(ErrorModel.AuthAborted);
+                return BadRequest(ErrorModel.AuthorizationAborted);
             }
             
             isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
@@ -81,7 +83,7 @@ namespace PMAuth.Controllers
             {
                 _logger.LogError("Unable to find user's profile in memory cache." +
                                  "Error occured during the authorization process");
-                return BadRequest(ErrorModel.AuthError("Error occured during the authorization process. " +
+                return BadRequest(ErrorModel.AuthorizationError("Error occured during the authorization process. " +
                                                        "Unable to receive user's profile for some reasons"));
             }
 

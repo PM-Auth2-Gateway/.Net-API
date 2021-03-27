@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+#pragma warning disable 1591
 
 namespace PMAuth.Exceptions.Models
 {
@@ -8,12 +9,13 @@ namespace PMAuth.Exceptions.Models
     public class ErrorModel
     {
         /// <summary>
-        /// Error code.
-        /// 10 - Session id expired or doesn't exists
-        /// 12 - User aborted authorization
-        /// 14 - Error occured during authorization
-        /// 16 - Invalid id
-        /// 18 - Token error
+        /// Error code. <br/>
+        /// 10 - Session id expired or doesn't exists <br/>
+        /// 12 - User aborted authorization <br/>
+        /// 14 - Error occured during authorization <br/>
+        /// 16 - Invalid id <br/>
+        /// 18 - Token error <br/>
+        /// 20 - Unauthorized access <br/>
         /// </summary>
         public int ErrorCode { get; set; }
         
@@ -36,17 +38,17 @@ namespace PMAuth.Exceptions.Models
             ErrorDescription = "There is no profile related to provided session id"
         };
         
-        public static ErrorModel AuthAborted => new ErrorModel
+        public static ErrorModel AuthorizationAborted => new ErrorModel
         {
             ErrorCode = 12,
             Error = "User did not confirm authorization",
             ErrorDescription = "User dropped authorization process"
         };
         
-        public static ErrorModel AuthError(string description) => new ErrorModel
+        public static ErrorModel AuthorizationError(string description) => new ErrorModel
         {
             ErrorCode = 14,
-            Error = "Authorization error",
+            Error = "Error occured during user authorization",
             ErrorDescription = description
         };
         public static ErrorModel IdErrorModel(string description) => new ErrorModel
@@ -59,6 +61,13 @@ namespace PMAuth.Exceptions.Models
         {
             ErrorCode = 18,
             Error = "Token error",
+            ErrorDescription = description
+        };
+        
+        public static ErrorModel UnauthorizedAccessModel(string description) => new ErrorModel
+        {
+            ErrorCode = 20,
+            Error = "Unauthorized access",
             ErrorDescription = description
         };
     }
