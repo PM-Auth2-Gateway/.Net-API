@@ -142,10 +142,9 @@ namespace PMAuth
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PMAuth v1"));
             }
 
-            app.UseCors(builder => builder
+            app.UseCors(builder => builder.SetIsOriginAllowed(_ => true)
                                 .AllowAnyMethod()
-                                .AllowAnyHeader()
-                                .AllowCredentials());
+                                .AllowAnyHeader().AllowCredentials());
 
             app.UseMiddleware<LogMiddleware>();
             app.UseRouting();

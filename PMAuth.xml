@@ -279,7 +279,7 @@
         </member>
         <member name="M:PMAuth.Controllers.AdminController.PostSocialSettingActive(System.Int32,System.Int32,System.Boolean)">
             <summary>
-            Post social settings of application
+            Post social active settings of application
             </summary>
             <param name="appId">Id application</param>
             <param name="socialId">Id social</param>
