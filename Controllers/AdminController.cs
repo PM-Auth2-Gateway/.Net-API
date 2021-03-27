@@ -139,6 +139,9 @@ namespace PMAuth.Controllers
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             var refreshToken = _authService.GenerateRefreshToken();
             _refreshTokenService.SaveRefreshToken(refreshToken);
+            if (!_refreshTokenService.CheckRefreshToken(refreshToken)) ////
+                return BadRequest(ErrorModel.TokenErrorModel("Server don't have refresh token"));////
+            _logger.LogInformation(refreshToken);
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
                 new CookieOptions {HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict});
             admin.Token = encodedJwt;
@@ -161,9 +164,8 @@ namespace PMAuth.Controllers
                 return BadRequest(ErrorModel.TokenErrorModel("Http request don't have refreshToken"));
             var principal = _authService.GetPrincipalFromExpiredToken(token);
             var username = principal.Identity.Name;
-            var savedRefreshToken =
-                _refreshTokenService.CheckRefreshToken(refreshToken); //retrieve the refresh token from a data store
-            if (!savedRefreshToken)
+            _logger.LogInformation(refreshToken);
+            if (!_refreshTokenService.CheckRefreshToken(refreshToken))
                 return BadRequest(ErrorModel.TokenErrorModel("Server don't have refresh token"));
 
             var newJwtToken = _authService.GenerateToken(principal.Claims);
