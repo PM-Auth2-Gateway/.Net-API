@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +27,7 @@ namespace PMAuth.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AdminController : Controller
     {
         private readonly IMemoryCache _memoryCache;
@@ -54,6 +56,7 @@ namespace PMAuth.Controllers
         /// </summary>
         /// <returns>Token</returns>
         [HttpPost("testToken")]
+        [AllowAnonymous]
         public ActionResult<string> GetTokenTest()
         {
             var identity = _authService.GetIdentity("admin");
@@ -80,6 +83,7 @@ namespace PMAuth.Controllers
         [HttpPost("tokenAndProfile")]
         [ProducesResponseType(typeof(AdminProfile), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
+        [AllowAnonymous]
         public async Task<ActionResult<AdminProfile>> GetTokenAndProfile(
             [FromBody, Required] SessionIdModel sessionIdModel)
         {
@@ -149,6 +153,7 @@ namespace PMAuth.Controllers
         [HttpPost("refreshToken")]
         [ProducesResponseType(typeof(AuthModel), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
+        [AllowAnonymous]
         public ActionResult<AuthModel> Refresh([Required, FromHeader] string token)
         {
             var refreshToken = Request.Cookies?["X-Refresh-Token"];
@@ -176,7 +181,6 @@ namespace PMAuth.Controllers
         /// <returns>AppModel[] or error if refresh admin wasn't found</returns>
         [HttpGet]
         [Route("applications")]
-        [Authorize]
         [ProducesResponseType(typeof(AppModel[]), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public ActionResult<AppModel[]> GetApps()
@@ -200,7 +204,6 @@ namespace PMAuth.Controllers
         /// <returns>AppModel or error if admin Id wasn't found</returns>
         [HttpPost]
         [Route("applications")]
-        [Authorize]
         [ProducesResponseType(typeof(AppModel), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public async Task<ActionResult<AppModel>> PostApp([FromBody, Required] CreateAppModel createApp)
@@ -226,7 +229,6 @@ namespace PMAuth.Controllers
         /// <returns>AppModel or error if admin,app Id wasn't found</returns>
         [HttpGet]
         [Route("applications/{appId}")]
-        [Authorize]
         [ProducesResponseType(typeof(AppModel), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public ActionResult<AppModel> GetAppInfo([FromRoute, Required] int appId)
@@ -250,7 +252,6 @@ namespace PMAuth.Controllers
         /// <returns>200 or error if admin,app Id wasn't found</returns>
         [HttpDelete]
         [Route("applications/{appId}")]
-        [Authorize]
         [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public async Task<ActionResult> DeleteApp([FromRoute, Required] int appId)
@@ -276,7 +277,6 @@ namespace PMAuth.Controllers
         /// <returns>AppModel or error if admin,app id wasn't found</returns>
         [HttpPut]
         [Route("applications/{appId}")]
-        [Authorize]
         [ProducesResponseType(typeof(AppModel), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public async Task<ActionResult<AppModel>> PutApp([FromRoute, Required] int appId,
@@ -302,7 +302,6 @@ namespace PMAuth.Controllers
         /// <returns>SocialModelResponse[] or error if admin,app id wasn't found</returns>
         [HttpGet]
         [Route("applications/{appId}/socials")]
-        [Authorize]
         [ProducesResponseType(typeof(SocialModelResponse[]), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public async Task<ActionResult<SocialModelResponse[]>> GetSocials([FromRoute, Required] int appId)
@@ -332,7 +331,6 @@ namespace PMAuth.Controllers
         /// <returns>SettingModel or error if admin,app,social id wasn't found</returns>
         [HttpGet]
         [Route("applications/{appId}/socials/{socialId}")]
-        [Authorize]
         [ProducesResponseType(typeof(SettingModel), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public ActionResult<SettingModel> GetSocialSetting([FromRoute, Required] int socialId,
@@ -364,7 +362,6 @@ namespace PMAuth.Controllers
         /// <returns>SettingModel or error if admin,app,social id wasn't found</returns>
         [HttpPost]
         [Route("applications/{appId}/socials/{socialId}")]
-        [Authorize]
         [ProducesResponseType(typeof(SettingModel), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public async Task<ActionResult<SettingModel>> PostSocialSetting([FromRoute, Required] int socialId,
@@ -408,7 +405,6 @@ namespace PMAuth.Controllers
         /// <returns>SettingModel or error if admin,app,social id wasn't found</returns>
         [HttpPut]
         [Route("applications/{appId}/socials/{socialId}")]
-        [Authorize]
         [ProducesResponseType(typeof(SettingModel), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public async Task<ActionResult<SettingModel>> PutSocialSetting([FromRoute, Required] int socialId,
@@ -444,7 +440,6 @@ namespace PMAuth.Controllers
         /// <returns>SettingModel or error if admin,app,social id wasn't found</returns>
         [HttpPost]
         [Route("applications/{appId}/socials/{socialId}/{isActive}")]
-        [Authorize]
         [ProducesResponseType(typeof(SettingModel), 200)]
         [ProducesResponseType(typeof(ErrorModel), 400)]
         public async Task<ActionResult<SettingModel>> PostSocialSettingActive([FromRoute, Required] int socialId,
