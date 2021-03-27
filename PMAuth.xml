@@ -145,6 +145,11 @@
             Scope - bunch of accessed information by user.
             </summary>
         </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.Setting.IsActive">
+            <summary>
+            Is a social disabled or enabled 
+            </summary>
+        </member>
         <member name="T:PMAuth.AuthDbContext.Entities.Social">
             <summary>
             Social entity
@@ -372,12 +377,12 @@
         </member>
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.ErrorCode">
             <summary>
-            Error code.
-            10 - Session id expired or doesn't exists
-            12 - User aborted authorization
-            14 - Error occured during authorization
-            16 - Invalid id
-            18 - Token error
+            Error code. <br/>
+            10 - Session id expired or doesn't exists <br/>
+            12 - User aborted authorization <br/>
+            14 - Error occured during authorization <br/>
+            16 - Invalid id <br/>
+            18 - Token error <br/>
             </summary>
         </member>
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.Error">

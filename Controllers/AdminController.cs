@@ -97,7 +97,7 @@ namespace PMAuth.Controllers
 
             if (sessionInfo.UserStartedAuthorization == false)
             {
-                return BadRequest(ErrorModel.AuthAborted);
+                return BadRequest(ErrorModel.AuthorizationAborted);
             }
 
             isSuccess = _memoryCache.TryGetValue(sessionIdModel.SessionId, out sessionInfo);
@@ -119,7 +119,7 @@ namespace PMAuth.Controllers
 
             if (sessionInfo?.UserProfile == null)
             {
-                return BadRequest(ErrorModel.AuthError("Error occured during the authorization process. " +
+                return BadRequest(ErrorModel.AuthorizationError("Error occured during the authorization process. " +
                                                        "Unable to receive user's profile for some reasons"));
             }
 
