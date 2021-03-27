@@ -49,6 +49,12 @@ namespace PMAuth.Models
         public string Scope { get;  }
 
         /// <summary>
+        /// True if this social is active in application
+        /// </summary>
+        [JsonPropertyName("is_active")]
+        public bool IsActive { get; }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="id"></param>
@@ -59,7 +65,7 @@ namespace PMAuth.Models
         /// <param name="clientId"></param>
         /// <param name="secretKey"></param>
         /// <param name="scope"></param>
-        public SettingModel(int id, int appId, string appName, int socialId, string socialName, string clientId, string secretKey, string scope)
+        public SettingModel(int id, int appId, string appName, int socialId, string socialName, string clientId, string secretKey, string scope,bool isActive)
         {
             Id = id;
             AppId = appId;
@@ -69,6 +75,7 @@ namespace PMAuth.Models
             ClientId = clientId;
             SecretKey = secretKey;
             Scope = scope;
+            IsActive = isActive;
         }
     }
 }
