@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -55,8 +56,8 @@ namespace PMAuth.Controllers
         /// <param name="authorizationCode"></param>
         /// <returns></returns>
         [HttpGet("auth/google")]
-        [ProducesResponseType(typeof(UserProfile), 200)]
-        [ProducesResponseType(typeof(ErrorModel), 400)]
+        [ProducesResponseType(typeof(UserProfile), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorModel), (int)HttpStatusCode.BadRequest)]
         public IActionResult ReceiveAuthorizationCodeGoogle(
             [FromQuery] RedirectionErrorModelGoogle error,
             [FromQuery] AuthorizationCodeModel authorizationCode)
@@ -64,13 +65,13 @@ namespace PMAuth.Controllers
             if (authorizationCode?.SessionId == null)
             {
                 _logger.LogError("Received redirect request from Google without session id (state)");
-                return BadRequest(ErrorModel.AuthError("Session Id is missing."));
+                return BadRequest(ErrorModel.AuthorizationError("Session Id is missing."));
             }
 
             if (error.Error != null || error.ErrorDescription != null)
             {
                 _logger.LogError(@$"Received redirect request from Google with error query params: {error.Error}  |  {error.ErrorDescription}");
-                return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
+                return BadRequest(ErrorModel.AuthorizationError($"{error.Error} {error.ErrorDescription}"));
             }
             
             string socialServiceName = "google";
@@ -97,13 +98,13 @@ namespace PMAuth.Controllers
             if (authorizationCode?.SessionId == null)
             {
                 _logger.LogError("Received redirect request from Facebook without session id (state)");
-                return BadRequest(ErrorModel.AuthError("Session Id is missing."));
+                return BadRequest(ErrorModel.AuthorizationError("Session Id is missing."));
             }
             
             if (error.Error != null || error.ErrorDescription != null)
             {
                 _logger.LogError(@$"Received redirect request from Facebook with error query params: {error.Error}  |  {error.ErrorDescription}");
-                return BadRequest(ErrorModel.AuthError($"{error.Error} {error.ErrorDescription}"));
+                return BadRequest(ErrorModel.AuthorizationError($"{error.Error} {error.ErrorDescription}"));
             }
 
             string socialServiceName = "facebook";
@@ -124,7 +125,7 @@ namespace PMAuth.Controllers
             if (session == null)
             {
                 _logger.LogError("Authorization time has expired");
-                return BadRequest(ErrorModel.AuthError("Time for authorization has expired"));
+                return BadRequest(ErrorModel.AuthorizationError("Time for authorization has expired"));
             }
             string device = session.Device.ToLower().Trim();
             session.UserStartedAuthorization = true;

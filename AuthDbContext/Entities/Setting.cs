@@ -41,6 +41,10 @@
         /// </summary>
         public string Scope { get; set; }
 
+        /// <summary>
+        /// Is a social disabled or enabled 
+        /// </summary>
+        public bool IsActive { get; set; }
 
     }
 }
