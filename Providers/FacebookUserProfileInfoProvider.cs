@@ -11,8 +11,6 @@ namespace PMAuth.Providers
     {
         public static UserProfile Provider(FacebookInfoModel facebookInfo)
         {
-        //    var dic = facebookInfo.AdditionalInformation;
-        //    dic.Add("location", facebookInfo.Location["location"]);
             return new UserProfile()
             {
                 Id = facebookInfo.Id,
@@ -20,7 +18,6 @@ namespace PMAuth.Providers
                 LastName = facebookInfo.LastName,
                 Name = facebookInfo.FullName,
                 Email = facebookInfo.Email,
-               // Location = facebookInfo.Location,
                 AdditionalInformation = facebookInfo.AdditionalInformation
             };
         }

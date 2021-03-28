@@ -21,6 +21,11 @@ namespace PMAuth.AuthDbContext.Entities
         public string RefreshTokenValue { get; set; }
 
         /// <summary>
+        /// User that recieve a token
+        /// </summary>
+        public string UserId { get; set; }
+
+        /// <summary>
         /// Expires time of refresh token.
         /// </summary>
         public DateTime ExpiresTime { get; set; }
