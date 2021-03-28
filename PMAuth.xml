@@ -191,7 +191,7 @@
             Admin Api for access to setting application
             </summary>
         </member>
-        <member name="M:PMAuth.Controllers.AdminController.#ctor(PMAuth.AuthDbContext.BackOfficeContext,PMAuth.Services.AuthAdmin.AuthService,PMAuth.Services.AuthAdmin.RefreshTokenService,Microsoft.Extensions.Caching.Memory.IMemoryCache,Microsoft.Extensions.Logging.ILogger{PMAuth.Controllers.AdminController})">
+        <member name="M:PMAuth.Controllers.AdminController.#ctor(PMAuth.AuthDbContext.BackOfficeContext,PMAuth.Services.AuthAdmin.Interface.IAuthServise,PMAuth.Services.AuthAdmin.Interface.IRefreshTokenService,Microsoft.Extensions.Caching.Memory.IMemoryCache,Microsoft.Extensions.Logging.ILogger{PMAuth.Controllers.AdminController})">
             <inheritdoc />
         </member>
         <member name="M:PMAuth.Controllers.AdminController.GetTokenTest">

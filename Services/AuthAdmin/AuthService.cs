@@ -6,10 +6,11 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using PMAuth.AuthDbContext;
+using PMAuth.Services.AuthAdmin.Interface;
 
 namespace PMAuth.Services.AuthAdmin
 {
-    public class AuthService
+    public class AuthService:IAuthServise
     {
         private readonly BackOfficeContext _backOfficeContext;
 
