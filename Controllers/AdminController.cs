@@ -19,6 +19,7 @@ using PMAuth.Models;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.RequestModels;
 using PMAuth.Services.AuthAdmin;
+using PMAuth.Services.AuthAdmin.Interface;
 
 namespace PMAuth.Controllers
 {
@@ -33,14 +34,14 @@ namespace PMAuth.Controllers
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<AdminController> _logger;
         private readonly BackOfficeContext _backOfficeContext;
-        private readonly AuthService _authService;
-        private readonly RefreshTokenService _refreshTokenService;
+        private readonly IAuthServise _authService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
         /// <inheritdoc />
         public AdminController(
             BackOfficeContext backOfficeContext,
-            AuthService authService,
-            RefreshTokenService refreshTokenService,
+            IAuthServise authService,
+            IRefreshTokenService refreshTokenService,
             IMemoryCache memoryCache,
             ILogger<AdminController> logger)
         {
@@ -69,7 +70,7 @@ namespace PMAuth.Controllers
                     SecurityAlgorithms.HmacSha256)
             );
             var refreshToken = _authService.GenerateRefreshToken();
-            _refreshTokenService.SaveRefreshToken(refreshToken);
+            _refreshTokenService.SaveRefreshToken(identity.Name,refreshToken);
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
                 new CookieOptions { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7), SameSite = SameSiteMode.None });
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -138,12 +139,10 @@ namespace PMAuth.Controllers
             var jwt = _authService.GenerateToken(identity.Claims);
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             var refreshToken = _authService.GenerateRefreshToken();
-            _refreshTokenService.SaveRefreshToken(refreshToken);
-            if (!_refreshTokenService.CheckRefreshToken(refreshToken)) ////
-                return BadRequest(ErrorModel.TokenErrorModel("Server don't have refresh token"));////
-            _logger.LogInformation(refreshToken);
+            _refreshTokenService.SaveRefreshToken(identity.Name,refreshToken);
+
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
-                new CookieOptions { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7), SameSite = SameSiteMode.None });
+                new CookieOptions { HttpOnly = true,Secure = true,Expires = DateTime.UtcNow.AddDays(7), SameSite = SameSiteMode.None });
             admin.Token = encodedJwt;
             return new JsonResult(admin);
         }
@@ -164,14 +163,13 @@ namespace PMAuth.Controllers
                 return BadRequest(ErrorModel.TokenErrorModel("Http request don't have refreshToken"));
             var principal = _authService.GetPrincipalFromExpiredToken(token);
             var username = principal.Identity.Name;
-            _logger.LogInformation(refreshToken);
-            if (!_refreshTokenService.CheckRefreshToken(refreshToken))
+            if (!_refreshTokenService.CheckRefreshToken(username,refreshToken))
                 return BadRequest(ErrorModel.TokenErrorModel("Server don't have refresh token"));
 
             var newJwtToken = _authService.GenerateToken(principal.Claims);
             var newRefreshToken = _authService.GenerateRefreshToken();
-            _refreshTokenService.DeleteRefreshToken(refreshToken);
-            _refreshTokenService.SaveRefreshToken(newRefreshToken);
+            _refreshTokenService.DeleteRefreshToken(username,refreshToken);
+            _refreshTokenService.SaveRefreshToken(username,newRefreshToken);
             Response.Cookies.Append("X-Refresh-Token", newRefreshToken,
                 new CookieOptions { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddDays(7), SameSite = SameSiteMode.None});
             return new JsonResult(new AuthModel(username, new JwtSecurityTokenHandler().WriteToken(newJwtToken)));

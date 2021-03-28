@@ -17,6 +17,7 @@ using PMAuth.Middleware;
 using PMAuth.AuthDbContext;
 using PMAuth.Services.Abstract;
 using PMAuth.Services.AuthAdmin;
+using PMAuth.Services.AuthAdmin.Interface;
 using PMAuth.Services.FacebookOAuth;
 using PMAuth.Services.GoogleOAuth;
 using PMAuth.Services.OAuthUniversal;
@@ -120,8 +121,8 @@ namespace PMAuth
             services.AddHttpClient();
             services.AddMemoryCache();
             
-            services.AddTransient<AuthService>();
-            services.AddTransient<RefreshTokenService>();
+            services.AddTransient<IAuthServise,AuthService>();
+            services.AddTransient<IRefreshTokenService,RefreshTokenService>();
 
             services.AddScoped<IUserProfileReceivingServiceContext, UserProfileReceivingServiceContext>();
             services.AddScoped<IAccessTokenReceivingService, GoogleAccessTokenReceivingService>();
