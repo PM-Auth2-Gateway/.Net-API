@@ -63,6 +63,15 @@ namespace PMAuth.Controllers
                 signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
                     SecurityAlgorithms.HmacSha256)
             );
+            var refreshToken = _authService.GenerateRefreshToken();
+            _refreshTokenService.SaveRefreshToken(refreshToken);
+            Response.Cookies.Append("X-Refresh-Token", refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
         /// <summary>
@@ -126,12 +135,13 @@ namespace PMAuth.Controllers
             var jwt = _authService.GenerateToken(identity.Claims);
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             var refreshToken = _authService.GenerateRefreshToken();
-            _refreshTokenService.SaveRefreshToken(identity.Name, refreshToken);
+            _refreshTokenService.SaveRefreshToken(refreshToken);
             Response.Cookies.Append("X-Refresh-Token", refreshToken,
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Lax
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
                 });
             admin.Token = encodedJwt;
             return new JsonResult(admin);
@@ -151,25 +161,26 @@ namespace PMAuth.Controllers
                 return BadRequest(ErrorModel.TokenErrorModel("Http request don't have refreshToken"));
             var principal = _authService.GetPrincipalFromExpiredToken(token);
             var username = principal.Identity.Name;
-            var savedRefreshToken = _refreshTokenService.GetRefreshToken(username); //retrieve the refresh token from a data store
-            if (savedRefreshToken != refreshToken)
+            var savedRefreshToken = _refreshTokenService.CheckRefreshToken(refreshToken); //retrieve the refresh token from a data store
+            if (!savedRefreshToken)
                 return BadRequest(ErrorModel.TokenErrorModel("Server don't have refresh token"));
 
             var newJwtToken = _authService.GenerateToken(principal.Claims);
             var newRefreshToken = _authService.GenerateRefreshToken();
-            _refreshTokenService.DeleteRefreshToken(username);
-            _refreshTokenService.SaveRefreshToken(username, newRefreshToken);
+            _refreshTokenService.DeleteRefreshToken(refreshToken);
+            _refreshTokenService.SaveRefreshToken(newRefreshToken);
             Response.Cookies.Append("X-Refresh-Token",refreshToken,
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Lax
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
                 });
             return new JsonResult(new AuthModel(username, new JwtSecurityTokenHandler().WriteToken(newJwtToken)));
         }
 
         /// <summary>
-        /// Get all applications foe logged in admin
+        /// Get all applications for logged in admin
         /// </summary>
         /// <returns>AppModel[] or error if refresh admin wasn't found</returns>
         [HttpGet]

@@ -120,7 +120,7 @@ namespace PMAuth
             services.AddMemoryCache();
             
             services.AddTransient<AuthService>();
-            services.AddSingleton<RefreshTokenService>();
+            services.AddTransient<RefreshTokenService>();
 
             services.AddScoped<IUserProfileReceivingServiceContext, UserProfileReceivingServiceContext>();
             services.AddScoped<IAccessTokenReceivingService, GoogleAccessTokenReceivingService>();
@@ -128,6 +128,7 @@ namespace PMAuth
 
             services.AddScoped<IProfileManagingService, GoogleProfileManager>();
             services.AddScoped<IProfileManagingService, FacebookProfileManager>();
+            services.AddHostedService<TimeRefreshTokenDeleteService>();
         }
 
         /// <summary>
