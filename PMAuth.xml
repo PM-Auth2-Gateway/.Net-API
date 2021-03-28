@@ -191,7 +191,7 @@
             Admin Api for access to setting application
             </summary>
         </member>
-        <member name="M:PMAuth.Controllers.AdminController.#ctor(PMAuth.AuthDbContext.BackOfficeContext,PMAuth.Services.AuthAdmin.AuthService,PMAuth.Services.AuthAdmin.RefreshTokenService,Microsoft.Extensions.Caching.Memory.IMemoryCache,Microsoft.Extensions.Logging.ILogger{PMAuth.Controllers.AdminController})">
+        <member name="M:PMAuth.Controllers.AdminController.#ctor(PMAuth.AuthDbContext.BackOfficeContext,PMAuth.Services.AuthAdmin.Interface.IAuthServise,PMAuth.Services.AuthAdmin.Interface.IRefreshTokenService,Microsoft.Extensions.Caching.Memory.IMemoryCache,Microsoft.Extensions.Logging.ILogger{PMAuth.Controllers.AdminController})">
             <inheritdoc />
         </member>
         <member name="M:PMAuth.Controllers.AdminController.GetTokenTest">
@@ -280,6 +280,15 @@
             <param name="appId">Id application</param>
             <param name="socialId">Id social</param>
             <param name="social">information of social setting</param>
+            <returns>SettingModel or error if admin,app,social id wasn't found</returns>
+        </member>
+        <member name="M:PMAuth.Controllers.AdminController.PostSocialSettingActive(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Post social active settings of application
+            </summary>
+            <param name="appId">Id application</param>
+            <param name="socialId">Id social</param>
+            <param name="isActive">information of social activity</param>
             <returns>SettingModel or error if admin,app,social id wasn't found</returns>
         </member>
         <member name="T:PMAuth.Controllers.ProfileController">
@@ -779,7 +788,12 @@
             Scope
             </summary>
         </member>
-        <member name="M:PMAuth.Models.SettingModel.#ctor(System.Int32,System.Int32,System.String,System.Int32,System.String,System.String,System.String,System.String)">
+        <member name="P:PMAuth.Models.SettingModel.IsActive">
+            <summary>
+            True if this social is active in application
+            </summary>
+        </member>
+        <member name="M:PMAuth.Models.SettingModel.#ctor(System.Int32,System.Int32,System.String,System.Int32,System.String,System.String,System.String,System.String,System.Boolean)">
             <summary>
             Constructor
             </summary>
@@ -827,7 +841,17 @@
             True if this social have setting for application
             </summary>
         </member>
-        <member name="M:PMAuth.Models.SocialModelResponse.#ctor(System.Int32,System.String,System.Boolean)">
+        <member name="P:PMAuth.Models.SocialModelResponse.IsActive">
+            <summary>
+            True if this social is active in application
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.SocialModelResponse.LogoPath">
+            <summary>
+            Path where stored a logo
+            </summary>
+        </member>
+        <member name="M:PMAuth.Models.SocialModelResponse.#ctor(System.Int32,System.String,System.Boolean,System.Boolean,System.String)">
             <summary>
             Constructor
             </summary>

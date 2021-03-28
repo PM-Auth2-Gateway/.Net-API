@@ -17,6 +17,7 @@ using PMAuth.Middleware;
 using PMAuth.AuthDbContext;
 using PMAuth.Services.Abstract;
 using PMAuth.Services.AuthAdmin;
+using PMAuth.Services.AuthAdmin.Interface;
 using PMAuth.Services.FacebookOAuth;
 using PMAuth.Services.GoogleOAuth;
 using PMAuth.Services.OAuthUniversal;
@@ -48,6 +49,10 @@ namespace PMAuth
         /// <param name="services">IServiceCollection</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication("RegisteredAppAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, RegisteredApplicationAuthenticationSchemaHandler>(
+                    "RegisteredAppAuthentication", null);
+
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -66,10 +71,7 @@ namespace PMAuth
                         IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
                         ValidateIssuerSigningKey = true,
                     };
-                })
-                .AddScheme<AuthenticationSchemeOptions, 
-                    RegisteredApplicationAuthenticationSchemaHandler>("RegisteredAppAuthentication", null);;
-                
+                });
             services.AddCors();
             services.AddHealthChecks();
             services.AddControllers();
@@ -119,8 +121,8 @@ namespace PMAuth
             services.AddHttpClient();
             services.AddMemoryCache();
             
-            services.AddTransient<AuthService>();
-            services.AddTransient<RefreshTokenService>();
+            services.AddTransient<IAuthServise,AuthService>();
+            services.AddTransient<IRefreshTokenService,RefreshTokenService>();
 
             services.AddScoped<IUserProfileReceivingServiceContext, UserProfileReceivingServiceContext>();
             services.AddScoped<IAccessTokenReceivingService, GoogleAccessTokenReceivingService>();
@@ -145,9 +147,9 @@ namespace PMAuth
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PMAuth v1"));
             }
 
-            app.UseCors(builder => builder.AllowAnyOrigin()
+            app.UseCors(builder => builder.SetIsOriginAllowed(_ => true)
                                 .AllowAnyMethod()
-                                .AllowAnyHeader());
+                                .AllowAnyHeader().AllowCredentials());
 
             app.UseMiddleware<LogMiddleware>();
             app.UseRouting();
