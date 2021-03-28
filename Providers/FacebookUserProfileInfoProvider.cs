@@ -19,7 +19,12 @@ namespace PMAuth.Providers
         /// <returns>UserProfile</returns>
         public static UserProfile Provider(FacebookInfoModel facebookInfo)
         {
-                return new UserProfile()
+            if(facebookInfo == null)
+            {
+                return null;
+            }
+
+            return new UserProfile()
             {
                 Id = facebookInfo.Id,
                 FirstName = facebookInfo.FirstName,
