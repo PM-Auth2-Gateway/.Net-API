@@ -7,14 +7,12 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
 WORKDIR /src
-COPY ["PMAuth.csproj", "."]
-RUN dotnet restore "./PMAuth.csproj"
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "PMAuth.csproj" -c Release -o /app/build
+RUN dotnet restore "src/PMAuth.csproj"
+RUN dotnet build "src/PMAuth.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "PMAuth.csproj" -c Release -o /app/publish
+RUN dotnet publish "src/PMAuth.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
