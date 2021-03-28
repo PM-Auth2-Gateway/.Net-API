@@ -358,6 +358,7 @@
             14 - Error occured during authorization <br/>
             16 - Invalid id <br/>
             18 - Token error <br/>
+            20 - Unauthorized access <br/>
             </summary>
         </member>
         <member name="P:PMAuth.Exceptions.Models.ErrorModel.Error">

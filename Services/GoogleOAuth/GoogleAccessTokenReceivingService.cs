@@ -80,17 +80,17 @@ namespace PMAuth.Services.GoogleOAuth
             }
             
             // if you need this code, think about moving it to another class
-            string tokenUri = _context.Socials.FirstOrDefault(s => s.Id == sessionInformation.SocialId)?.TokenUrl; //"https://oauth2.googleapis.com/token"; 
+            string tokenUri = _context.Socials.FirstOrDefault(s => s.Id == sessionInformation.SocialId)?.TokenUrl;
             string code = authorizationCodeModel.AuthorizationCode;
-            string redirectUri = sessionInformation.RedirectUri; // "https://localhost:5001/auth/google";
-            /*string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId && 
+            string redirectUri = sessionInformation.RedirectUri; 
+
+            string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId &&
                                                                s.SocialId == sessionInformation.SocialId)
-                                                               ?.ClientId;*/
-            string clientId = "532364683542-3hg1fdiptik9lhbj22o72rrnsb9eqtvi.apps.googleusercontent.com";
-            /*string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId &&
+                                                               ?.ClientId;
+
+            string clientSecret = _context.Settings.FirstOrDefault(s => s.AppId == appId &&
                                                                 s.SocialId == sessionInformation.SocialId)
-                                                                ?.SecretKey;*/
-            string clientSecret = "zwqbWaKdRhyyQf6scdJWTiod";
+                                                                ?.SecretKey;
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             {
