@@ -505,9 +505,49 @@
             User registered Email.
             </summary>
         </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.Pricture">
+            <summary>
+            Picture profile of user
+            </summary>
+        </member>
         <member name="P:PMAuth.Models.OAuthFacebook.FacebookInfoModel.AdditionalInformation">
             <summary>
             Key-value pairs ("paramName": "value") of additional information about user.
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthFacebook.FacebookPicture.FacebookProfilePicture">
+            <summary>
+            Facebook user's profile picture
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookPicture.FacebookProfilePicture.Data">
+            <summary>
+            Picture data
+            </summary>
+        </member>
+        <member name="T:PMAuth.Models.OAuthFacebook.FacebookPicture.FacebookProfilePictureData">
+            <summary>
+            Facebook user's profile picture data
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookPicture.FacebookProfilePictureData.Height">
+            <summary>
+            Picture height
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookPicture.FacebookProfilePictureData.IsSilhouette">
+            <summary>
+            Picture is silhouette
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookPicture.FacebookProfilePictureData.Url">
+            <summary>
+            Picture url
+            </summary>
+        </member>
+        <member name="P:PMAuth.Models.OAuthFacebook.FacebookPicture.FacebookProfilePictureData.Width">
+            <summary>
+            Picture width
             </summary>
         </member>
         <member name="T:PMAuth.Models.OAuthFacebook.FacebookProperties">
@@ -899,6 +939,18 @@
             </summary>
             <param name="args">string[] args</param>
             <returns>IHostBuilder</returns>
+        </member>
+        <member name="T:PMAuth.Providers.FacebookUserProfileInfoProvider">
+            <summary>
+            Provider from FacebookInfoModel to UserProfile
+            </summary>
+        </member>
+        <member name="M:PMAuth.Providers.FacebookUserProfileInfoProvider.Provider(PMAuth.Models.OAuthFacebook.FacebookInfoModel)">
+            <summary>
+            Mapps UserProfile fields
+            </summary>
+            <param name="facebookInfo">FacebookInfoModel</param>
+            <returns>UserProfile</returns>
         </member>
         <member name="M:PMAuth.Services.Abstract.IAccessTokenReceivingService.ExchangeAuthorizationCodeForTokens(System.Int32,PMAuth.Models.OAuthUniversal.RedirectPart.AuthorizationCodeModel)">
             <summary>

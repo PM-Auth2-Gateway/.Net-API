@@ -14,6 +14,7 @@ using PMAuth.Models.OAuthFacebook;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
 using PMAuth.Services.Abstract;
+#pragma warning disable CS1591
 
 namespace PMAuth.Services.FacebookOAuth
 {
@@ -32,17 +33,15 @@ namespace PMAuth.Services.FacebookOAuth
 
         private readonly HttpClient _httpClient;
 
-
-#pragma warning disable CS1591
         public FacebookAccessTokenReceivingService(
             IHttpClientFactory httpClientFactory, 
             BackOfficeContext context,
-            IMemoryCache memoryCache
-            /*ILogger<FacebookAccessTokenReceivingService> logger*/) 
+            IMemoryCache memoryCache,
+            ILogger<FacebookAccessTokenReceivingService> logger) 
         {
             _context = context;
             _memoryCache = memoryCache;
-            //_logger = logger;
+            _logger = logger;
             _httpClient = httpClientFactory.CreateClient();
         }
 
