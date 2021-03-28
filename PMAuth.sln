@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PMAuth", "PMAuth.csproj", "{3413B135-E885-474B-855D-3FD68471F8BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PMAuth", "src\PMAuth.csproj", "{53A8F924-8C3C-45B3-80E5-DE9A9095A8AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMAuth.Tests", "PMAuth.Tests\PMAuth.Tests.csproj", "{8432BC75-90D0-4444-9F2B-78CBDDCCAA55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMAuth.Tests", "Tests\PMAuth.Tests\PMAuth.Tests.csproj", "{5818FAEB-ACDA-4C74-AA85-04A26EB58B96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3413B135-E885-474B-855D-3FD68471F8BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3413B135-E885-474B-855D-3FD68471F8BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3413B135-E885-474B-855D-3FD68471F8BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3413B135-E885-474B-855D-3FD68471F8BA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8432BC75-90D0-4444-9F2B-78CBDDCCAA55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8432BC75-90D0-4444-9F2B-78CBDDCCAA55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8432BC75-90D0-4444-9F2B-78CBDDCCAA55}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8432BC75-90D0-4444-9F2B-78CBDDCCAA55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53A8F924-8C3C-45B3-80E5-DE9A9095A8AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53A8F924-8C3C-45B3-80E5-DE9A9095A8AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53A8F924-8C3C-45B3-80E5-DE9A9095A8AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53A8F924-8C3C-45B3-80E5-DE9A9095A8AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5818FAEB-ACDA-4C74-AA85-04A26EB58B96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5818FAEB-ACDA-4C74-AA85-04A26EB58B96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5818FAEB-ACDA-4C74-AA85-04A26EB58B96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5818FAEB-ACDA-4C74-AA85-04A26EB58B96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
