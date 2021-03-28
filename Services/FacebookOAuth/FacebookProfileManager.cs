@@ -62,7 +62,7 @@ namespace PMAuth.Services.FacebookOAuth
             string fields = ReformScopeToFields.Transform(tokensModel.Scope);
             
             string url = facebookProperties.GetProfileLink + tokensModel.AccessToken +
-                    "&fields=first_name,last_name,name,gender,location" + fields;
+                    "&fields=first_name,last_name,name,gender,location,picture" + fields;
 
             var response = await _httpClient.GetAsync(url);
 

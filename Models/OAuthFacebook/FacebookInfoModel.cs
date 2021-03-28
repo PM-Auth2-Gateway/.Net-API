@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PMAuth.Models.OAuthFacebook.FacebookPicture;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -40,6 +41,12 @@ namespace PMAuth.Models.OAuthFacebook
         /// </summary>
         [JsonPropertyName("email")]
         public string Email { get; set; }
+
+        /// <summary>
+        /// Picture profile of user
+        /// </summary>
+        [JsonPropertyName("picture")]
+        public FacebookProfilePicture Pricture { get; set; }
 
         /// <summary>
         /// Key-value pairs ("paramName": "value") of additional information about user.
