@@ -95,6 +95,11 @@
             Handle Refresh Token Value
             </summary>
         </member>
+        <member name="P:PMAuth.AuthDbContext.Entities.RefreshToken.UserId">
+            <summary>
+            User that recieve a token
+            </summary>
+        </member>
         <member name="P:PMAuth.AuthDbContext.Entities.RefreshToken.ExpiresTime">
             <summary>
             Expires time of refresh token.
