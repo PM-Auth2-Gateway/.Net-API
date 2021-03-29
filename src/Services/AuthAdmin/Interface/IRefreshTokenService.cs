@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace PMAuth.Services.AuthAdmin.Interface
+﻿namespace PMAuth.Services.AuthAdmin.Interface
 {
     public interface IRefreshTokenService
     {
