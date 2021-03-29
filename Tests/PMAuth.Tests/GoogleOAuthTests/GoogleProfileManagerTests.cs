@@ -66,7 +66,6 @@ namespace PMAuth.Tests.GoogleOAuthTests
             expectedUserProfile.Should().BeEquivalentTo(actualUserProfile);
         }
 
-
         [Fact]
         public async Task GetUserProfile_NullTokenModelValidSessionId_UserProfileInMemoryCacheIsEmpty()
         {
@@ -131,7 +130,5 @@ namespace PMAuth.Tests.GoogleOAuthTests
             actualUserProfile.Should().BeNull();
             userProfileForValidSession.Should().BeNull();
         }
-
     }
-
 }
