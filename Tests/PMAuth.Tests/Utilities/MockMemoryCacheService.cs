@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
-namespace PMAuth.Tests
+namespace PMAuth.Tests.Utilities
 {
     public static class MockMemoryCacheService
     {

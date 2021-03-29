@@ -5,6 +5,7 @@ using PMAuth.Services.GoogleOAuth;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
+using PMAuth.Tests.Utilities;
 
 namespace PMAuth.Tests.GoogleOAuthTests
 {
@@ -64,7 +65,6 @@ namespace PMAuth.Tests.GoogleOAuthTests
             //assert
             expectedUserProfile.Should().BeEquivalentTo(actualUserProfile);
         }
-
 
         [Fact]
         public async Task GetUserProfile_NullTokenModelValidSessionId_UserProfileInMemoryCacheIsEmpty()
@@ -130,7 +130,5 @@ namespace PMAuth.Tests.GoogleOAuthTests
             actualUserProfile.Should().BeNull();
             userProfileForValidSession.Should().BeNull();
         }
-
     }
-
 }
