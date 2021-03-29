@@ -125,6 +125,7 @@ namespace PMAuth
             services.AddTransient<IRefreshTokenService,RefreshTokenService>();
 
             services.AddScoped<IUserProfileReceivingServiceContext, UserProfileReceivingServiceContext>();
+            services.AddScoped<IExchangeCodeForTokenService, ExchangeCodeForTokenService>();
             services.AddScoped<IAccessTokenReceivingService, GoogleAccessTokenReceivingService>();
             services.AddScoped<IAccessTokenReceivingService, FacebookAccessTokenReceivingService>();
 
