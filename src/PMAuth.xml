@@ -364,26 +364,6 @@
             Get SocialLinkModel from app_id header and social_id value.
             </remarks>
         </member>
-        <member name="T:PMAuth.Controllers.WeatherForecastController">
-            <summary>
-            Eto nam ne nado, prosto testoviy endpoint
-            </summary>
-        </member>
-        <member name="M:PMAuth.Controllers.WeatherForecastController.#ctor(Microsoft.Extensions.Logging.ILogger{PMAuth.Controllers.WeatherForecastController})">
-            <summary>
-            WeatherForecastController constructor
-            </summary>
-            <param name="logger"></param>
-        </member>
-        <member name="M:PMAuth.Controllers.WeatherForecastController.Get">
-            <summary>
-            Daje ne otkrivai
-            </summary>
-            <returns>IEnumerable WeatherForecast</returns>
-            <remarks>
-            Ny i zachem ti syda zawel???
-            </remarks>
-        </member>
         <member name="T:PMAuth.Exceptions.Models.ErrorModel">
             <summary>
             Error model that will be returned if something will go wrong after user redirection to social network service 
@@ -1088,31 +1068,6 @@
             </summary>
             <param name="app">IApplicationBuilder</param>
             <param name="env">IWebHostEnvironment</param>
-        </member>
-        <member name="T:PMAuth.WeatherForecast">
-            <summary>
-            Vse ewe ne ponimau za4em ti eto smotriw ...
-            </summary>
-        </member>
-        <member name="P:PMAuth.WeatherForecast.Date">
-            <summary>
-            Date
-            </summary>
-        </member>
-        <member name="P:PMAuth.WeatherForecast.TemperatureC">
-            <summary>
-            TemperatureC
-            </summary>
-        </member>
-        <member name="P:PMAuth.WeatherForecast.TemperatureF">
-            <summary>
-            TemperatureF
-            </summary>
-        </member>
-        <member name="P:PMAuth.WeatherForecast.Summary">
-            <summary>
-            Summary
-            </summary>
         </member>
     </members>
 </doc>

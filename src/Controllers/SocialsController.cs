@@ -88,6 +88,11 @@ namespace PMAuth.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         public ActionResult<SocialLinkModel> GetLinkParameters([FromHeader] int App_id, [FromBody] SocialModel socialModel)
         {
+            if (string.IsNullOrEmpty(socialModel.Device))
+            {
+                return BadRequest("Field 'device' shouldn't be empty");
+            }
+            
             Setting setting = context.Settings
                 .FirstOrDefault(x => x.AppId == App_id && x.SocialId == socialModel.SocialId && x.IsActive);
 
