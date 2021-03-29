@@ -9,6 +9,10 @@ namespace PMAuth.Extensions
     {
         public static Uri AddQuery(this Uri uri, string name, string value)
         {
+            if (name == null || value == null)
+            {
+                return uri;
+            }
             NameValueCollection httpValueCollection = HttpUtility.ParseQueryString(uri.Query);
 
             httpValueCollection.Remove(name);

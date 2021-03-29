@@ -5,6 +5,7 @@ using PMAuth.Services.GoogleOAuth;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
+using PMAuth.Tests.Utilities;
 
 namespace PMAuth.Tests.GoogleOAuthTests
 {
