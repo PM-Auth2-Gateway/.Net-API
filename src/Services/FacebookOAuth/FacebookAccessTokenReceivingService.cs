@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
-using PMAuth.AuthDbContext.Entities;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
-using PMAuth.Extensions;
 using PMAuth.Models.OAuthFacebook;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;

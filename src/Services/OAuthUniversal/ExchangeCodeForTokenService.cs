@@ -1,16 +1,14 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
-using PMAuth.AuthDbContext;
+﻿using Microsoft.Extensions.Logging;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
 using PMAuth.Extensions;
 using PMAuth.Services.Abstract;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+#pragma warning disable 1591
 
 namespace PMAuth.Services.OAuthUniversal
 {

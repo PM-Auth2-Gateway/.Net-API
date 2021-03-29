@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using PMAuth.AuthDbContext;
 using PMAuth.Exceptions;
 using PMAuth.Exceptions.Models;
-using PMAuth.Extensions;
 using PMAuth.Models.OAuthGoogle;
 using PMAuth.Models.OAuthUniversal;
 using PMAuth.Models.OAuthUniversal.RedirectPart;
@@ -56,7 +54,7 @@ namespace PMAuth.Services.GoogleOAuth
             }
 
             string code = authorizationCodeModel.AuthorizationCode;
-
+            
             string redirectUri = sessionInformation.RedirectUri;
 
             string clientId = _context.Settings.FirstOrDefault(s => s.AppId == appId &&

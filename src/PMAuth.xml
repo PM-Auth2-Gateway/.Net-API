@@ -1060,11 +1060,6 @@
             <param name="cancellationToken">CancellationToken</param>
             <returns>Task</returns>
         </member>
-        <member name="T:PMAuth.Services.OAuthUniversal.AccessTokenReceivingService">
-            <summary>
-            Service that operates Facebook Access token
-            </summary>
-        </member>
         <member name="T:PMAuth.Startup">
             <summary>
             Startup
